@@ -231,3 +231,12 @@ test("/status lists multiple repos under the cwd", async () => {
 	assert.match(result.text, /r1/);
 	assert.match(result.text, /r2/);
 });
+
+test("/undo on a clean tree reports nothing to stash", async () => {
+	const repo = makeRepo();
+	const { commands } = await mount(repo);
+	const undo = commands.find((c) => c.name === "undo");
+	const result = await undo.handler({ rawInput: "", agent: agentFor(repo), signal: signal() });
+	assert.equal(result.kind, "success");
+	assert.match(result.text, /Nothing to stash/);
+});
