@@ -51,6 +51,7 @@ dsh plugin --profile <name> add /path/to/dsh-git-plugin
 | `stderrMaxBytes` | `65536` | 单次 git 调用 stderr 的上限字节数 |
 | `graceMs` | `3000` | 子进程终止前的宽限毫秒数 |
 | `timeoutMs` | `30000` | 工具调用的协作超时毫秒数 |
+| `preCommit` | `[]` | 提交前要运行的 argv 命令（如 `["npm","test"]`）；非零退出则中止 `/commit` |
 
 ## 提交规范
 
@@ -69,11 +70,26 @@ feat / fix / docs / chore / style / refactor / test / perf
 - 分支命名：`feat/xxx`、`fix/xxx`、`docs/xxx`、`chore/xxx`。
 - 提交消息：`<类型>(<可选作用域>): <中文主体>`。
 
-本地语法校验：
+本地校验与测试：
 
 ```bash
-node --check lib/index.js
+npm install
+npm run check   # 语法校验
+npm test        # 单元 + 真实 git 集成测试
 ```
+
+集成测试会在临时目录里真正 `git init` / `commit` / `stash`，验证 `/commit`、`/undo`、`/branch` 与只读工具端到端可用。
+
+## Hook 与 CI
+
+- **插件 pre-commit 钩子**：通过 `config.preCommit` 配置一个 argv 命令，`/commit` 会在 `git add` 前运行它，失败即中止提交。
+- **仓库 `commit-msg` 钩子**：`.githooks/commit-msg` 强制 MAA 提交格式。启用：
+
+  ```bash
+  git config core.hooksPath .githooks
+  ```
+
+- **CI**：`.github/workflows/ci.yml` 在 push / PR 时跑 `npm ci`、`node --check` 和 `node --test`。
 
 ## License
 
