@@ -1,5 +1,9 @@
 # dsh-git-plugin
 
+[![npm version](https://img.shields.io/npm/v/dsh-git-plugin)](https://www.npmjs.com/package/dsh-git-plugin)
+[![npm downloads](https://img.shields.io/npm/dm/dsh-git-plugin)](https://www.npmjs.com/package/dsh-git-plugin)
+[![License](https://img.shields.io/npm/l/dsh-git-plugin)](https://github.com/MashedPotato817/dsh-git-plugin)
+
 给 DeepSeek Harness（DSH）的 Git 工作流插件：补齐 DSH 相比 Claude Code / Codex 缺失的「程序员手感」——diff 感知、自动分支、规范提交、可恢复撤销。全部通过 `ctx.subprocess` seam 以纯 argv 调用 `git`，不经过 shell 层，每次运行都受字节与超时上限约束。
 
 ## 能力
