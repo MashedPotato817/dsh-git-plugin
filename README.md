@@ -31,20 +31,34 @@
 
 ## 安装
 
-> 尚未发布到 npm registry，当前按本地包安装。发布后可直接 `dsh plugin --profile <name> add dsh-git-plugin`。
+已发布到 npm（`dsh-git-plugin@0.1.0`），一条命令安装：
 
 ```bash
-# 1) 本地安装到某个 profile
-dsh plugin --profile <name> add /path/to/dsh-git-plugin
-
-# 2) 在 profile 配置里声明插件
+dsh plugin --profile <name> add dsh-git-plugin
 ```
 
+本地 / 源码开发时也可用路径安装：
+
+```bash
+dsh plugin --profile <name> add /path/to/dsh-git-plugin
+```
+
+安装后，在 profile 的 `cordis.patch.yml` 里用 `insert` 声明启用：
+
 ```yaml
-- name: dsh-git-plugin
-  config:
-    maxBytes: 1048576
-    timeoutMs: 30000
+- insert:
+    - id: dsh-git-plugin
+      name: dsh-git-plugin
+```
+
+需要配置时加上 `config`：
+
+```yaml
+- insert:
+    - id: dsh-git-plugin
+      name: dsh-git-plugin
+      config:
+        preCommit: [npm, test]
 ```
 
 ## 配置
