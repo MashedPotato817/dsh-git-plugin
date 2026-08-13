@@ -193,3 +193,41 @@ test("git tools fail clearly outside a git repository", async () => {
 		/not a git repository/
 	);
 });
+
+function initRepoAt(dir) {
+	runSync(["git", "init", "-b", "main"], dir);
+	runSync(["git", "config", "user.email", "test@example.com"], dir);
+	runSync(["git", "config", "user.name", "Test"], dir);
+}
+
+test("/status auto-resolves a single git repo under the cwd", async () => {
+	const parent = fs.mkdtempSync(path.join(os.tmpdir(), "dsh-parent-"));
+	const repo = path.join(parent, "proj");
+	fs.mkdirSync(repo);
+	initRepoAt(repo);
+	fs.writeFileSync(path.join(repo, "a.txt"), "hello\n");
+	runSync(["git", "add", "-A"], repo);
+	runSync(["git", "commit", "-m", "chore: init"], repo);
+
+	const { commands } = await mount(parent);
+	const status = commands.find((c) => c.name === "status");
+	const result = await status.handler({ rawInput: "", agent: agentFor(parent), signal: signal() });
+	assert.equal(result.kind, "success");
+	assert.match(result.text, /main/);
+});
+
+test("/status lists multiple repos under the cwd", async () => {
+	const parent = fs.mkdtempSync(path.join(os.tmpdir(), "dsh-parent-"));
+	for (const name of ["r1", "r2"]) {
+		const repo = path.join(parent, name);
+		fs.mkdirSync(repo);
+		initRepoAt(repo);
+	}
+	const { commands } = await mount(parent);
+	const status = commands.find((c) => c.name === "status");
+	const result = await status.handler({ rawInput: "", agent: agentFor(parent), signal: signal() });
+	assert.equal(result.kind, "error");
+	assert.match(result.text, /multiple git repositories/);
+	assert.match(result.text, /r1/);
+	assert.match(result.text, /r2/);
+});

@@ -25,6 +25,10 @@
 
 插件还会注入一段 system-prompt 指引，让模型主动用 git 工具查看状态、并遵循仓库的提交与分支规范。
 
+### 仓库发现
+
+当会话工作目录不是 git 仓库时，插件会：若其**直接子目录**里只有一个 git 仓库，自动使用它；有多个则列出让用户选择；一个都没有才报 `not a git repository`。这让它能在「项目集合」式的工作区根目录下正常工作。
+
 ## 安装
 
 > 尚未发布到 npm registry，当前按本地包安装。发布后可直接 `dsh plugin --profile <name> add dsh-git-plugin`。
