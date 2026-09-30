@@ -222,6 +222,12 @@ GitHub 与 npm 两个远端安装渠道（发布前无法实测）。
 
 - **CI**：`.github/workflows/ci.yml` 在 push / PR 时跑 `npm ci`、构建、`lib/` 新鲜度检查（`git diff --exit-code lib`）、类型检查、`node --check lib/index.js` 和 `node --test`（Node 20 / 22）。
 
+## 参与贡献
+
+缺陷、功能建议与 DSH 兼容性反馈可通过 [Issues](https://github.com/MashedPotato817/dsh-git-plugin/issues) 提交。
+开发环境、及时本地提交、验证与审查要求见 [CONTRIBUTING.md](CONTRIBUTING.md)，PR 使用仓库模板。
+Issue / PR 模板进入默认分支后生效。
+
 ## License
 
 MIT

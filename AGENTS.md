@@ -18,7 +18,7 @@
   - `packages/subprocess/subprocess`、`packages/core/agent`、`packages/core/session`。
   - `docs/cordis-primer.zh.md`、`docs/cordis-tutorial/01-first-plugin.zh.md`、`docs/cookbook/extension-cookbook.zh.md`。
   - `apps/web/tests/plugin-*.e2e.ts`：插件安装、配置与管理测试。
-- 本仓库：`README.md`、`CHANGELOG.md`、`docs/maintenance-plan.md`、`test/`、`scripts/verify-real-dsh.mjs`、`.github/workflows/ci.yml`。
+- 本仓库：`CONTRIBUTING.md`、`README.md`、`CHANGELOG.md`、`docs/maintenance-plan.md`、`test/`、`scripts/verify-real-dsh.mjs`、`.github/workflows/ci.yml`。
 - 在线来源：[DSH Releases](https://github.com/deepseek-ai/deepseek-harness/releases)、npm 注册表、本插件 [Issues](https://github.com/MashedPotato817/dsh-git-plugin/issues) 与 [PR](https://github.com/MashedPotato817/dsh-git-plugin/pulls)。逐包核对精确版本与 dist-tags，不盲用 `@latest`。
 
 ## 工作与验证
@@ -52,3 +52,8 @@
 - 用 git status --porcelain 确认本任务没有遗漏。原本干净且无其他任务改动时，收尾工作区应干净；有用户或其他任务的改动时保留并说明，不为清空状态而删除、重置、stash 或顺带提交。
 - 构建产物与源码同批提交；不同目的的修复与流程规则分别提交。不自动 amend 已有提交。提交后需要产物门的任务，验证完成后及时提交报告。
 - 尚未完成但需要保存进度时可以做明确标注未完成的本地 checkpoint commit，不宣称测试或任务通过。commit 失败先排查并修复；凭据、缓存、临时测试数据不纳入提交。
+
+## 社区协作入口
+
+- 贡献指南见 CONTRIBUTING.md；Issue 表单在 .github/ISSUE_TEMPLATE，PR 使用 .github/pull_request_template.md。报告必须区分本地、真实宿主、模型会话与当前 SHA 的 CI 证据。
+- 大任务先明确 Issue 范围与验收条件，拆阶段提交；维护者负责分流、审查与合并/发布。模板需进入默认分支后生效，不宣称标签、分支保护或远端设置已经启用。
