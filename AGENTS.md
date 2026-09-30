@@ -5,9 +5,9 @@
 - 主工作目录：`C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`；先确认所在 checkout，避免把改动写到另一 worktree。
 - 适配已提交：`8181856`，包含严格 TypeScript 迁移、DSH 0.2.0-rc.2 适配、Git 参数安全/超时/钩子目录修复、测试与文档。
 - 源码为 `src/index.ts`；`npm run build` 生成 `lib/index.js`、`lib/index.d.ts`，构建产物随 Git 提交并用于 npm 安装。保持 ESM 与现有命令/工具行为。
-- 当前包版本仍为 `0.1.0`，变更位于 CHANGELOG 的 Unreleased；尚未推送、打 tag 或发布兼容版本。
+- 当前包版本（本地）为 `0.2.0`：发布准备分支 `feat/release-0.2.0`（从 `2f80cb3` 创建）上已提升 `package.json` / `package-lock.json`，`CHANGELOG` 的 `[Unreleased]` 内容已整理进 `## [0.2.0] - 待发布`；发布候选已按授权在该分支提交（SHA 以 Git 历史为准），**未推送、未打 tag、未发布**，npm 上仍是 `0.1.0`（只有 `latest`，无 `next`）。
 - 已验证：严格类型检查、26 项测试、构建产物一致性。仅 DSH `0.2.0-rc.2` 有适配验证记录；服务栈/profile 验证不等于真实模型会话验证。
-- Linux、GitHub Actions Node 20/22、GitHub 安装及其他 DSH 版本仍需验证。依赖允许范围不等于实测范围；旧版本与在线状态需重新查询。
+- Linux、GitHub Actions Node 20/22、GitHub 安装、运行中 DSH 会话里的模型调用、以及 `0.2.x` 中除 `0.2.0-rc.2` 之外的版本均仍**待验证**。依赖允许范围不等于实测范围；旧版本与在线状态需重新查询（2026-10-01 复核：最新 DSH Release 仍是 `dsh-v0.2.0-rc.2`，无新增版本）。
 
 ## 必看参考
 
@@ -36,5 +36,5 @@
 - P3：再考虑 stage/commit/branch/stash 等写操作，核对 DSH 权限与审批及恢复方式。
 - 版本文件、CHANGELOG、源码、编译配置、测试和 `lib/` 一起纳入发布提交；确保 tag、Release、npm gitHead 与包内产物对应同一提交。
 - 同一版本只 `npm publish --tag next` 一次；验证通过后用 `npm dist-tag add dsh-git-plugin@<版本> latest` 推广。需要修改已发布内容时提升版本。
-- `AGENTS.md` 作为项目指引纳入版本控制，但不加入 npm files；`.agent-teams/`、缓存和独立测试目录保持忽略。
+- `AGENTS.md` 作为项目指引纳入版本控制，但不加入 npm files（发布包只含 `files = ["lib", "README.md", "LICENSE"]`，因此 `AGENTS.md`、`docs/`、`.agent-teams/` 都不会进入 tarball）；`.agent-teams/`、缓存和独立测试目录保持忽略。
 - 提交、合并、推送、打 tag、发布及社区消息分别需要用户授权；已有授权直接执行，不重复询问。结束报告修改文件、原因、验证结果、未验证项与下一条 Git 命令。

@@ -26,7 +26,8 @@
 注意 4 个子包（`dsh-commands`、`dsh-tools`、`dsh-subprocess`、`dsh-system-prompt`）的 **`latest` 标签仍停在 `0.0.1-rc.1`**，安装与开发请使用 `next` 或精确版本 `0.2.0-rc.2`，不要用 `@latest`。
 
 > **当前 npm 上的 `0.1.0` 面向 DSH 0.1.x**，在 0.2.0-rc.2 上会被判为不兼容而无法加载。
-> 面向 0.2.0-rc.2 的版本尚未发布（见 [CHANGELOG.md](CHANGELOG.md) 的 Unreleased）。
+> 面向 0.2.0-rc.2 的版本已整理为本地 `0.2.0` 发布候选（`package.json` 已提升，见 [CHANGELOG.md](CHANGELOG.md) 的 `[0.2.0]`），
+> 但**尚未推送、未打 tag、未发布**。
 
 ## 能力
 
@@ -59,7 +60,9 @@
 
 ## 安装
 
-> 针对 DSH 0.2.0-rc.2 的修复已在本地提交（`8181856`），**尚未推送或发布**：远端 `main` 与 npm 上的 `0.1.0` 仍是旧代码。
+> 针对 DSH 0.2.0-rc.2 的修复已提交到本地分支（`fix/git-show-option-injection` 的 `8181856`、`2f80cb3`），
+> 版本随之在本地提升为 `0.2.0`（发布准备分支 `feat/release-0.2.0`），但**尚未推送、未打 tag、未发布**：
+> 远端 `main` 与 npm 上的 `0.1.0` 仍是旧代码。
 > 在兼容版本推送之前，请使用下面的「本地 / 源码安装」。
 
 ### 本地 / 源码安装（推送前推荐）
@@ -169,13 +172,16 @@ npm test        # node --test（单元 + 真实 git 集成测试）
 
 ## 验证
 
-| 层次 | 命令 / 方式 | 本轮结果（DSH 0.2.0-rc.2） |
+| 层次 | 命令 / 方式 | 本轮结果（本地发布候选 `0.2.0`，未推送 / 未发布） |
 |---|---|---|
 | 类型与语法 | `npm run build`、`npm run check` | 0 错误；两次构建产物哈希一致 |
 | 单元（模拟 subprocess seam） | `node test/smoke.test.js` | 10 通过 |
 | 集成（临时目录真实 `git init`/`commit`/`stash`） | `node test/integration.test.js` | 16 通过 |
 | 全部测试（与 CI 同一条命令） | `npm test` | 26 通过 / 0 失败 |
 | 打包内容 | `npm pack --dry-run` | 仅 `lib/`、README、LICENSE、package.json |
+
+以上结果均来自本地工作区（分支 `feat/release-0.2.0`）：**本地已完成**，但尚未推送、未打 tag、未发布到 npm
+（npm 上仍是 `0.1.0`）。
 
 ### 真实 DSH 服务栈验证（按需运行，不纳入 `npm test` / CI）
 

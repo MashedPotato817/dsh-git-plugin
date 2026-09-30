@@ -2,21 +2,24 @@
 
 本轮工作按「审查 → 适配 → 验证 → 交付」推进，本文记录证据、结论、剩余问题与后续安排。
 2026-10-01 状态更新：适配已按授权在本地提交为 `8181856`；推送、合并、打 tag、发布 npm / GitHub Release、社区回复均未执行，后续分别等待授权。第 2 节保留当时采集的版本证据，执行新任务前需刷新在线信息。
+2026-10-01 发布准备更新：0.2.0 发布准备在 `feat/release-0.2.0` 上进行，包版本已在本地提升到 `0.2.0`，`CHANGELOG` 的 `[Unreleased]` 已整理进 `## [0.2.0] - 待发布`；发布候选按授权提交到该分支，候选 SHA 以 Git 历史为准；未推送、未打 tag、未发布。
 
 ## 1. 当前状态
 
 | 项目 | 状态 |
 |---|---|
-| 仓库 | `MashedPotato817/dsh-git-plugin`，默认分支 `main`，最新提交 `3bbb253 docs: README 增加 npm 徽章` |
-| 工作分支 | `fix/git-show-option-injection`（适配提交 `8181856`，尚未合并或推送） |
-| npm | `dsh-git-plugin@0.1.0`，2026-08-13T16:31:32Z 发布，`gitHead b9cfbd9` |
-| GitHub Release | `v0.1.0`，2026-08-13T16:06:59Z，tag 指向 `b9cfbd9`（与 npm `gitHead` 一致） |
+| 仓库 | `MashedPotato817/dsh-git-plugin`，默认分支 `main`，最新提交 `3bbb253 docs: README 增加 npm 徽章`（远端 `origin/main` 同步为 `3bbb253`，两个本地新提交尚未推送） |
+| 工作分支 | `feat/release-0.2.0`（发布准备分支，从 `2f80cb3` 创建，发布候选提交在此分支完成，未推送）；上一次适配分支为 `fix/git-show-option-injection`，其两个提交 `8181856`、`2f80cb3` 尚未合并或推送 |
+| npm | `dsh-git-plugin@0.1.0`，2026-08-13T16:31:32Z 发布，`gitHead b9cfbd9`（**npm 上仍只有这一个版本**；0.2.0 尚不存在，dist-tags 只有 `latest=0.1.0`） |
+| GitHub Release | `v0.1.0`，2026-08-13T16:06:59Z，tag 指向 `b9cfbd9`（与 npm `gitHead` 一致）；**尚无 0.2.0 的 tag / Release** |
+| 本地包版本 | `0.2.0`：`package.json` 与 `package-lock.json` 已提升，**本地发布候选，未推送、未发布** |
 | 目标 DSH | 0.2.0-rc.2（本机运行中的桌面运行时版本，见第 2 节） |
 | **实际验证版本** | **仅 `0.2.0-rc.2`**：官方 npm 包、本机桌面运行时、独立测试 profile 三处均只验证了这一个版本。允许范围内的其他版本（如 0.2.0 / 0.2.1-rc.1）**未验证**；0.2.0-rc.1 低于下限，不在允许范围内。 |
 | **依赖允许范围** | peer / `engines.dsh` 声明为 `>=0.2.0-rc.2 <0.3.0-0`（Node `>=20`）。这是「允许安装与加载的范围」，不是「已验证兼容的范围」；范围内未实测的版本需按第 5.2 节重跑验证后再宣称。 |
 | Git 要求 | 需支持 `--end-of-options`（Git 2.24+）；实测 Git 2.53.0.windows.2，更老版本未验证 |
 | 源码形态 | `src/index.ts`（严格模式 TypeScript）→ `npm run build` → `lib/index.js` + `lib/index.d.ts`；`lib/` 随仓库提交，npm 与 GitHub 两种安装渠道都不需要安装期构建 |
-| 已提交适配 | `8181856` 包含 TypeScript 源码、配置、编译产物、测试与维护文档；`AGENTS.md` 作为项目指引纳入版本控制，不进入 npm 发布包。`.agent-teams/` 与临时测试目录已忽略 |
+| 已提交适配 | **本轮已提交到 `fix/git-show-option-injection`（`8181856`、`2f80cb3`），本次发布准备在其之上继续**：`8181856` 包含 TypeScript 源码、配置、编译产物、测试与维护文档；`2f80cb3` 更新 `AGENTS.md` 的维护指引与发布安排。`AGENTS.md` 作为项目指引纳入版本控制，不进入 npm 发布包（`files = ["lib","README.md","LICENSE"]`）。`.agent-teams/` 与临时测试目录已忽略 |
+| **状态三态** | **① 本地已完成**：TS 迁移 + 三个缺陷修复 + 26 项测试 + 真实 DSH 服务栈 / 独立 profile 验证，全部在本地工作区可复现（第 4、5.1–5.3 节）。**② 待验证**：以第 5.4 节列出的未验证项为准（真实模型会话、Windows 之外、`0.2.x` 其他版本、GitHub 安装渠道、CI 实跑、GUI 面板——本轮只交付方案文档、未实现）；第 7 节是能力评估，不是未验证项清单。**③ 未发布**：npm 仍是 `0.1.0`（`latest=0.1.0`、无 `next` 标签），无 `v0.2.0` tag / Release，远端 `origin/main` 仍是 `3bbb253`，本地提交与 0.2.0 版本均未推送 |
 
 ## 2. 版本核实（证据，2026-09-29 采集）
 
@@ -37,6 +40,12 @@
 2. **子包的 `latest` 标签滞后于 `@deepseek-ai/dsh`**：直接用 `@latest` 会装到 0.0.1-rc.1。
    安装/开发必须以 `next` 或精确版本 `0.2.0-rc.2` 为准。
 3. 上一轮审查线索（DSH 已到 0.2.0-rc.2、插件仍为 0.1.0、依赖 0.1.0-rc.6）**本轮核实成立**。
+4. 2026-10-01 发布准备期间再次只读核对在线状态，结论与上表一致、无新增版本：官方 GitHub Releases 最新仍是
+   `dsh-v0.2.0-rc.2`（2026-09-29，提交 `639ed015`）；npm `@deepseek-ai/dsh` 的 `latest = next = 0.2.0-rc.2`，
+   4 个子包（`dsh-commands` / `dsh-tools` / `dsh-subprocess` / `dsh-system-prompt`）的 `latest` 仍滞后为 `0.0.1-rc.1`、
+   `next = 0.2.0-rc.2`，`@deepseek-ai/cordis` `latest = 4.0.4`，`@deepseek-ai/schemastery` `latest = 3.18.4`；
+   `dsh-git-plugin` 只有 `latest = 0.1.0`（从无 `next` 标签）；本地 DSH 源码仍是 `master@639ed015` = tag `dsh-v0.2.0-rc.2`。
+   **因此发布基准不变：只有 `0.2.0-rc.2` 是实际验证过的版本**，peer / `engines.dsh` 的 `>=0.2.0-rc.2 <0.3.0-0` 仍只是允许范围。
 
 ## 3. 兼容性核对（对照 0.2.0-rc.2 官方源码与声明）
 
@@ -114,9 +123,9 @@
 | 单元（模拟） | `node test/smoke.test.js` | 10 通过 / 0 失败 |
 | 集成（真实 Git，临时仓库） | `node test/integration.test.js` | 16 通过 / 0 失败 |
 | 全部测试（与 CI 同一条命令） | `npm test`（`node --test`） | 26 通过 / 0 失败 |
-| 打包 | `npm pack --dry-run` | 5 个文件 13.6 kB：LICENSE、README、`lib/index.js`、`lib/index.d.ts`、package.json |
+| 打包 | `npm pack --dry-run` / `npm pack` | 5 个文件：LICENSE、README、`lib/index.js`、`lib/index.d.ts`、package.json；`dsh-git-plugin-0.2.0.tgz` 15054 字节（package 15.1 kB / unpacked 43.2 kB，shasum `9366057f…`） |
 | peer 准入范围（`node-semver@7.8.5`） | 旧范围 `^0.1.0-rc.6` 对 `0.2.0-rc.2` 为 false；新范围 `>=0.2.0-rc.2 <0.3.0-0` 为 true | 通过（第 3 节表格） |
-| **真实 DSH 0.2.0-rc.2 服务栈** | `node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify`（官方 `cordis` + `dsh-commands` + `dsh-tools` + `dsh-system-prompt` + `dsh-subprocess-local`，真实 Git 子进程） | `ALL CHECKS PASSED`，见 5.2 |
+| **真实 DSH 0.2.0-rc.2 服务栈** | `node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify`（官方 `cordis` + `dsh-commands` + `dsh-tools` + `dsh-system-prompt` + `dsh-subprocess-local`，真实 Git 子进程） | `ALL CHECKS PASSED`（脚本当前 28 项 check；数量以脚本为准），见 5.2 |
 | **独立测试 profile（真实 DSH CLI）** | 独立 `DSH_HOME` 下用 `--from-default-profile headless` 建 profile，`dsh plugin add <本地路径>` 安装，`cordis.patch.yml` 用 `insert` 启用，再跑 `--dump-config` / `--dump-config-schema` | 见 5.3 |
 
 > `node --test` 需要捕获子进程输出；在本会话最初的受限沙箱里会 `spawn EPERM`，直接运行两个测试文件不受影响。
@@ -146,6 +155,8 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
 
 退出码 0 = 全部通过，1 = 有检查失败（逐行 PASS/FAIL），2 = 无法从该 root 解析 DSH 包。
 
+脚本当前执行 **28 项 check**（数量以脚本为准；此前口头任务描述曾写作 27 项，实际为 28 项）。
+
 ### 5.3 独立测试 profile 的安装与加载（真实 DSH CLI 0.2.0-rc.2）
 
 在仓库内的独立 `DSH_HOME`（`.tmp-dsh-home`）中：
@@ -172,6 +183,8 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
 | DSH 0.1.x 旧版本 | 已从 peer 范围移除，不再宣称兼容；如需回退需另开分支验证。 |
 | Git < 2.24（无 `--end-of-options`） | 未实测。 |
 | GitHub 安装渠道 | `dsh plugin add github:MashedPotato817/dsh-git-plugin` 未实测；为此把编译产物 `lib/` 纳入版本控制，避免依赖安装期构建脚本。 |
+| 从 npm 安装 `0.2.0` | 发布前无法实测（npm 上仍是 `0.1.0`）；须在发布后按第 9.3 节第 11 步在独立 profile 中验证 `dsh plugin add dsh-git-plugin@0.2.0` 的加载与命令/工具行为。 |
+| **Web 面板（Issue #1）** | 本轮只交付方案文档 [docs/web-panel-plan.md](web-panel-plan.md)，**GUI 未实现**（本插件仍无 `dsh.client` 字段与 client 入口）；三视图实现、真实 Web GUI 内的显示与启停清理验证、客户端包体与构建门均待后续阶段（P2）。 |
 
 ## 6. 社区反馈（2026-09-29 采集）
 
@@ -185,24 +198,45 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
 
 ## 7. Issue #1 的可复用能力评估（只读，本轮不实现 GUI）
 
-已核实的 DSH 现有能力（均为运行中 0.2.0-rc.2 的官方包）：
+已核实的 DSH 现有能力（均为运行中 0.2.0-rc.2 的官方包；下表各行给出本次实读的直接出处，实读清单另见
+[docs/web-panel-plan.md](web-panel-plan.md) 第 9 节）：
 
-| 包 | 已核实的作用 | 对本需求的复用判断 |
+| 包 | 已核实可复用什么 | 需要自建的部分 |
 |---|---|---|
-| `@deepseek-ai/dsh-workspace-changes` | 按「顶层回合」用 git 工作树快照 + 整文件快照汇总变更文件与行数，提供每文件回合前后对比，事件 `workspace/changes`，由 Web 变更卡片渲染 | **直接复用**：只读状态与 diff 的主数据源，不必自己实现 |
-| `@deepseek-ai/dsh-client-ui-workspace` | Workspace / Session 浏览与选择；Session 行菜单是**slot 列表**，客户端插件可扩展 | **扩展点**：Git 面板入口可挂在这里，而非自建顶层应用 |
-| `@deepseek-ai/dsh-client-ui-slots` | 客户端 UI slot 组合机制 | 实现面板所需的客户端扩展接口 |
-| `@deepseek-ai/dsh-api-workspace-files` | Workspace 文件相关 API | 只读文件/diff 数据的 Host 侧通道候选 |
-| `@deepseek-ai/dsh-client-ui-sidebar-*`（files / documentpreview / terminal 等） | 侧边栏分栏的既有实现 | 面板落位参考（右侧栏 / 文件栏） |
+| `@deepseek-ai/dsh-workspace-changes` | **回合变更审阅**：按顶层回合用 git 工作树快照 + 整文件快照汇总变更文件与行数、逐文件回合前后对比、事件 `workspace/changes`，由 Web 变更卡片/审阅 tab 渲染（`packages/deliverables/workspace-changes/README.md` 第 12、48 行；hunk 形状 `src/types.ts` 第 43–54 行可只做类型复用） | **不能**提供工作区状态（HEAD↔工作区）、staged/unstaged、分支与历史，三条限制：① 范围是 turn，不含回合开始前已有的未提交改动（README 第 44 行）；② summary 与对比只在该 Session 存活期内有效，Host 重启后旧回合没有卡片（第 88 行）；③ 数据形状只有 `path`/行数/`binary`/`oversized`，没有暂存维度（`src/types.ts` 第 5–40 行）。状态与 diff 必须由本插件自己跑只读 git（`status --porcelain=v1 -z --branch -uall`、`diff -U3`） |
+| `@deepseek-ai/dsh-client-ui-workspace` | 会话行菜单座位 `sidebar.workspaces.session.menu.item`（list / root）已核实存在且可由第三方插件注册（声明 `packages/client/ui-workspace/src/client/contract/slots.ts` 第 166–172 行；用法与启停断言 `apps/web/tests/fixtures/plugins/fixture-live-client/client.js` 第 75–96 行、`apps/web/tests/client-plugin-live.e2e.ts`） | 该座位只适合"一次点击型动作"，放不下常驻三视图；面板入口**不**挂这里 |
+| `@deepseek-ai/dsh-client-ui-slots` | 客户端扩展机制本身：四类座位（single / list / keyed / chain）、声明即独占、条目 disposer 递归收敛（`packages/client/ui-slots/README.md` 第 28、46 行） | 面板具体注册哪些座位、由什么组件填充 |
+| `@deepseek-ai/dsh-client-ui-sidebar-right`（面板落位在此） | 公开两步注册：类型进 `ctx.sidebarRightTabs.register({ id, kind, priority, title, guide })`，主体进 keyed 座位 `sidebar.right.pane.tab`（`packages/client/ui-sidebar-right/README.md` 第 83 行、契约 `src/client/contract/slots.ts` 第 59–64 行、完整样例 `packages/client/ui-sidebar-files/src/client/index.ts` 第 81–96 行）；会话身份与 cwd 由框架给出（`ui-sidebar-files/src/client/FilesBody.tsx` 第 140–147 行） | 三个视图的 UI、样式与刷新控件 |
+| `@deepseek-ai/dsh-api-workspace-files` | 只读**文件**通道：`read` / `stat` / `readBytes` / `list`（分页、字节窗口与上限）与 `changes` 失效订阅（`packages/api/workspace-files/README.md` 第 28、33、58 行）；可作"未跟踪文件内容预览"与"文件失效信号" | git 数据（历史 blob/tree/diff、分支）它读不到；目录 watch 只看直接子项、部分后端 `watch-unsupported`（README 第 58、141 行），不能当唯一刷新依据 |
+| `@deepseek-ai/dsh-client-ui-sidebar-*`（files / browser / terminal / documentpreview） | 右侧栏分栏的既有实现与落位先例：file / browser / terminal 三者都贡献 guide 条目（`ui-sidebar-files/src/client/definition.tsx` 第 31 行、`ui-sidebar-browser/src/client/definition.tsx` 第 22 行、`ui-sidebar-terminal/src/client/index.ts` 第 73 行） | 面板自身的渲染与数据获取 |
 
 判断与范围：
 
-1. **只读优先**：状态、diff、历史（log / show）可以直接建立在 `dsh-workspace-changes` 与本插件现有
-   只读工具之上，不需要新的写路径。
-2. **写操作后置**：stage / commit / branch / stash 属于有副作用的操作，必须走 DSH 的审批与权限模型，
-   放在第二阶段之后，并明确「谁批准、可撤销」。
+1. **只读优先**：状态、diff、历史（log / show）全部由本插件自己的只读 git 调用产生
+   （`status --porcelain=v1 -z --branch -uall`、`diff -U3`、`log --format`、`show --end-of-options`），
+   不建立在 `dsh-workspace-changes` 之上；后者只用于「回合变更审阅」这一既有能力。
+2. **写操作后置**：stage / commit / branch / stash 属于有副作用的操作，必须走 DSH 审批
+   （`ctx.approval.request`；`packages/interaction/user-approval/README.md` 第 52 行要求一个 open turn，
+   而面板按钮点击不在 turn 内，这是 P3 的前置未决问题），放在第二阶段之后，并明确「谁批准、可撤销」。
 3. 本轮**不实现任何 GUI**；本插件保持无客户端代码（`dsh.client` 字段与 client 入口都不添加），
    以免在未验证的情况下承担客户端兼容风险。
+
+来自面板方案的 3 条硬约束（细节见 [docs/web-panel-plan.md](web-panel-plan.md)）：
+
+1. 客户端半侧用 **TypeScript / TSX** 编写（`src/client/**`），由一个**小型构建配置**生成 DSH 需要的包装产物
+   `lib/client.js`（`window.__ModuleLoader__.load({ id, factory(require) { … } })` 形态，只 `require('react')`
+   与平台基线包）；**不手写** `lib/client.js`。官方客户端打包预设 `packages/client/tsdown.client.ts` 未发布到 npm
+   （`packages/client/` 无 `package.json`，预设依赖仓库根 glob），因此自建的小配置只负责包装形态，
+   格式契约照 `packages/client/tsdown.client.ts` 第 473–627 行（banner/footer/intro、`entryFileNames: 'client.js'`），
+   形态可用性由 DSH 自己的夹具 `apps/web/tests/fixtures/plugins/fixture-live-client/client.js` 佐证。
+2. 声明 `dsh.client` 时**必须同时**提供 `exports["./client"]` 与构建好的 `lib/client.js`：客户端模块扫描
+   在缺少 `./client` 导出时直接抛错（`packages/client/modules/src/index.ts` 第 841–848 行），bundle 文件缺失
+   会让 Web 启动期的激活扫描失败（`packages/client/modules/README.md` 第 50 行）。
+3. `lib/client.js` 必须随仓库提交并纳入 npm `files`：当前 `files: ["lib", "README.md", "LICENSE"]` 已覆盖
+   整个 `lib/`，仍要在发布流程里把客户端半侧产物与 `lib/index.js` 同等对待（随提交、`npm pack --dry-run` 核对）。
+
+Issue #1 的只读 Web 面板完整方案（能力复用、入口落位、Host 数据通道、最小文件范围、验收标准与风险）
+另见 [docs/web-panel-plan.md](web-panel-plan.md)。
 
 ## 8. 后续阶段、负责人角色与验收标准
 
@@ -210,24 +244,33 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
 |---|---|---|---|
 | P0（本轮） | 适配 0.2.0-rc.2、修复三个缺陷、补测试与文档 | 插件维护者 | `npm run build` / `npm run check` / 两个测试文件全绿；真实服务栈验证全绿 |
 | P1（发布） | 版本 0.2.0 预发布 → 用 dist-tag 推广；tag / Release / npm 对应同一提交 | 仓库负责人（授权发布） | 第 9 节发布步骤全部完成，四者一致性核对通过 |
-| P2（GUI 只读面板） | 用 `dsh-workspace-changes` + client slot 做状态 / diff / 历史只读面板 | 插件维护者 + 客户端联调者 | 面板只读；不新增写路径；禁用插件后 UI 与注册完全清理 |
+| P2（GUI 只读面板） | 用本插件自己的只读 git 调用（`status --porcelain=v1 -z --branch -uall`、`diff -U3`、`log`）+ client slot（右侧栏 tab）做状态 / diff / 历史只读面板；**回合变更审阅**可复用 `dsh-workspace-changes`，但它不提供工作区状态 / staged-unstaged / 分支 / 历史（见第 7 节） | 插件维护者 + 客户端联调者 | 面板只读；不新增写路径；禁用插件后 UI 与注册完全清理；逐视图验收标准见 [docs/web-panel-plan.md](web-panel-plan.md) 第 7 节 |
 | P3（GUI 写操作） | stage / commit / branch / stash 纳入面板，走审批 | 同上 + 安全评审者 | 每个写操作都能说明审批来源与撤销手段 |
 | P4（长期维护） | 每个 DSH `0.2.x` 新版本先跑 `scripts/verify-real-dsh.mjs`，通过后再更新 peer/`engines` 与本文档的「实际验证版本」 | 插件维护者 | 兼容表更新 + 真实服务栈验证重跑并记录输出 |
 
 ## 9. 发布步骤（需仓库负责人授权后执行）
 
 原则：**一个版本只 `npm publish` 一次**；`next` 验证通过后用 `npm dist-tag add` 把同一版本推广到 `latest`，
-不再发布第二次（同一版本号无法重复发布）。发布提交必须同时包含版本文件、CHANGELOG、编译配置与构建产物，
-之后打的 tag 与 GitHub Release 都指向这个提交，npm 记录的 `gitHead` 也必须是它。
+不再发布第二次（同一版本号无法重复发布）。
 
-### 9.1 准备发布提交（版本文件 + CHANGELOG + 构建产物同一提交）
+发布分两个提交，**发布点**是最终发布提交（或其上的合并提交）：
 
-1. 合并到 `main`（本分支当前为 `fix/git-show-option-injection`）。
-2. 提升版本：`npm version 0.2.0 --no-git-tag-version`
-   → 同时改写 `package.json` 与 `package-lock.json` 的版本字段（**两个文件都要进同一次提交**）。
-   `--no-git-tag-version` 是刻意的：tag 留到第 9.4 步、在发布并验证之后打。
-3. 改 `CHANGELOG.md`：把 `## [Unreleased]` 的内容移到 `## [0.2.0] - <发布日期>`，并保留空的 `Unreleased` 段
-   （这样提交里的变更记录与即将发布的版本一一对应）。
+- **候选提交**（9.1）在发布分支 `feat/release-0.2.0` 上承载版本文件、CHANGELOG、编译配置、测试与 `lib/`；
+  此时 CHANGELOG 的日期可保留「待发布」。
+- **最终发布提交**（9.3）只把 CHANGELOG 的日期定稿；发布日期必须在 `npm publish` **之前**确定并进入提交，
+  不允许发布后再改。
+- npm 记录的 `gitHead`、`v0.2.0` tag、GitHub Release 与包内产物都必须对应**同一个发布点**。
+
+### 9.1 准备候选提交（在 `feat/release-0.2.0` 上，版本文件 + CHANGELOG + 构建产物同一提交）
+
+1. 工作在发布分支 `feat/release-0.2.0`（已从 `2f80cb3` 创建）：**审阅与提交都在该分支完成**，
+   不要在本地直接改 `main`；合并到 `main` 走 PR，并放在最终发布提交之后（9.3）。
+2. 版本**已经**是 `0.2.0`（建分支时已执行 `npm version 0.2.0 --no-git-tag-version`）。只需确认三处一致：
+   `package.json`、`package-lock.json` 顶层、`package-lock.json` 的 `packages[""].version`。
+   **不要重复执行 `npm version`**；确实需要改版本时才运行 `npm version <新版本> --no-git-tag-version` 并同步锁文件。
+3. 改 `CHANGELOG.md`：把 `## [Unreleased]` 的内容移到 `## [0.2.0] - 待发布`，并保留空的 `Unreleased` 段
+   （**本轮已整理完毕，只需核对**）。候选阶段日期写「待发布」；**实际发布日期在 9.3 的最终发布提交里定稿**
+   （发布前，而不是发布后）。
 4. 全量检查（在工作区执行）：
    ```bash
    npm ci
@@ -247,16 +290,15 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
    - `dsh --profile <测试名> --dump-config` 确认该行没有 `disabled: true`
    - `dsh --profile <测试名> --dump-config-schema` 确认该行 `status: "schema"`、`diagnostics` 为空、
      配置 schema 与本插件的五个字段一致
-7. 提交发布提交（**版本文件 + CHANGELOG + 编译配置 + 测试 + `lib/` 一起**）：
+7. 在 `feat/release-0.2.0` 上提交**候选提交**（版本文件 + CHANGELOG + 编译配置 + 测试 + `lib/` + 文档一起）：
    ```bash
-   git add package.json package-lock.json CHANGELOG.md README.md \
+   git add package.json package-lock.json CHANGELOG.md README.md AGENTS.md \
            tsconfig.json src lib test scripts docs .github .gitignore
-   git commit -m "chore(release): 0.2.0"
-   git push origin main          # 需授权
+   git commit -m "chore(release): 0.2.0 candidate"
    ```
-   记下这个提交的 SHA，第 9.2–9.4 步都要用它（9.2 的干净检出、9.3 的 `gitHead` 核对、9.4 的 tag）。
-   注意：`AGENTS.md` 按用户授权作为项目指引纳入版本控制，不加入 npm 发布包；
-   按上面的显式路径暂存发布改动，避免带入团队状态或临时文件。
+   记下候选提交 SHA，9.2 的干净检出要用它。**此处不要推送 `main`**：合并走 9.3 的 PR 流程。
+   注意：`AGENTS.md` 作为项目指引纳入版本控制，但不加入 npm 发布包（`files = ["lib","README.md","LICENSE"]`）；
+   按上面的显式路径暂存，避免带入 `.agent-teams/`、缓存或临时目录。
 
 ### 9.2 提交后复核：构建产物门（在干净检出里重建后比较）
 
@@ -264,7 +306,7 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
    ```bash
    git clone <仓库地址> /tmp/dsh-git-plugin-verify
    cd /tmp/dsh-git-plugin-verify
-   git checkout <9.1 第 7 步的提交 SHA>
+   git checkout <9.1 第 7 步的候选提交 SHA>
    npm ci
    npm run build
    git diff --exit-code lib      # 此时应为 0：提交的 lib/ 与重新构建的产物一致
@@ -273,46 +315,62 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
    ```
    若这里出现差异，说明提交里的 `lib/` 不是当前源码的产物，回到 9.1 重新构建并 amend 提交后再继续。
 
-### 9.3 发布 npm（同一版本只发布一次）
+### 9.3 最终发布提交与合并到 `main`
 
-9. 先看打包内容：`npm pack --dry-run` → 应为 `LICENSE`、`README.md`、`lib/index.js`、`lib/index.d.ts`、`package.json`。
-10. 发布到预发布标签：`npm publish --tag next`
+9. 确定发布日期：把 `CHANGELOG.md` 的 `## [0.2.0] - 待发布` 改成 `## [0.2.0] - <YYYY-MM-DD>`。
+   这一步**只改 CHANGELOG**；若同时改动了源码或 `lib/`，必须先重跑 9.2 的构建产物门。
+10. 提交**最终发布提交**并记下 SHA（它将成为发布点）：
+    ```bash
+    git add CHANGELOG.md
+    git commit -m "chore(release): 0.2.0"
+    ```
+11. （授权后）从 `feat/release-0.2.0` 开 PR 合并到 `main`，并推送 `origin`：
+    - 采用 **merge commit**：以 `main` 上的合并提交为**发布点**，并确认它与最终发布提交在发布相关文件上一致
+      （`git diff <最终发布提交> <main 合并提交> -- .` 无输出）；随后 `git checkout main && git pull`。
+    - 采用 **fast-forward**：发布点就是最终发布提交本身，提交 SHA 不变。
+    - 采用 **rebase**：可能重写提交 SHA；以合并后 `main` 上实际承载发布内容的提交为发布点，重新记录 SHA，并核对它与最终发布提交的文件树一致，npm `gitHead`、tag、Release 都使用这个实际 SHA。
+    发布点确定后，9.4 的 `npm publish` 与 9.5 的 tag/Release 都从它出发。
+
+### 9.4 发布 npm（同一版本只发布一次）
+
+12. 在发布点先看打包内容：`npm pack --dry-run` → 应为 `LICENSE`、`README.md`、`lib/index.js`、`lib/index.d.ts`、`package.json`。
+13. 在发布点（`main` 的合并提交或最终发布提交）执行：`npm publish --tag next`
     —— `prepack` 会自动重新构建 `lib/`（`tsc` 输出确定，已实测两次构建哈希一致，所以产物与 9.2 复核的一致）；
-    npm 会把当前 HEAD 记为 `gitHead`，所以 9.1 必须先提交、9.2 必须先通过。
-11. 验证预发布：
+    npm 会把当前 HEAD 记为 `gitHead`，因此必须在发布点上执行。
+14. 验证预发布：
     ```bash
     npm view dsh-git-plugin@0.2.0 version dist-tags gitHead
     npm dist-tag ls dsh-git-plugin
     ```
-    确认 `gitHead` 等于 9.1 第 7 步的提交 SHA；再在独立测试 profile 里
+    确认 `gitHead` 等于发布点 SHA；再在独立测试 profile 里
     `dsh plugin --profile <测试名> add dsh-git-plugin@0.2.0`，重复 5.3 的加载检查与 5.2 的命令/工具检查。
-12. 推广到正式标签（**不再 publish**）：
+15. 推广到正式标签（**不再 publish**）：
     ```bash
     npm dist-tag add dsh-git-plugin@0.2.0 latest
     npm dist-tag ls dsh-git-plugin      # next 与 latest 都指向 0.2.0
     ```
 
-### 9.4 tag 与 GitHub Release（指向同一提交）
+### 9.5 tag 与 GitHub Release（指向同一发布点）
 
-13. 打 tag 并推送（tag 名与版本一致，指向 9.1 第 7 步的提交）：
+16. 打 tag 并推送（tag 名与版本一致，指向发布点）：
     ```bash
-    git tag -a v0.2.0 -m "dsh-git-plugin 0.2.0" <9.1 第 7 步的提交 SHA>
+    git tag -a v0.2.0 -m "dsh-git-plugin 0.2.0" <发布点 SHA>
     git push origin v0.2.0
     ```
     推送 `main` 之后，README 的 GitHub 安装渠道才真正可用；届时可按发布 tag 固定：
     `dsh plugin --profile <name> add github:MashedPotato817/dsh-git-plugin#v0.2.0`。
-14. 在该 tag 上创建 GitHub Release，说明取 `CHANGELOG.md` 的 `[0.2.0]` 段。
-15. 一致性核对（四者必须对应同一提交/同一份产物）：
-    - `git rev-parse v0.2.0^{commit}` == 9.1 第 7 步的提交 SHA == `npm view dsh-git-plugin@0.2.0 gitHead`
+17. 在该 tag 上创建 GitHub Release，说明取 `CHANGELOG.md` 的 `[0.2.0]` 段。
+18. 一致性核对（四者必须对应同一发布点/同一份产物）：
+    - `git rev-parse v0.2.0^{commit}` == 发布点 SHA == `npm view dsh-git-plugin@0.2.0 gitHead`
     - GitHub Release 的 tag 指向同一 SHA
-    - `CHANGELOG.md` 的 `## [0.2.0]` 与 `package.json` 的 `version` 一致，且 `Unreleased` 已清空
+    - `CHANGELOG.md` 的 `## [0.2.0]` 日期已定稿（不再是「待发布」），与 `package.json` 的 `version` 一致，且 `Unreleased` 已清空
     - 已发布 tarball 里的 `lib/` 与仓库提交的 `lib/` 逐字节一致：
       `npm pack dsh-git-plugin@0.2.0` 后比对 `lib/index.js` / `lib/index.d.ts` 的哈希
     - `npm dist-tag ls dsh-git-plugin` 中 `latest` 与（可选的）`next` 都指向 `0.2.0`
 
-### 9.5 出错时
+### 9.6 出错时
 
-已发布的版本号不能重发：任何需要改动的发布问题都提升到下一个补丁版本（如 `0.2.1`）重走 9.1–9.4，
+已发布的版本号不能重发：任何需要改动的发布问题都提升到下一个补丁版本（如 `0.2.1`）重走 9.1–9.5，
 不要试图覆盖 `0.2.0`。
 
 > 兼容核对脚本 `scripts/verify-real-dsh.mjs` 依赖一份独立的 DSH 安装，刻意**不纳入 `npm test`/CI**：
@@ -338,3 +396,18 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
    任何发布后修复都提升补丁版本重走第 9 节，不要覆盖已发布版本。
 7. **兼容声明纪律**：peer/`engines` 的 `>=0.2.0-rc.2 <0.3.0-0` 只是允许范围；
    只有实际跑过 `scripts/verify-real-dsh.mjs` 的版本才能写进「实际验证版本」。
+8. **Web 面板只有方案、尚未实现**：本轮只交付 [docs/web-panel-plan.md](web-panel-plan.md) 这份方案文档，
+   **GUI 未实现**（无 `dsh.client` 字段、无 client 入口）；三视图实现与真实 Web GUI 内的显示、启停清理验证
+   属于后续阶段（P2）。实现前必须先满足三条硬约束：客户端半侧用 TypeScript / TSX 编写并由小型构建配置生成
+   `lib/client.js`（官方客户端打包预设未发布，故自建包装配置，不手写产物）、
+   声明 `dsh.client` 必须同时提供 `exports["./client"]` 与构建产物、`lib/client.js` 必须随仓库提交并纳入 npm `files`。
+   面板的状态 / diff 数据由本插件自己的只读 git 调用产生，**不**依赖 `dsh-workspace-changes`（它只提供回合变更
+   审阅，见第 7 节）。
+9. **npm 12 默认拦截 install scripts**：安装 DSH 0.2.0-rc.2 时有 5 个脚本被拦——
+   `@deepseek-ai/dsh-subprocess-local` 的 postinstall `ensure-spawn-helper.mjs`、`koffi`、`node-pty`、
+   `@google/genai`、`protobufjs`。Windows 下本次验证不受影响（该 postinstall 只恢复 POSIX 可执行位），
+   但 Linux/macOS 上 `node-pty` 的 spawn-helper 执行位可能受影响，属**待相应平台确认**的风险。
+10. **验证脚本的临时目录未自清**：`scripts/verify-real-dsh.mjs` 用 `fs.mkdtempSync` 自建
+    `%TEMP%/dsh-verify-repo-*` 后不自清（本轮由人工清理了 3 个旧目录），属已知跟进项
+    （本轮为不使已验证工具链失效而未改脚本）。修复建议：用 `try/finally` 在成功与失败路径都清理临时仓库
+    （脚本内 `dsh-verify-run-*` 辅助目录已自清，可直接照搬该写法）。

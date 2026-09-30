@@ -5,7 +5,9 @@
 
 ## [Unreleased]
 
-适配目标：DeepSeek Harness（DSH）0.2.0-rc.2。以下内容均未发布、未打 tag、未推送。
+## [0.2.0] - 待发布
+
+适配目标：DeepSeek Harness（DSH）0.2.0-rc.2。以下内容均为 0.2.0 发布候选：尚未推送、未打 tag、未发布到 npm。
 
 ### Added
 
