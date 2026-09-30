@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -59,13 +59,59 @@ function signal() {
 	return new AbortController().signal;
 }
 
-async function mount(cwd, config = {}) {
+/**
+ * An asynchronous spawn seam that honours the request's abort signal, for the
+ * deadline tests. Output still travels through file descriptors, so the DSH
+ * sandbox's named-pipe restriction does not apply.
+ */
+function makeAsyncSpawn() {
+	return ({ argv, cwd, signal: requestSignal }) => {
+		const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dsh-git-async-"));
+		const outFile = path.join(tmp, "out.txt");
+		const errFile = path.join(tmp, "err.txt");
+		const ofd = fs.openSync(outFile, "w");
+		const efd = fs.openSync(errFile, "w");
+		const child = spawn(argv[0], argv.slice(1), { cwd, stdio: ["ignore", ofd, efd] });
+		let settled = false;
+		const done = new Promise((resolve) => {
+			const finish = (outcome) => {
+				if (settled) return;
+				settled = true;
+				fs.closeSync(ofd);
+				fs.closeSync(efd);
+				resolve(outcome);
+			};
+			child.on("error", () => finish({ signal: null, exitCode: null }));
+			child.on("close", (code, sig) => finish({ signal: sig ?? null, exitCode: code }));
+			if (requestSignal?.aborted === true) child.kill();
+			else requestSignal?.addEventListener("abort", () => child.kill(), { once: true });
+		});
+		const read = (file) => {
+			try {
+				return fs.readFileSync(file, "utf8");
+			} catch {
+				return "";
+			}
+		};
+		return {
+			done,
+			terminate: () => child.kill(),
+			waitForExit: () => done,
+			collected: {
+				stdout: { readFrom: () => ({ text: read(outFile), lossy: false }) },
+				stderr: { readFrom: () => ({ text: read(errFile), lossy: false }) }
+			}
+		};
+	};
+}
+
+async function mount(cwd, config = {}, spawnImpl = makeSpawn()) {
 	const registered = { commands: [], tools: [] };
 	const ctx = {
 		commands: { register: (definition) => registered.commands.push(definition) },
 		tools: { register: (definition) => registered.tools.push(definition) },
 		systemPrompt: { section: () => {} },
-		subprocess: { spawn: makeSpawn() }
+		subprocess: { spawn: spawnImpl }
 	};
 	await apply(ctx, config);
 	return registered;
@@ -239,4 +285,57 @@ test("/undo on a clean tree reports nothing to stash", async () => {
 	const result = await undo.handler({ rawInput: "", agent: agentFor(repo), signal: signal() });
 	assert.equal(result.kind, "success");
 	assert.match(result.text, /Nothing to stash/);
+});
+
+test("git-show refuses an option-shaped ref and writes no file", async () => {
+	const repo = makeRepo();
+	const { tools } = await mount(repo);
+	const gitShow = tools.find((t) => t.name === "git-show");
+	const probe = path.join(repo, "do-not-create.txt");
+
+	await assert.rejects(
+		() => gitShow.execute({ ref: `--output=${probe}` }, { agent: agentFor(repo), signal: signal() })
+	);
+	assert.equal(fs.existsSync(probe), false, "git never wrote the option-named file");
+
+	// The same guard keeps ordinary refs working.
+	const show = await gitShow.execute({ ref: "HEAD" }, { agent: agentFor(repo), signal: signal() });
+	assert.match(show.text, /chore: init/);
+});
+
+test("/commit runs preCommit inside the auto-discovered repository", async () => {
+	const parent = fs.mkdtempSync(path.join(os.tmpdir(), "dsh-parent-hook-"));
+	const repo = path.join(parent, "proj");
+	fs.mkdirSync(repo);
+	initRepoAt(repo);
+	fs.writeFileSync(path.join(repo, "a.txt"), "hello\n");
+	runSync(["git", "add", "-A"], repo);
+	runSync(["git", "commit", "-m", "chore: init"], repo);
+
+	// The hook only succeeds when its working directory is the repository root.
+	const { commands } = await mount(parent, {
+		preCommit: [process.execPath, "-e", "process.exit(require('node:fs').existsSync('.git') ? 0 : 1)"]
+	});
+	fs.writeFileSync(path.join(repo, "b.txt"), "change\n");
+	const commit = commands.find((c) => c.name === "commit");
+	const result = await commit.handler({ rawInput: "chore: hook in repo", agent: agentFor(parent), signal: signal() });
+	assert.equal(result.kind, "success", result.text);
+	assert.match(runSync(["git", "log", "--oneline", "-1"], repo).stdout, /chore: hook in repo/);
+});
+
+test("timeoutMs terminates a real preCommit process that overruns", async () => {
+	const repo = makeRepo();
+	fs.writeFileSync(path.join(repo, "slow.txt"), "x\n");
+	const { commands } = await mount(repo, {
+		timeoutMs: 500,
+		preCommit: [process.execPath, "-e", "setTimeout(() => {}, 30000)"]
+	}, makeAsyncSpawn());
+	const commit = commands.find((c) => c.name === "commit");
+	const started = Date.now();
+	const result = await commit.handler({ rawInput: "chore: must not land", agent: agentFor(repo), signal: signal() });
+	const elapsed = Date.now() - started;
+	assert.equal(result.kind, "error");
+	assert.match(result.text, /timed out after 500ms/);
+	assert.ok(elapsed < 10000, `the overrunning hook was terminated instead of awaited (${elapsed}ms)`);
+	assert.doesNotMatch(runSync(["git", "log", "--oneline", "-1"], repo).stdout, /must not land/);
 });

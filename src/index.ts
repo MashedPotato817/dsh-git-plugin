@@ -1,0 +1,647 @@
+import { existsSync } from "node:fs";
+import { readdir } from "node:fs/promises";
+import { join } from "node:path";
+import z from "@deepseek-ai/schemastery";
+import { defineTool } from "@deepseek-ai/dsh-tools";
+import type { ToolDefinition, ToolRunContext, ValueSchemaSpec } from "@deepseek-ai/dsh-tools";
+import type { CommandDefinition, CommandInvocation, CommandResult } from "@deepseek-ai/dsh-commands";
+import type { PromptSection } from "@deepseek-ai/dsh-system-prompt";
+import type { SubprocessOutcome, SubprocessSpawnSpec } from "@deepseek-ai/dsh-subprocess";
+
+/**
+ * dsh-git-plugin — Git workflow plugin for DeepSeek Harness.
+ *
+ * Registers human-facing slash commands (`/status`, `/diff`, `/branch`,
+ * `/commit`, `/undo`) and read-only model-facing tools (`git-status`,
+ * `git-diff`, `git-log`, `git-show`), all backed by the `ctx.subprocess` seam.
+ * Git is always invoked as a plain argv vector — no shell layer — and every run
+ * is bounded by the plugin's output-byte and timeout caps.
+ *
+ * @module dsh-git-plugin
+ */
+
+const name = "dsh-git-plugin";
+const inject = ["commands", "tools", "systemPrompt", "subprocess"];
+
+const DEFAULT_MAX_BYTES = 1024 * 1024;
+const DEFAULT_STDERR_MAX_BYTES = 64 * 1024;
+const DEFAULT_GRACE_MS = 3000;
+const DEFAULT_TIMEOUT_MS = 30000;
+
+const Config = z.object({
+	maxBytes: z.number().default(DEFAULT_MAX_BYTES),
+	stderrMaxBytes: z.number().default(DEFAULT_STDERR_MAX_BYTES),
+	graceMs: z.number().default(DEFAULT_GRACE_MS),
+	timeoutMs: z.number().default(DEFAULT_TIMEOUT_MS),
+	preCommit: z.array(z.string()).default([])
+});
+
+/** The validated plugin config, as Schemastery's own output type. */
+type GitConfig = Schemastery.TypeT<typeof Config>;
+
+/** Resolved per-run limits: the plugin's own copy of the validated config. */
+interface Caps {
+	maxBytes: number;
+	stderrMaxBytes: number;
+	graceMs: number;
+	timeoutMs: number;
+	preCommit: string[];
+}
+
+/** The caller identity and cwd fact the plugin reads from one invocation. */
+interface AgentLike {
+	session?: { header?: { cwd?: string } } | undefined;
+}
+
+/**
+ * The subprocess capability this plugin calls: one collect-mode spawn whose
+ * `stdout`/`stderr` are buffered, plus the exit outcome and the provider
+ * teardown verbs. The full `SubprocessRuntime` service also exposes executable
+ * lookup and a terminal primitive, which are declared separately here because
+ * the plugin calls none of them and a caller that mounts only this much can
+ * still drive the plugin.
+ */
+interface SpawnedHandle {
+	readonly done: Promise<SubprocessOutcome>;
+	/** Whole-stream collected reads; present because the plugin always requests collect mode. */
+	readonly collected: {
+		readonly stdout?: { readFrom(fromByte: number): { text: string; lossy: boolean } } | undefined;
+		readonly stderr?: { readFrom(fromByte: number): { text: string; lossy: boolean } } | undefined;
+	};
+	/** Provider teardown; absent on a caller-supplied stand-in that has nothing to tear down. */
+	terminate?(): void;
+	/** Quiescence of the provider's managed process range; absent for the same reason. */
+	waitForExit?(): Promise<boolean>;
+}
+
+/** The exact `ctx.subprocess` surface the plugin uses. */
+interface SubprocessCapability {
+	spawn(spec: SubprocessSpawnSpec): SpawnedHandle;
+}
+
+/**
+ * The context `apply` receives: exactly the four injected DSH services this
+ * plugin reads. `@deepseek-ai/cordis` service registration is a module
+ * augmentation that this standalone package does not import, so naming the
+ * members here keeps `apply` assignable from a real Cordis context and from the
+ * partial stand-ins the tests mount.
+ */
+interface PluginContext {
+	readonly commands: { register(definition: CommandDefinition): unknown };
+	readonly tools: { register(definition: ToolDefinition): unknown };
+	readonly systemPrompt: { section(section: PromptSection): unknown };
+	readonly subprocess: SubprocessCapability;
+}
+
+/** Options for one `runProcess` call. */
+interface RunOptions {
+	cwd: string;
+	signal?: AbortSignal | undefined;
+	caps: Caps;
+}
+
+/**
+ * One process result. Failures carry the plugin's own cause flags so a caller
+ * that falls back on failure — repository discovery — can tell a cancellation
+ * or an expired deadline apart from a genuinely absent repository.
+ */
+type RunOutcome =
+	| { ok: true; text: string }
+	| { ok: false; text: string; aborted?: true; timedOut?: true };
+
+/** The repository `resolveGitRoot` selected. */
+interface ResolvedRoot {
+	ok: true;
+	root: string;
+}
+
+const COMMIT_CONVENTION_HINT = [
+	"Commit message convention (MAA style):",
+	"  <type>(<scope>): <中文主体>      e.g. feat(git): 新增 /status 命令",
+	"  types: feat fix docs chore style refactor test perf",
+	"If this repo defines its own convention (AGENTS.md / CLAUDE.md), read it and follow it instead."
+].join("\n");
+
+function assertPositiveInteger(field: string, value: number): void {
+	if (!Number.isInteger(value) || value < 1) {
+		throw new Error(`dsh-git-plugin: ${field} must be a positive integer`);
+	}
+}
+
+/**
+ * The calling agent's session cwd, falling back to the process cwd.
+ * @param agent - the invoking agent, when the caller supplied one.
+ * @returns an absolute working directory for the git call.
+ */
+function agentCwd(agent: AgentLike | undefined): string {
+	return agent?.session?.header?.cwd ?? process.cwd();
+}
+
+/**
+ * Start the provider's teardown for a handle and give it the configured grace
+ * period to prove quiescence. Both steps are bounded on purpose: a provider that
+ * never settles must not turn this plugin's deadline into an unbounded wait.
+ * @param handle - the live subprocess handle to tear down.
+ * @param graceMs - how long the provider's teardown may take to settle.
+ * @returns a promise that settles once the handle is quiescent or the grace period expires.
+ */
+async function terminateHandle(handle: SpawnedHandle, graceMs: number): Promise<void> {
+	try {
+		await handle.terminate?.();
+	} catch {
+		// A teardown failure must not mask the caller-facing timeout result.
+	}
+	const quiescent = handle.waitForExit?.();
+	if (quiescent === void 0) return;
+	let timer: NodeJS.Timeout | undefined;
+	try {
+		await Promise.race([
+			quiescent.then(() => {}, () => {}),
+			new Promise((resolve) => {
+				timer = setTimeout(resolve, graceMs);
+				timer.unref?.();
+			})
+		]);
+	} finally {
+		clearTimeout(timer);
+	}
+}
+
+/**
+ * Run one arbitrary argv vector through the subprocess seam and return its
+ * complete stdout. The plugin owns the deadline: `@deepseek-ai/dsh-subprocess`
+ * documents that "callers own deadlines", and a slash command carries no
+ * separate timeout policy — so `timeoutMs` is enforced here for every git call,
+ * every preCommit hook, and every tool body alike. On expiry the derived abort
+ * signal starts the provider's teardown and the caller gets one explicit
+ * timeout result. Non-zero exits, signals, aborts, and launch failures surface
+ * as `{ ok: false, text }`; success returns `{ ok: true, text }`. Cancellation
+ * and timeout failures also carry `aborted`/`timedOut`, so a caller that falls
+ * back on failure — repository discovery — can tell them apart from a genuinely
+ * absent repository.
+ * @param ctx - the plugin context owning the subprocess seam.
+ * @param argv - the complete executable and argument vector, never shell-interpreted.
+ * @param options - working directory, caller cancellation, and the resolved caps.
+ * @returns the collected stdout, or a failure with the plugin's cause flags.
+ */
+async function runProcess(ctx: PluginContext, argv: string[], { cwd, signal, caps }: RunOptions): Promise<RunOutcome> {
+	const label = argv.join(" ");
+	if (signal?.aborted) {
+		return { ok: false, aborted: true, text: `${label} aborted` };
+	}
+	const timeoutText = `${label} timed out after ${caps.timeoutMs}ms (process terminated)`;
+	const abort = new AbortController();
+	let timedOut = false;
+	const forwardAbort = () => abort.abort(signal?.reason);
+	signal?.addEventListener("abort", forwardAbort, { once: true });
+	const timer = setTimeout(() => {
+		timedOut = true;
+		abort.abort(new Error(timeoutText));
+	}, caps.timeoutMs);
+	timer.unref?.();
+	const release = () => {
+		clearTimeout(timer);
+		signal?.removeEventListener("abort", forwardAbort);
+	};
+	let handle: SpawnedHandle;
+	try {
+		handle = ctx.subprocess.spawn({
+			argv,
+			cwd,
+			stdio: {
+				stdin: "ignore",
+				stdout: { maxBytes: caps.maxBytes },
+				stderr: { maxBytes: caps.stderrMaxBytes }
+			},
+			graceMs: caps.graceMs,
+			signal: abort.signal
+		});
+	} catch (error) {
+		release();
+		return { ok: false, text: `${label} failed to start: ${String(error)}` };
+	}
+	let outcome: SubprocessOutcome;
+	try {
+		outcome = await handle.done;
+	} catch (error) {
+		release();
+		if (timedOut) {
+			await terminateHandle(handle, caps.graceMs);
+			return { ok: false, timedOut: true, text: timeoutText };
+		}
+		if (signal?.aborted) {
+			return { ok: false, aborted: true, text: `${label} aborted` };
+		}
+		return { ok: false, text: `${label} failed: ${String(error)}` };
+	}
+	release();
+	if (timedOut) {
+		await terminateHandle(handle, caps.graceMs);
+		return { ok: false, timedOut: true, text: timeoutText };
+	}
+	if (signal?.aborted) {
+		return { ok: false, aborted: true, text: `${label} aborted` };
+	}
+	const stdout = handle.collected?.stdout?.readFrom(0);
+	const stderr = handle.collected?.stderr?.readFrom(0);
+	const outText = stdout?.text ?? "";
+	const errText = stderr?.text ?? "";
+	const lossy = (stdout?.lossy ?? false) || (stderr?.lossy ?? false);
+	if (outcome.signal !== null || outcome.exitCode === null) {
+		return { ok: false, text: `${label} was killed by signal ${outcome.signal ?? "(unknown)"}` };
+	}
+	if (outcome.exitCode !== 0) {
+		return { ok: false, text: `${label} failed (exit ${outcome.exitCode})${errText.length > 0 ? `: ${errText}` : ""}` };
+	}
+	return { ok: true, text: lossy ? `${outText}\n(output truncated)` : outText };
+}
+
+/**
+ * List immediate subdirectories of `cwd` that look like git repositories.
+ * @param cwd - the directory to scan.
+ * @returns the absolute path of every immediate subdirectory holding a `.git` entry.
+ */
+async function discoverRepos(cwd: string): Promise<string[]> {
+	let entries;
+	try {
+		entries = await readdir(cwd, { withFileTypes: true });
+	} catch {
+		return [];
+	}
+	const repos: string[] = [];
+	for (const entry of entries) {
+		if (!entry.isDirectory()) continue;
+		const dir = join(cwd, entry.name);
+		if (existsSync(join(dir, ".git"))) repos.push(dir);
+	}
+	return repos;
+}
+
+/**
+ * Resolve the repository a git command should target. Prefers the repo that
+ * contains `cwd` (git walks parents); when `cwd` is not inside a repo — e.g. a
+ * workspace root holding several projects — it falls back to the immediate
+ * subdirectories: exactly one is auto-selected, several are listed, none is a
+ * clear error.
+ * @param ctx - the plugin context owning the subprocess seam.
+ * @param cwd - the starting directory.
+ * @param signal - caller cancellation.
+ * @param caps - the resolved caps.
+ * @returns the resolved repository root, or the failure the caller should report.
+ */
+async function resolveGitRoot(
+	ctx: PluginContext,
+	cwd: string,
+	signal: AbortSignal | undefined,
+	caps: Caps
+): Promise<ResolvedRoot | { ok: false; text: string }> {
+	const probe = await runProcess(ctx, ["git", "rev-parse", "--show-toplevel"], { cwd, signal, caps });
+	if (probe.ok && probe.text.trim().length > 0) return { ok: true, root: cwd };
+	// A cancelled or expired probe is not evidence about the repository: report
+	// the real cause instead of pretending the directory is not a repository.
+	if (!probe.ok && (probe.aborted === true || probe.timedOut === true)) return probe;
+	const repos = await discoverRepos(cwd);
+	if (repos.length === 0) return { ok: false, text: `not a git repository (no .git in ${cwd} or its parents)` };
+	if (repos.length === 1) return { ok: true, root: repos[0] };
+	return {
+		ok: false,
+		text: `multiple git repositories under ${cwd}; run from inside one of them:\n${repos.map((repo) => `  - ${repo}`).join("\n")}`
+	};
+}
+
+/**
+ * Run one `git` argv vector in an already-resolved repository directory.
+ * @param ctx - the plugin context owning the subprocess seam.
+ * @param root - the repository root to run in.
+ * @param argv - the git subcommand and its arguments.
+ * @param opts - working directory, caller cancellation, and the resolved caps.
+ * @returns the collected stdout, or a failure with the plugin's cause flags.
+ */
+function runGitAt(ctx: PluginContext, root: string, argv: string[], opts: RunOptions): Promise<RunOutcome> {
+	return runProcess(ctx, ["git", ...argv], { ...opts, cwd: root });
+}
+
+/**
+ * Run one `git` argv vector, resolving the target repository first.
+ * @param ctx - the plugin context owning the subprocess seam.
+ * @param argv - the git subcommand and its arguments.
+ * @param opts - starting directory, caller cancellation, and the resolved caps.
+ * @returns the collected stdout, or a failure with the plugin's cause flags.
+ */
+async function runGit(ctx: PluginContext, argv: string[], opts: RunOptions): Promise<RunOutcome> {
+	const resolved = await resolveGitRoot(ctx, opts.cwd, opts.signal, opts.caps);
+	if (!resolved.ok) return resolved;
+	return runGitAt(ctx, resolved.root, argv, opts);
+}
+
+/**
+ * Shared command plumbing: run git, map failures/empty output to a result.
+ * @param ctx - the plugin context owning the subprocess seam.
+ * @param invocation - the command invocation whose agent cwd and signal apply.
+ * @param argv - the git subcommand and its arguments.
+ * @param caps - the resolved caps.
+ * @param emptyText - the text reported when git succeeds with no output.
+ * @returns the command result a UI renders directly.
+ */
+async function runCommand(
+	ctx: PluginContext,
+	invocation: CommandInvocation,
+	argv: string[],
+	caps: Caps,
+	emptyText: string
+): Promise<CommandResult> {
+	const result = await runGit(ctx, argv, {
+		cwd: agentCwd(invocation.agent),
+		signal: invocation.signal,
+		caps
+	});
+	if (!result.ok) return { kind: "error", text: result.text };
+	return { kind: "success", text: result.text.length > 0 ? result.text : emptyText };
+}
+
+/**
+ * Register the five human-facing slash commands.
+ * @param ctx - the plugin context owning the command registry.
+ * @param caps - the resolved caps shared by every command.
+ */
+function applyCommands(ctx: PluginContext, caps: Caps): void {
+	ctx.commands.register({
+		name: "status",
+		description: "show git branch and working-tree status",
+		handler: (invocation) => runCommand(ctx, invocation, ["status", "--porcelain=v1", "--branch"], caps, "working tree clean")
+	});
+
+	ctx.commands.register({
+		name: "diff",
+		description: "show a summary of staged and unstaged changes",
+		handler: async (invocation) => {
+			const cwd = agentCwd(invocation.agent);
+			const signal = invocation.signal;
+			const unstaged = await runGit(ctx, ["diff", "--stat"], { cwd, signal, caps });
+			const staged = await runGit(ctx, ["diff", "--cached", "--stat"], { cwd, signal, caps });
+			if (!unstaged.ok || !staged.ok) {
+				return { kind: "error", text: unstaged.ok ? staged.text : unstaged.text };
+			}
+			const sections: string[] = [];
+			if (staged.text.length > 0) sections.push(`Staged changes:\n${staged.text}`);
+			if (unstaged.text.length > 0) sections.push(`Unstaged changes:\n${unstaged.text}`);
+			if (sections.length === 0) {
+				return { kind: "success", text: "No changes (working tree matches HEAD)." };
+			}
+			return { kind: "success", text: sections.join("\n\n") };
+		}
+	});
+
+	ctx.commands.register({
+		name: "branch",
+		description: "create and switch to a branch, or list branches",
+		input: { hint: "[<name>]" },
+		handler: async (invocation) => {
+			const input = invocation.rawInput.trim();
+			const cwd = agentCwd(invocation.agent);
+			const signal = invocation.signal;
+			if (input.length === 0) {
+				const current = await runGit(ctx, ["branch", "--show-current"], { cwd, signal, caps });
+				const list = await runGit(ctx, ["branch", "--list"], { cwd, signal, caps });
+				if (!current.ok || !list.ok) {
+					return { kind: "error", text: current.ok ? list.text : current.text };
+				}
+				const currentName = current.text.trim().length > 0 ? current.text.trim() : "(detached HEAD)";
+				return { kind: "success", text: `Current branch: ${currentName}\n\nBranches:\n${list.text}` };
+			}
+			const check = await runGit(ctx, ["check-ref-format", "--branch", input], { cwd, signal, caps });
+			if (!check.ok) return { kind: "error", text: `Invalid branch name "${input}".\n${check.text}` };
+			const result = await runGit(ctx, ["switch", "-c", input], { cwd, signal, caps });
+			if (!result.ok) return { kind: "error", text: result.text };
+			return { kind: "success", text: `Switched to new branch ${input}\n${result.text}` };
+		}
+	});
+
+	ctx.commands.register({
+		name: "commit",
+		description: "stage all changes and commit with a message",
+		input: { hint: "<message>" },
+		handler: async (invocation) => {
+			const message = invocation.rawInput.trim();
+			const cwd = agentCwd(invocation.agent);
+			const signal = invocation.signal;
+			if (message.length === 0) {
+				const status = await runGit(ctx, ["status", "--porcelain=v1", "--branch"], { cwd, signal, caps });
+				const statusText = status.ok && status.text.length > 0 ? status.text : (status.ok ? "working tree clean" : status.text);
+				return {
+					kind: "success",
+					text: [
+						"Usage: /commit <message>     stage all changes and commit with <message>",
+						"",
+						COMMIT_CONVENTION_HINT,
+						"",
+						"Current changes:",
+						statusText
+					].join("\n")
+				};
+			}
+			// Resolve the repository once so the pre-commit hook and the git
+			// commands below share one working directory — including the
+			// auto-discovered single sub-repository case.
+			const resolved = await resolveGitRoot(ctx, cwd, signal, caps);
+			if (!resolved.ok) return { kind: "error", text: resolved.text };
+			const root = resolved.root;
+			if (caps.preCommit.length > 0) {
+				const hook = await runProcess(ctx, caps.preCommit, { cwd: root, signal, caps });
+				if (!hook.ok) {
+					return { kind: "error", text: `pre-commit hook failed (${caps.preCommit.join(" ")}):\n${hook.text}` };
+				}
+			}
+			const add = await runGitAt(ctx, root, ["add", "-A"], { cwd: root, signal, caps });
+			if (!add.ok) return { kind: "error", text: add.text };
+			const commit = await runGitAt(ctx, root, ["commit", "-m", message], { cwd: root, signal, caps });
+			if (!commit.ok) return { kind: "error", text: commit.text };
+			return { kind: "success", text: commit.text };
+		}
+	});
+
+	ctx.commands.register({
+		name: "undo",
+		description: "stash current changes as a recoverable snapshot",
+		input: { hint: "[list|pop]" },
+		handler: async (invocation) => {
+			const input = invocation.rawInput.trim().toLowerCase();
+			const cwd = agentCwd(invocation.agent);
+			const signal = invocation.signal;
+			if (input === "list") {
+				const list = await runGit(ctx, ["stash", "list"], { cwd, signal, caps });
+				if (!list.ok) return { kind: "error", text: list.text };
+				return { kind: "success", text: list.text.length > 0 ? list.text : "no stashes" };
+			}
+			if (input === "pop") {
+				const pop = await runGit(ctx, ["stash", "pop"], { cwd, signal, caps });
+				if (!pop.ok) return { kind: "error", text: pop.text };
+				return { kind: "success", text: pop.text };
+			}
+			const stash = await runGit(ctx, ["stash", "push", "-u", "-m", "dsh-git-plugin undo snapshot"], { cwd, signal, caps });
+			if (!stash.ok) return { kind: "error", text: stash.text };
+			if (/No local changes to save/i.test(stash.text)) {
+				return { kind: "success", text: "Nothing to stash (working tree has no changes)." };
+			}
+			const list = await runGit(ctx, ["stash", "list"], { cwd, signal, caps });
+			const listText = list.ok ? (list.text.length > 0 ? list.text : "(none)") : list.text;
+			return {
+				kind: "success",
+				text: [
+					"Stashed current changes (recoverable snapshot).",
+					stash.text,
+					"",
+					"Stash list:",
+					listText,
+					"",
+					"Recover with: /undo pop   (or git stash pop)"
+				].join("\n")
+			};
+		}
+	});
+}
+
+/** The model-facing content blocks one tool output declaration renders to. */
+type OutputBlocks = ReturnType<ToolDefinition["output"]["render"]>;
+
+/**
+ * Build one tool's canonical output declaration: a `{ text }` object schema
+ * plus the text projection. The schema is a type parameter so `defineTool`
+ * reads the declared output type instead of a widened schema union.
+ * @param schema - the object schema enforced against the tool's canonical value.
+ * @returns the output declaration shared by every read-only git tool.
+ */
+function textToolOutput<const S extends ValueSchemaSpec>(schema: S): {
+	readonly schema: S;
+	render(args: unknown, value: { text: string }): OutputBlocks;
+} {
+	return {
+		schema,
+		render: (_args, value) => [{ type: "text", text: value.text }]
+	};
+}
+
+/** The output declaration of every read-only git tool. */
+const GIT_TEXT_OUTPUT = textToolOutput({
+	type: "object",
+	additionalProperties: false,
+	properties: { text: { type: "string", required: true } }
+});
+
+/**
+ * Execute one read-only git tool, throwing a plain Error on failure.
+ * @param ctx - the plugin context owning the subprocess seam.
+ * @param exec - the tool execution supplying the agent cwd and caller signal.
+ * @param argv - the git subcommand and its arguments.
+ * @param caps - the resolved caps.
+ * @param emptyText - the text returned when git succeeds with no output.
+ * @returns the tool's canonical `{ text }` value.
+ */
+async function executeGitTool(
+	ctx: PluginContext,
+	exec: ToolRunContext,
+	argv: string[],
+	caps: Caps,
+	emptyText: string
+): Promise<{ text: string }> {
+	const result = await runGit(ctx, argv, {
+		cwd: agentCwd(exec.agent),
+		signal: exec.signal,
+		caps
+	});
+	if (!result.ok) throw new Error(result.text);
+	return { text: result.text.length > 0 ? result.text : emptyText };
+}
+
+/**
+ * Register the four read-only model-facing git tools.
+ * @param ctx - the plugin context owning the tool registry.
+ * @param caps - the resolved caps shared by every tool.
+ */
+function applyTools(ctx: PluginContext, caps: Caps): void {
+	ctx.tools.register(defineTool({
+		name: "git-status",
+		description: "Show the git branch and working-tree status (porcelain v1). Returns the current branch with tracking info and a compact list of staged and unstaged changes. Empty output means a clean working tree.",
+		parameters: {},
+		timeoutMs: caps.timeoutMs,
+		isConcurrencySafe: () => true,
+		output: GIT_TEXT_OUTPUT,
+		execute: (_args, exec) => executeGitTool(ctx, exec, ["status", "--porcelain=v1", "--branch"], caps, "(clean working tree)")
+	}));
+
+	ctx.tools.register(defineTool({
+		name: "git-diff",
+		description: "Show the git diff for staged or unstaged changes. By default shows unstaged changes (git diff); pass staged=true for staged changes (git diff --cached).",
+		parameters: {
+			staged: { type: "boolean", description: "Show staged (git diff --cached) changes instead of unstaged ones." }
+		},
+		timeoutMs: caps.timeoutMs,
+		isConcurrencySafe: () => true,
+		output: GIT_TEXT_OUTPUT,
+		execute: (args, exec) => executeGitTool(ctx, exec, args.staged === true ? ["diff", "--cached"] : ["diff"], caps, "(no diff)")
+	}));
+
+	ctx.tools.register(defineTool({
+		name: "git-log",
+		description: "Show recent git commit history in oneline format. Use count to control how many commits to list (default 10); optionally filter to one file or directory with path.",
+		parameters: {
+			count: { type: "integer", description: "Number of commits to list (default 10)." },
+			path: { type: "string", description: "Optional file or directory path to filter history to." }
+		},
+		timeoutMs: caps.timeoutMs,
+		isConcurrencySafe: () => true,
+		output: GIT_TEXT_OUTPUT,
+		execute: (args, exec) => {
+			const argv = ["log", "--oneline", "-n", String(args.count ?? 10)];
+			if (args.path !== void 0) argv.push("--", args.path);
+			return executeGitTool(ctx, exec, argv, caps, "(no commits)");
+		}
+	}));
+
+	ctx.tools.register(defineTool({
+		name: "git-show",
+		description: "Show a specific commit (or HEAD by default): commit message, author, and full diff.",
+		parameters: {
+			ref: { type: "string", description: "Commit reference (SHA, branch, or tag) to show. Defaults to HEAD." }
+		},
+		timeoutMs: caps.timeoutMs,
+		isConcurrencySafe: () => true,
+		output: GIT_TEXT_OUTPUT,
+		execute: (args, exec) => {
+			const ref = args.ref !== void 0 && args.ref.length > 0 ? args.ref : "HEAD";
+			// Treat refs beginning with '-' as revisions, never as git-show options.
+			return executeGitTool(ctx, exec, ["show", "--end-of-options", ref], caps, "");
+		}
+	}));
+}
+
+/**
+ * Register the plugin's commands, tools, and system-prompt section.
+ * @param ctx - the Cordis context carrying the four injected services.
+ * @param config - the plugin config as Cordis supplies it; every field has a schema default, so a partial object is accepted and each missing field falls back to its default.
+ * @returns a promise that settles once every registration is installed.
+ */
+async function apply(ctx: PluginContext, config: Partial<GitConfig>): Promise<void> {
+	const caps: Caps = {
+		maxBytes: config.maxBytes ?? DEFAULT_MAX_BYTES,
+		stderrMaxBytes: config.stderrMaxBytes ?? DEFAULT_STDERR_MAX_BYTES,
+		graceMs: config.graceMs ?? DEFAULT_GRACE_MS,
+		timeoutMs: config.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+		preCommit: Array.isArray(config.preCommit) ? config.preCommit : []
+	};
+	assertPositiveInteger("maxBytes", caps.maxBytes);
+	assertPositiveInteger("stderrMaxBytes", caps.stderrMaxBytes);
+	assertPositiveInteger("graceMs", caps.graceMs);
+	assertPositiveInteger("timeoutMs", caps.timeoutMs);
+
+	applyCommands(ctx, caps);
+	applyTools(ctx, caps);
+
+	ctx.systemPrompt.section({
+		name: "tool:git",
+		order: 150,
+		text: "Use the git tools (git-status, git-diff, git-log, git-show) — not shell git — to inspect repository state before and while editing. Before committing, read the repo's commit convention (AGENTS.md or CLAUDE.md) and commit with /commit <message> using a conventional MAA-style message. Create branches with /branch <name> following the repo's branch-prefix convention (feat/, fix/, docs/, etc.)."
+	});
+}
+
+export { Config, apply, inject, name };

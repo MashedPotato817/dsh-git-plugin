@@ -21,6 +21,15 @@ jobs:
 
       - run: npm ci
 
+      - name: Build
+        run: npm run build
+
+      - name: Check that the committed lib/ is current
+        run: git diff --exit-code lib
+
+      - name: Type check
+        run: npm run check
+
       - name: Syntax check
         run: node --check lib/index.js
 

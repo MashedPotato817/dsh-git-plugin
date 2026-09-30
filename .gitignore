@@ -3,3 +3,13 @@ node_modules/
 .DS_Store
 .pnpm-store/
 .vscode/
+
+# Local npm cache and debug logs, used because the sandbox blocks writes outside the workspace.
+.npm-cache/
+
+# Isolated DSH install used by scripts/verify-real-dsh.mjs and by profile checks.
+.tmp-dsh-verify/
+.tmp-dsh-home/
+
+# AgentTeams runtime state, created under the workspace by the team tooling.
+.agent-teams/
