@@ -1,14 +1,14 @@
 # dsh-git-plugin 维护计划
 
 本轮工作按「审查 → 适配 → 验证 → 交付」推进，本文记录证据、结论、剩余问题与后续安排。
-所有外部动作（提交、推送、打 tag、发布 npm / GitHub Release、社区回复）均未执行，等待仓库负责人授权。
+2026-10-01 状态更新：适配已按授权在本地提交为 `8181856`；推送、合并、打 tag、发布 npm / GitHub Release、社区回复均未执行，后续分别等待授权。第 2 节保留当时采集的版本证据，执行新任务前需刷新在线信息。
 
 ## 1. 当前状态
 
 | 项目 | 状态 |
 |---|---|
 | 仓库 | `MashedPotato817/dsh-git-plugin`，默认分支 `main`，最新提交 `3bbb253 docs: README 增加 npm 徽章` |
-| 工作分支 | `fix/git-show-option-injection`（上一轮遗留分支，本轮在其上继续，未提交） |
+| 工作分支 | `fix/git-show-option-injection`（适配提交 `8181856`，尚未合并或推送） |
 | npm | `dsh-git-plugin@0.1.0`，2026-08-13T16:31:32Z 发布，`gitHead b9cfbd9` |
 | GitHub Release | `v0.1.0`，2026-08-13T16:06:59Z，tag 指向 `b9cfbd9`（与 npm `gitHead` 一致） |
 | 目标 DSH | 0.2.0-rc.2（本机运行中的桌面运行时版本，见第 2 节） |
@@ -16,7 +16,7 @@
 | **依赖允许范围** | peer / `engines.dsh` 声明为 `>=0.2.0-rc.2 <0.3.0-0`（Node `>=20`）。这是「允许安装与加载的范围」，不是「已验证兼容的范围」；范围内未实测的版本需按第 5.2 节重跑验证后再宣称。 |
 | Git 要求 | 需支持 `--end-of-options`（Git 2.24+）；实测 Git 2.53.0.windows.2，更老版本未验证 |
 | 源码形态 | `src/index.ts`（严格模式 TypeScript）→ `npm run build` → `lib/index.js` + `lib/index.d.ts`；`lib/` 随仓库提交，npm 与 GitHub 两种安装渠道都不需要安装期构建 |
-| 未提交改动 | `src/index.ts`、`tsconfig.json`、`lib/index.js`（tsc 重新生成）、`lib/index.d.ts`（新增）、`scripts/verify-real-dsh.mjs`（新增）、`package.json`、`package-lock.json`、`test/smoke.test.js`、`test/integration.test.js`、`README.md`、`CHANGELOG.md`（新增）、`docs/maintenance-plan.md`（新增）、`docs/article-dsh-git-plugin.md`、`.github/workflows/ci.yml`、`.gitignore`。另有 `AGENTS.md`（本地维护指引）与 `.agent-teams/`（本轮验证产生的团队状态）**均不纳入发布提交**，后者已在 `.gitignore` 中忽略 |
+| 已提交适配 | `8181856` 包含 TypeScript 源码、配置、编译产物、测试与维护文档；`AGENTS.md` 作为项目指引纳入版本控制，不进入 npm 发布包。`.agent-teams/` 与临时测试目录已忽略 |
 
 ## 2. 版本核实（证据，2026-09-29 采集）
 
@@ -255,8 +255,8 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
    git push origin main          # 需授权
    ```
    记下这个提交的 SHA，第 9.2–9.4 步都要用它（9.2 的干净检出、9.3 的 `gitHead` 核对、9.4 的 tag）。
-   注意：`AGENTS.md`（本地维护指引）目前是未跟踪文件，是否纳入提交由仓库负责人决定；
-   不确定时不要用 `git add -A`，按上面的显式路径暂存。
+   注意：`AGENTS.md` 按用户授权作为项目指引纳入版本控制，不加入 npm 发布包；
+   按上面的显式路径暂存发布改动，避免带入团队状态或临时文件。
 
 ### 9.2 提交后复核：构建产物门（在干净检出里重建后比较）
 
