@@ -303,8 +303,9 @@ Issue #1 的只读 Web 面板完整方案（能力复用、入口落位、Host �
 ### 9.2 提交后复核：构建产物门（在干净检出里重建后比较）
 
 8. 该门只有在发布提交存在之后才有意义（CI 会在推送后跑同一道门）；需要本地复核时用干净检出：
+   候选 SHA 尚未推送时必须从本地主仓库克隆。以下示例在 WSL 中执行；Windows 请使用对应的本地绝对路径与独立临时目录。只有确认远端包含该 SHA 后，才可改用远端地址。
    ```bash
-   git clone <仓库地址> /tmp/dsh-git-plugin-verify
+   git clone --no-hardlinks "/mnt/c/Users/Mashed Potato/Desktop/npm/dsh-git-plugin" /tmp/dsh-git-plugin-verify
    cd /tmp/dsh-git-plugin-verify
    git checkout <9.1 第 7 步的候选提交 SHA>
    npm ci

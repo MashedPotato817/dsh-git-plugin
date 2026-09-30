@@ -38,3 +38,9 @@
 - 同一版本只 `npm publish --tag next` 一次；验证通过后用 `npm dist-tag add dsh-git-plugin@<版本> latest` 推广。需要修改已发布内容时提升版本。
 - `AGENTS.md` 作为项目指引纳入版本控制，但不加入 npm files（发布包只含 `files = ["lib", "README.md", "LICENSE"]`，因此 `AGENTS.md`、`docs/`、`.agent-teams/` 都不会进入 tarball）；`.agent-teams/`、缓存和独立测试目录保持忽略。
 - 提交、合并、推送、打 tag、发布及社区消息分别需要用户授权；已有授权直接执行，不重复询问。结束报告修改文件、原因、验证结果、未验证项与下一条 Git 命令。
+
+## 后续任务入口（2026-10-01 核查）
+
+- 任务分包见 [docs/dsh-tasks/README.md](docs/dsh-tasks/README.md)：验证补齐 → 发布 → Web Host → TSX UI → 真实 Web 验收；逐包完成与交接，不一次混做。
+- 候选基线为 feba7b8；适配与 Windows 回归已完成，Web 仍只有方案。当前远端 main 与 Actions 成功记录不含此候选，不能替代候选 CI。
+- 本机 WSL Ubuntu 24.04 的 Node 18.19.1 低于要求；Linux Node 20/22 尚待隔离运行时验证。未推送 SHA 的干净检出从本地主仓库克隆。
