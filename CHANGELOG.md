@@ -7,7 +7,7 @@
 
 ## [0.2.0] - 待发布
 
-适配目标：DeepSeek Harness（DSH）0.2.0-rc.2。以下内容均为 0.2.0 发布候选：尚未推送、未打 tag、未发布到 npm。
+适配目标：DeepSeek Harness（DSH）0.2.0-rc.2。允许版本范围与实际验证版本分开记录；真实模型会话仍未验证。
 
 ### Added
 
@@ -19,6 +19,7 @@
   `dsh-tools` + `dsh-system-prompt` + `dsh-subprocess-local` + 真实 Git），刻意不纳入 `npm test` / CI。
 - 包元数据：`repository`、`bugs`、`homepage`、`engines.dsh`、`dsh.manifestVersion`。
 - 文档：`CHANGELOG.md`、`docs/maintenance-plan.md`（含版本证据、验证结果与发布步骤）。
+- 仓库协作：`CONTRIBUTING.md`、缺陷/功能/兼容性 Issue 表单与 PR 模板；提交钩子支持 `ci` 类型。
 
 ### Changed
 

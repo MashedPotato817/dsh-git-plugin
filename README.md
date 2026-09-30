@@ -25,9 +25,8 @@
 0.2.0-rc.2 的证据：官方 Release [`dsh-v0.2.0-rc.2`](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.0-rc.2)（2026-09-29，提交 `639ed015`），npm `@deepseek-ai/dsh` 的 `next`/`latest` 均为 `0.2.0-rc.2`，本机 `@deepseek-ai/dsh-desktop-runtime@0.2.0-rc.2`。
 注意 4 个子包（`dsh-commands`、`dsh-tools`、`dsh-subprocess`、`dsh-system-prompt`）的 **`latest` 标签仍停在 `0.0.1-rc.1`**，安装与开发请使用 `next` 或精确版本 `0.2.0-rc.2`，不要用 `@latest`。
 
-> **当前 npm 上的 `0.1.0` 面向 DSH 0.1.x**，在 0.2.0-rc.2 上会被判为不兼容而无法加载。
-> 面向 0.2.0-rc.2 的版本已整理为本地 `0.2.0` 发布候选（`package.json` 已提升，见 [CHANGELOG.md](CHANGELOG.md) 的 `[0.2.0]`），
-> 但**尚未推送、未打 tag、未发布**。
+> **插件 `0.1.0` 面向 DSH 0.1.x**，在 DSH 0.2.0-rc.2 上不兼容。
+> 本源码版本为 `0.2.0`，已适配并实测 DSH `0.2.0-rc.2`；安装时请核对精确版本，见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 能力
 
@@ -60,12 +59,10 @@
 
 ## 安装
 
-> 针对 DSH 0.2.0-rc.2 的修复已提交到本地分支（`fix/git-show-option-injection` 的 `8181856`、`2f80cb3`），
-> 版本随之在本地提升为 `0.2.0`（发布准备分支 `feat/release-0.2.0`），但**尚未推送、未打 tag、未发布**：
-> 远端 `main` 与 npm 上的 `0.1.0` 仍是旧代码。
-> 在兼容版本推送之前，请使用下面的「本地 / 源码安装」。
+> DSH 0.2.0-rc.2 请安装插件 `0.2.0`；插件 `0.1.0` 的旧 peer 范围会被新版宿主拒绝。
+> npm 版本、dist-tag 和 GitHub Release 的在线状态以对应渠道为准。
 
-### 本地 / 源码安装（推送前推荐）
+### 本地 / 源码安装
 
 ```bash
 dsh plugin --profile <name> add /path/to/dsh-git-plugin
@@ -73,22 +70,22 @@ dsh plugin --profile <name> add /path/to/dsh-git-plugin
 
 本地路径安装直接使用工作区里的 `lib/`，包含本轮全部修复。
 
-### 从 GitHub 安装（推送兼容版本后适用）
+### 从 GitHub 安装
 
 编译产物 `lib/` 随源码提交，因此从 Git 安装不需要在安装期构建。
-**该渠道只有在兼容版本推送后才可用**；推送后建议固定到发布 tag，避免拿到中间状态：
+使用已推送的固定发布 tag，避免拿到中间状态：
 
 ```bash
 dsh plugin --profile <name> add github:MashedPotato817/dsh-git-plugin#v0.2.0
 ```
 
-### 从 npm 安装（发布并推广 `latest` 后适用）
+### 从 npm 安装
 
 ```bash
-dsh plugin --profile <name> add dsh-git-plugin
+dsh plugin --profile <name> add dsh-git-plugin@0.2.0
 ```
 
-在 `0.2.0` 发布并用 dist-tag 推广到 `latest` 之前，npm 上的 `0.1.0` 与 DSH 0.2.0-rc.2 不兼容（会被 peer 准入拒绝）。
+建议固定版本；需要默认渠道时先确认 `npm view dsh-git-plugin dist-tags` 中 `latest` 已指向兼容版本。
 
 ### 启用
 
@@ -172,7 +169,7 @@ npm test        # node --test（单元 + 真实 git 集成测试）
 
 ## 验证
 
-| 层次 | 命令 / 方式 | 本轮结果（本地发布候选 `0.2.0`，未推送 / 未发布） |
+| 层次 | 命令 / 方式 | 0.2.0 发布前验证结果 |
 |---|---|---|
 | 类型与语法 | `npm run build`、`npm run check` | 0 错误；两次构建产物哈希一致 |
 | 单元（模拟 subprocess seam） | `node test/smoke.test.js` | 10 通过 |
@@ -183,8 +180,8 @@ npm test        # node --test（单元 + 真实 git 集成测试）
 | 真实 DSH 服务栈 | `node scripts/verify-real-dsh.mjs --dsh-root <隔离安装>` | `ALL CHECKS PASSED`（28 项，连续 3 次） |
 | 独立 DSH profile | 独立 `DSH_HOME` + `headless` 模板 | 安装 / 加载 / schema / 禁用 / 重新启用全部通过 |
 
-以上结果均来自本地工作区（分支 `feat/release-0.2.0`）：**本地已完成**，但尚未推送、未打 tag、未发布到 npm
-（npm 上仍是 `0.1.0`）。完整证据与未验证项见 [docs/validation-report-0.2.0.md](docs/validation-report-0.2.0.md)。
+以上为发布前本地验证记录；真实模型会话与 Linux 上完整 DSH 宿主仍未验证。
+当前提交的远端 CI、发布渠道安装和四者一致性以发布记录为准；历史证据见 [docs/validation-report-0.2.0.md](docs/validation-report-0.2.0.md)。
 
 ### 真实 DSH 服务栈验证（按需运行，不纳入 `npm test` / CI）
 
@@ -205,9 +202,9 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
 斜杠命令 / 只读工具 / preCommit 三处超时终止、调用方取消不被误报为超时、
 以及自动发现子仓库后 preCommit 与 Git 操作共用同一工作目录。
 
-**未验证项**（不作兼容宣称）：运行中 DSH 会话里由模型调用命令/工具（已给出可手动执行的验收单）、
-GitHub Actions 的 20/22 矩阵实跑、DSH 0.1.x、`0.2.x` 中除 `0.2.0-rc.2` 外的版本、Git < 2.24、
-GitHub 与 npm 两个远端安装渠道（发布前无法实测）。
+**验证边界**：运行中 DSH 会话的模型调用、Linux 上完整 DSH 服务栈、
+DSH 0.1.x、`0.2.x` 中除 `0.2.0-rc.2` 外的版本、Git < 2.24 均不作已验证兼容宣称。
+远端 CI 与 npm/GitHub 安装在发布过程中单独核对，不以发布前本地测试替代。
 详细证据见 [docs/validation-report-0.2.0.md](docs/validation-report-0.2.0.md) 与
 [docs/maintenance-plan.md](docs/maintenance-plan.md) 第 5 节。
 
