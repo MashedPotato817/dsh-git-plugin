@@ -122,8 +122,9 @@
 | 类型 / 语法 | `npm run build`、`npm run check`（`tsc --noEmit`，strict） | 通过，0 错误；两次构建产物哈希一致（确定性） |
 | 单元（模拟） | `node test/smoke.test.js` | 10 通过 / 0 失败 |
 | 集成（真实 Git，临时仓库） | `node test/integration.test.js` | 16 通过 / 0 失败 |
-| 全部测试（与 CI 同一条命令） | `npm test`（`node --test`） | 26 通过 / 0 失败 |
-| 打包 | `npm pack --dry-run` / `npm pack` | 5 个文件：LICENSE、README、`lib/index.js`、`lib/index.d.ts`、package.json；`dsh-git-plugin-0.2.0.tgz` 15054 字节（package 15.1 kB / unpacked 43.2 kB，shasum `9366057f…`） |
+| 全部测试（与 CI 同一条命令） | `npm test`（`node --test`） | 26 通过 / 0 失败（Windows 24.19.0；Linux 20.20.2 / 22.23.3） |
+| **Linux Node 20 / 22 隔离矩阵** | WSL2 Ubuntu 24.04，隔离 Node v20.20.2 / v22.23.3；旧候选执行完整流程，修复后拷入源码并重建复验 | 旧候选产物门 exit 0，但测试各 5 cancelled；修复后 build/check/test exit 0、26/26；新修复提交后的产物门与完整矩阵待执行，详见 [validation-report-0.2.0.md](validation-report-0.2.0.md) |
+| 打包 | `npm pack --dry-run` / `npm pack` | 5 个文件：LICENSE、README、`lib/index.js`、`lib/index.d.ts`、package.json；修复前 `dsh-git-plugin-0.2.0.tgz` 15054 字节（15.1 kB），修复后 15.3 kB / unpacked 43.7 kB |
 | peer 准入范围（`node-semver@7.8.5`） | 旧范围 `^0.1.0-rc.6` 对 `0.2.0-rc.2` 为 false；新范围 `>=0.2.0-rc.2 <0.3.0-0` 为 true | 通过（第 3 节表格） |
 | **真实 DSH 0.2.0-rc.2 服务栈** | `node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify`（官方 `cordis` + `dsh-commands` + `dsh-tools` + `dsh-system-prompt` + `dsh-subprocess-local`，真实 Git 子进程） | `ALL CHECKS PASSED`（脚本当前 28 项 check；数量以脚本为准），见 5.2 |
 | **独立测试 profile（真实 DSH CLI）** | 独立 `DSH_HOME` 下用 `--from-default-profile headless` 建 profile，`dsh plugin add <本地路径>` 安装，`cordis.patch.yml` 用 `insert` 启用，再跑 `--dump-config` / `--dump-config-schema` | 见 5.3 |
@@ -388,8 +389,9 @@ Issue #1 的只读 Web 面板完整方案（能力复用、入口落位、Host �
 2. **子包 `latest` 滞后**：任何安装/开发命令不要使用 `@latest`，用 `next` 或精确版本。
 3. **`timeoutMs` 语义变化**：现在对 preCommit 也生效，默认 30s 可能对 `preCommit: ["npm","test"]`
    这类慢钩子偏紧，需要在配置里调大，README 已注明。
-4. **CI 尚未在 GitHub Actions 上实际运行**：本地已用同一条 `npm test`（26/26）与 `npm run check` 验证；
-   首次推送后需确认 Actions 上的构建、`git diff --exit-code lib` 新鲜度门与 Node 20/22 矩阵结果。
+4. **CI 尚未在 GitHub Actions 上实际运行**：本地已用同一条 `npm test`（Windows 26/26；Linux Node 20.20.2 / 22.23.3 各 26/26）
+   与 `npm run check` 验证；首次推送后需确认 Actions 上的构建、`git diff --exit-code lib` 新鲜度门与 Node 20/22 矩阵结果。
+   **本机 Linux 矩阵不能替代候选 CI**。
 5. **GitHub 安装渠道**（`dsh plugin add github:MashedPotato817/dsh-git-plugin`）未实测，且**推送前不可用**
    （远端仍是旧代码）。README 已把该渠道标注为「推送兼容版本后适用」并建议固定到发布 tag；
    编译产物 `lib/` 纳入版本控制，避免依赖安装期构建脚本。
@@ -408,7 +410,12 @@ Issue #1 的只读 Web 面板完整方案（能力复用、入口落位、Host �
    `@deepseek-ai/dsh-subprocess-local` 的 postinstall `ensure-spawn-helper.mjs`、`koffi`、`node-pty`、
    `@google/genai`、`protobufjs`。Windows 下本次验证不受影响（该 postinstall 只恢复 POSIX 可执行位），
    但 Linux/macOS 上 `node-pty` 的 spawn-helper 执行位可能受影响，属**待相应平台确认**的风险。
-10. **验证脚本的临时目录未自清**：`scripts/verify-real-dsh.mjs` 用 `fs.mkdtempSync` 自建
-    `%TEMP%/dsh-verify-repo-*` 后不自清（本轮由人工清理了 3 个旧目录），属已知跟进项
-    （本轮为不使已验证工具链失效而未改脚本）。修复建议：用 `try/finally` 在成功与失败路径都清理临时仓库
-    （脚本内 `dsh-verify-run-*` 辅助目录已自清，可直接照搬该写法）。
+10. ~~**验证脚本的临时目录未自清**~~ → **已修复（包 01，未提交）**：`scripts/verify-real-dsh.mjs` 现在把
+    `run()` 的临时目录与自建 Git 仓库统一登记，在所有退出路径（正常、失败、未捕获异常）清理，并对 Windows 上
+    「被终止的子进程短暂锁住目录」重试 5×100 ms；连续 3 次运行后 `%TEMP%/dsh-verify-*` 残留为 0。
+    同时补了 `--dsh-root` 缺值/未知选项的 exit 2 与用法提示，以及实际加载的官方包版本与入口路径打印。
+11. **截止时间定时器缺陷（包 01 发现并修复，未提交）**：`runProcess` 的超时定时器与 `terminateHandle` 的宽限定时器
+    曾被 `unref`，在被等待的 promise 只由该定时器推进时事件循环会在到期前耗尽——Linux Node 20/22 上稳定复现
+    （`npm test` 5 项 `cancelledByParent`），等于超时可能被跳过。修复移除两处 `unref`，`lib/` 已重建；
+    Windows 与 Linux 两个 Node 版本复验 26/26，真实服务栈连续 3 次 `ALL CHECKS PASSED`。
+    **源码已变动**：`feba7b8` / `2a5ef36` 之后的改动需要一个新候选提交，提交后才重跑干净检出产物门。

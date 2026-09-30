@@ -14,8 +14,8 @@
 | 项目 | 允许范围（声明） | 实际验证版本 |
 |---|---|---|
 | DSH | `>=0.2.0-rc.2 <0.3.0-0` | **仅 `0.2.0-rc.2`**（官方 npm 包、本机桌面运行时、独立测试 profile 三处） |
-| Node.js | `>=20` | 24.19.0；CI 矩阵覆盖 20 / 22（尚未实际跑过） |
-| Git | 需支持 `--end-of-options`（Git 2.24+） | 2.53.0.windows.2 |
+| Node.js | `>=20` | 24.19.0（Windows）；**20.20.2 与 22.23.3（Linux，隔离运行时，2026-10-01）**；GitHub Actions 的 20/22 矩阵**尚未实跑** |
+| Git | 需支持 `--end-of-options`（Git 2.24+） | 2.53.0.windows.2（Windows）、2.43.0（Linux） |
 
 - 范围内的 `0.2.x` 其他版本（`0.2.0`、`0.2.1-rc.1` …）**未验证**：能被加载不代表行为正确。
   换版本使用时请按下面的「真实 DSH 服务栈验证」重跑一次再判断。
@@ -177,11 +177,14 @@ npm test        # node --test（单元 + 真实 git 集成测试）
 | 类型与语法 | `npm run build`、`npm run check` | 0 错误；两次构建产物哈希一致 |
 | 单元（模拟 subprocess seam） | `node test/smoke.test.js` | 10 通过 |
 | 集成（临时目录真实 `git init`/`commit`/`stash`） | `node test/integration.test.js` | 16 通过 |
-| 全部测试（与 CI 同一条命令） | `npm test` | 26 通过 / 0 失败 |
-| 打包内容 | `npm pack --dry-run` | 仅 `lib/`、README、LICENSE、package.json |
+| 全部测试（与 CI 同一条命令） | `npm test` | 26 通过 / 0 失败（Windows、Linux Node 20.20.2、Linux Node 22.23.3） |
+| 打包内容 | `npm pack --dry-run` | 仅 `lib/`、README、LICENSE、package.json（5 文件） |
+| Linux 构建与测试 | WSL2 Ubuntu 24.04，隔离 Node 20.20.2 / 22.23.3 | 旧候选产物门 exit 0，但测试 5 cancelled；修复后 build/check/test exit 0，26/26；新修复提交后的产物门与完整矩阵待执行 |
+| 真实 DSH 服务栈 | `node scripts/verify-real-dsh.mjs --dsh-root <隔离安装>` | `ALL CHECKS PASSED`（28 项，连续 3 次） |
+| 独立 DSH profile | 独立 `DSH_HOME` + `headless` 模板 | 安装 / 加载 / schema / 禁用 / 重新启用全部通过 |
 
 以上结果均来自本地工作区（分支 `feat/release-0.2.0`）：**本地已完成**，但尚未推送、未打 tag、未发布到 npm
-（npm 上仍是 `0.1.0`）。
+（npm 上仍是 `0.1.0`）。完整证据与未验证项见 [docs/validation-report-0.2.0.md](docs/validation-report-0.2.0.md)。
 
 ### 真实 DSH 服务栈验证（按需运行，不纳入 `npm test` / CI）
 
@@ -202,9 +205,11 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
 斜杠命令 / 只读工具 / preCommit 三处超时终止、调用方取消不被误报为超时、
 以及自动发现子仓库后 preCommit 与 Git 操作共用同一工作目录。
 
-**未验证项**（不作兼容宣称）：运行中 DSH 会话里由模型调用命令/工具、Linux 行为、
-DSH 0.1.x、`0.2.x` 中除 `0.2.0-rc.2` 外的版本、Git < 2.24、GitHub 安装渠道。
-详细证据见 [docs/maintenance-plan.md](docs/maintenance-plan.md) 第 5 节。
+**未验证项**（不作兼容宣称）：运行中 DSH 会话里由模型调用命令/工具（已给出可手动执行的验收单）、
+GitHub Actions 的 20/22 矩阵实跑、DSH 0.1.x、`0.2.x` 中除 `0.2.0-rc.2` 外的版本、Git < 2.24、
+GitHub 与 npm 两个远端安装渠道（发布前无法实测）。
+详细证据见 [docs/validation-report-0.2.0.md](docs/validation-report-0.2.0.md) 与
+[docs/maintenance-plan.md](docs/maintenance-plan.md) 第 5 节。
 
 ## Hook 与 CI
 

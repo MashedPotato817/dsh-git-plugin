@@ -158,8 +158,10 @@ async function terminateHandle(handle: SpawnedHandle, graceMs: number): Promise<
 		await Promise.race([
 			quiescent.then(() => {}, () => {}),
 			new Promise((resolve) => {
+				// The grace period is a deadline this plugin must honour, so the timer is not
+				// unref'd: an unref'd timer lets the event loop drain and the wait would be
+				// skipped instead of expiring. It is cleared as soon as the handle settles.
 				timer = setTimeout(resolve, graceMs);
-				timer.unref?.();
 			})
 		]);
 	} finally {
@@ -194,11 +196,14 @@ async function runProcess(ctx: PluginContext, argv: string[], { cwd, signal, cap
 	let timedOut = false;
 	const forwardAbort = () => abort.abort(signal?.reason);
 	signal?.addEventListener("abort", forwardAbort, { once: true });
+	// The deadline is this plugin's own obligation, so the timer is not unref'd: an
+	// unref'd timer lets the event loop drain (observed on Linux) and the operation
+	// would hang or be cancelled instead of timing out. `release()` clears it as soon
+	// as the spawn settles, so it never outlives the run it bounds.
 	const timer = setTimeout(() => {
 		timedOut = true;
 		abort.abort(new Error(timeoutText));
 	}, caps.timeoutMs);
-	timer.unref?.();
 	const release = () => {
 		clearTimeout(timer);
 		signal?.removeEventListener("abort", forwardAbort);

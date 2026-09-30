@@ -6,8 +6,9 @@
 - 适配已提交：`8181856`，包含严格 TypeScript 迁移、DSH 0.2.0-rc.2 适配、Git 参数安全/超时/钩子目录修复、测试与文档。
 - 源码为 `src/index.ts`；`npm run build` 生成 `lib/index.js`、`lib/index.d.ts`，构建产物随 Git 提交并用于 npm 安装。保持 ESM 与现有命令/工具行为。
 - 当前包版本（本地）为 `0.2.0`：发布准备分支 `feat/release-0.2.0`（从 `2f80cb3` 创建）上已提升 `package.json` / `package-lock.json`，`CHANGELOG` 的 `[Unreleased]` 内容已整理进 `## [0.2.0] - 待发布`；发布候选已按授权在该分支提交（SHA 以 Git 历史为准），**未推送、未打 tag、未发布**，npm 上仍是 `0.1.0`（只有 `latest`，无 `next`）。
-- 已验证：严格类型检查、26 项测试、构建产物一致性。仅 DSH `0.2.0-rc.2` 有适配验证记录；服务栈/profile 验证不等于真实模型会话验证。
-- Linux、GitHub Actions Node 20/22、GitHub 安装、运行中 DSH 会话里的模型调用、以及 `0.2.x` 中除 `0.2.0-rc.2` 之外的版本均仍**待验证**。依赖允许范围不等于实测范围；旧版本与在线状态需重新查询（2026-10-01 复核：最新 DSH Release 仍是 `dsh-v0.2.0-rc.2`，无新增版本）。
+- 已验证：严格类型检查、26 项测试、构建产物一致性，以及 **Linux Node 20.20.2 / 22.23.3 的隔离矩阵**（WSL2 Ubuntu 24.04；修复后 build/check/test 通过；旧候选产物门通过，新修复提交后的产物门仍待执行）。仅 DSH `0.2.0-rc.2` 有适配验证记录；服务栈/profile 验证不等于真实模型会话验证。完整证据见 `docs/validation-report-0.2.0.md`。
+- Linux 上的真实 DSH 服务栈、GitHub Actions Node 20/22、GitHub 安装、运行中 DSH 会话里的模型调用、以及 `0.2.x` 中除 `0.2.0-rc.2` 之外的版本均仍**待验证**。依赖允许范围不等于实测范围；旧版本与在线状态需重新查询（2026-10-01 复核：最新 DSH Release 仍是 `dsh-v0.2.0-rc.2`，无新增版本）。
+- 包 01 复查发现并修复了一个真实缺陷：截止时间/宽限定时器曾被 `unref`，在被等待的 promise 只由该定时器推进时超时会被跳过（Linux 上稳定复现）。修复位于 `src/index.ts`，**尚未提交**；`lib/` 已重建，`scripts/verify-real-dsh.mjs` 也做了参数校验、版本打印与临时目录回收加固。这些改动需要一个新的审阅提交，之后才重跑提交后的干净检出产物门。
 
 ## 必看参考
 
@@ -42,5 +43,5 @@
 ## 后续任务入口（2026-10-01 核查）
 
 - 任务分包见 [docs/dsh-tasks/README.md](docs/dsh-tasks/README.md)：验证补齐 → 发布 → Web Host → TSX UI → 真实 Web 验收；逐包完成与交接，不一次混做。
-- 候选基线为 feba7b8；适配与 Windows 回归已完成，Web 仍只有方案。当前远端 main 与 Actions 成功记录不含此候选，不能替代候选 CI。
-- 本机 WSL Ubuntu 24.04 的 Node 18.19.1 低于要求；Linux Node 20/22 尚待隔离运行时验证。未推送 SHA 的干净检出从本地主仓库克隆。
+- 候选基线为 feba7b8（其后有文档提交 2a5ef36，仅 AGENTS.md 与 docs/）；适配与 Windows 回归已完成，Web 仍只有方案。当前远端 main 与 Actions 成功记录不含此候选，不能替代候选 CI。
+- Linux Node 20/22 已用**隔离运行时**（WSL2 Ubuntu 24.04，`~/dsh-node-runtimes/node-v20.20.2-linux-x64`、`node-v22.23.3-linux-x64`）完成修复后 build/check/test 复验；旧候选的构建/产物门/类型/语法/打包已执行，新修复提交后的完整干净矩阵待重跑。系统 Node 18.19.1 未用于验证。证据见 `docs/validation-report-0.2.0.md`。未推送 SHA 的干净检出从本地主仓库克隆。

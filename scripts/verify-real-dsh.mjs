@@ -45,10 +45,75 @@ const DSH_PACKAGES = [
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const pluginRoot = path.resolve(scriptDir, "..");
+
+const USAGE = [
+	"usage: node scripts/verify-real-dsh.mjs [--dsh-root <dir>]",
+	"  --dsh-root <dir>  directory whose node_modules holds the DSH packages",
+	"                    (defaults to this repository's own node_modules)"
+].join("\n");
+
 const argv = process.argv.slice(2);
 const rootFlag = argv.indexOf("--dsh-root");
+if (rootFlag !== -1) {
+	const value = argv[rootFlag + 1];
+	if (value === void 0 || value.startsWith("--")) {
+		console.error("verify-real-dsh: --dsh-root requires a directory value");
+		console.error(USAGE);
+		process.exit(2);
+	}
+}
+const unknown = argv.filter((arg, index) => arg.startsWith("--") && index !== rootFlag);
+if (unknown.length > 0) {
+	console.error(`verify-real-dsh: unknown option ${unknown.join(", ")}`);
+	console.error(USAGE);
+	process.exit(2);
+}
 const dshRoot = path.resolve(rootFlag === -1 ? path.join(pluginRoot, "node_modules") : argv[rootFlag + 1]);
 const requireFromDsh = createRequire(path.join(dshRoot, "verify-real-dsh.cjs"));
+
+/**
+ * Temp directories created by this run. They are removed on every exit path —
+ * normal completion, a failed check, or an uncaught error — so one run never
+ * leaves throwaway repositories behind in the OS temp directory.
+ */
+const tempDirs = new Set();
+/** Register one temp directory for exit-time cleanup. */
+function trackTemp(dir) {
+	tempDirs.add(dir);
+	return dir;
+}
+/**
+ * Remove one temp directory, retrying briefly. The timeout check terminates a child
+ * process inside the throwaway repository, and Windows can keep that directory locked
+ * for a moment after the kill, so a single best-effort removal is not always enough.
+ * @returns true once the directory is gone, false after the last attempt failed.
+ */
+function removeTempDir(dir) {
+	for (let attempt = 0; attempt < 5; attempt += 1) {
+		try {
+			fs.rmSync(dir, { recursive: true, force: true });
+			return true;
+		} catch {
+			Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
+		}
+	}
+	return false;
+}
+process.on("exit", () => {
+	for (const dir of tempDirs) removeTempDir(dir);
+});
+
+/** Describe one loaded DSH package: its version and the entry file actually imported. */
+function describeDsh(name) {
+	const entry = requireFromDsh.resolve(name);
+	let version = "unknown";
+	try {
+		version = requireFromDsh(`${name}/package.json`).version;
+	} catch {
+		// Some packages do not export ./package.json; the entry path still identifies the install.
+	}
+	return `${name}@${version} (${entry})`;
+}
 
 /** Load one DSH package from the requested root through its own package entry. */
 async function loadDsh(name) {
@@ -65,6 +130,8 @@ try {
 	console.error("  npm install --prefix .tmp-dsh-verify --no-save @deepseek-ai/dsh@0.2.0-rc.2");
 	process.exit(2);
 }
+
+for (const name of DSH_PACKAGES) console.log(`loaded ${describeDsh(name)}`);
 
 const { Context } = dsh["@deepseek-ai/cordis"];
 const pluginPath = path.join(pluginRoot, "lib", "index.js");
@@ -85,7 +152,7 @@ function check(label, ok, detail = "") {
 
 /** Run a process with file-descriptor stdio, so a sandbox that blocks pipes still works. */
 function run(argvList, cwd) {
-	const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dsh-verify-run-"));
+	const tmp = trackTemp(fs.mkdtempSync(path.join(os.tmpdir(), "dsh-verify-run-")));
 	const outFile = path.join(tmp, "out.txt");
 	const errFile = path.join(tmp, "err.txt");
 	const ofd = fs.openSync(outFile, "w");
@@ -94,13 +161,13 @@ function run(argvList, cwd) {
 	fs.closeSync(ofd);
 	fs.closeSync(efd);
 	const stdout = fs.readFileSync(outFile, "utf8");
-	fs.rmSync(tmp, { recursive: true, force: true });
+	removeTempDir(tmp);
 	return { status: result.status, stdout };
 }
 
 /** Create a throwaway repository with one commit. */
 function makeRepo() {
-	const repo = fs.mkdtempSync(path.join(os.tmpdir(), "dsh-verify-repo-"));
+	const repo = trackTemp(fs.mkdtempSync(path.join(os.tmpdir(), "dsh-verify-repo-")));
 	run(["git", "init", "-b", "main"], repo);
 	run(["git", "config", "user.email", "verify@example.com"], repo);
 	run(["git", "config", "user.name", "Verify"], repo);

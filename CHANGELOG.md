@@ -38,3 +38,7 @@
   `git show` 写出任意文件，现在以 `--end-of-options` 固定为 revision，选项形式引用会被 Git 拒绝，
   文件不会生成；`HEAD`、`HEAD~1`、分支名等合法引用行为不变。
 - 已取消的调用方信号不再导致调用挂起：信号在 spawn 前已中止时立即返回 `aborted`。
+- **截止时间定时器不再被 `unref`**：`runProcess` 的超时定时器与 `terminateHandle` 的宽限定时器此前标为
+  `unref`，在被等待的 promise 只由该定时器推进时，事件循环会在到期前耗尽（Linux Node 20/22 上稳定复现：
+  `npm test` 有 5 项被 `cancelledByParent`），等于超时可能被跳过。现在两个定时器都保持引用，并在操作结束时
+  清除，既不跳过超时也不延长进程寿命。
