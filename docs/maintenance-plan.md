@@ -123,7 +123,7 @@
 | 单元（模拟） | `node test/smoke.test.js` | 10 通过 / 0 失败 |
 | 集成（真实 Git，临时仓库） | `node test/integration.test.js` | 16 通过 / 0 失败 |
 | 全部测试（与 CI 同一条命令） | `npm test`（`node --test`） | 26 通过 / 0 失败（Windows 24.19.0；Linux 20.20.2 / 22.23.3） |
-| **Linux Node 20 / 22 隔离矩阵** | WSL2 Ubuntu 24.04，隔离 Node v20.20.2 / v22.23.3；旧候选执行完整流程，修复后拷入源码并重建复验 | 旧候选产物门 exit 0，但测试各 5 cancelled；修复后 build/check/test exit 0、26/26；新修复提交后的产物门与完整矩阵待执行，详见 [validation-report-0.2.0.md](validation-report-0.2.0.md) |
+| **Linux Node 20 / 22 隔离矩阵** | WSL2 Ubuntu 24.04，隔离 Node v20.20.2 / v22.23.3；旧候选执行完整流程，修复后拷入源码并重建复验 | 旧候选产物门 exit 0，但测试各 5 cancelled；修复后 build/check/test exit 0、26/26；修复候选 922408d 的完整干净矩阵与产物门通过，详见 [validation-report-0.2.0.md](validation-report-0.2.0.md) |
 | 打包 | `npm pack --dry-run` / `npm pack` | 5 个文件：LICENSE、README、`lib/index.js`、`lib/index.d.ts`、package.json；修复前 `dsh-git-plugin-0.2.0.tgz` 15054 字节（15.1 kB），修复后 15.3 kB / unpacked 43.7 kB |
 | peer 准入范围（`node-semver@7.8.5`） | 旧范围 `^0.1.0-rc.6` 对 `0.2.0-rc.2` 为 false；新范围 `>=0.2.0-rc.2 <0.3.0-0` 为 true | 通过（第 3 节表格） |
 | **真实 DSH 0.2.0-rc.2 服务栈** | `node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify`（官方 `cordis` + `dsh-commands` + `dsh-tools` + `dsh-system-prompt` + `dsh-subprocess-local`，真实 Git 子进程） | `ALL CHECKS PASSED`（脚本当前 28 项 check；数量以脚本为准），见 5.2 |
@@ -249,7 +249,7 @@ Issue #1 的只读 Web 面板完整方案（能力复用、入口落位、Host �
 | P3（GUI 写操作） | stage / commit / branch / stash 纳入面板，走审批 | 同上 + 安全评审者 | 每个写操作都能说明审批来源与撤销手段 |
 | P4（长期维护） | 每个 DSH `0.2.x` 新版本先跑 `scripts/verify-real-dsh.mjs`，通过后再更新 peer/`engines` 与本文档的「实际验证版本」 | 插件维护者 | 兼容表更新 + 真实服务栈验证重跑并记录输出 |
 
-## 9. 发布步骤（需仓库负责人授权后执行）
+## 9. 发布步骤（本地 commit 自动执行，线上动作按授权执行）
 
 原则：**一个版本只 `npm publish` 一次**；`next` 验证通过后用 `npm dist-tag add` 把同一版本推广到 `latest`，
 不再发布第二次（同一版本号无法重复发布）。
@@ -410,12 +410,16 @@ Issue #1 的只读 Web 面板完整方案（能力复用、入口落位、Host �
    `@deepseek-ai/dsh-subprocess-local` 的 postinstall `ensure-spawn-helper.mjs`、`koffi`、`node-pty`、
    `@google/genai`、`protobufjs`。Windows 下本次验证不受影响（该 postinstall 只恢复 POSIX 可执行位），
    但 Linux/macOS 上 `node-pty` 的 spawn-helper 执行位可能受影响，属**待相应平台确认**的风险。
-10. ~~**验证脚本的临时目录未自清**~~ → **已修复（包 01，未提交）**：`scripts/verify-real-dsh.mjs` 现在把
+10. ~~**验证脚本的临时目录未自清**~~ → **已修复（包 01，922408d）**：`scripts/verify-real-dsh.mjs` 现在把
     `run()` 的临时目录与自建 Git 仓库统一登记，在所有退出路径（正常、失败、未捕获异常）清理，并对 Windows 上
     「被终止的子进程短暂锁住目录」重试 5×100 ms；连续 3 次运行后 `%TEMP%/dsh-verify-*` 残留为 0。
     同时补了 `--dsh-root` 缺值/未知选项的 exit 2 与用法提示，以及实际加载的官方包版本与入口路径打印。
-11. **截止时间定时器缺陷（包 01 发现并修复，未提交）**：`runProcess` 的超时定时器与 `terminateHandle` 的宽限定时器
+11. **截止时间定时器缺陷（包 01 发现并修复，922408d）**：`runProcess` 的超时定时器与 `terminateHandle` 的宽限定时器
     曾被 `unref`，在被等待的 promise 只由该定时器推进时事件循环会在到期前耗尽——Linux Node 20/22 上稳定复现
     （`npm test` 5 项 `cancelledByParent`），等于超时可能被跳过。修复移除两处 `unref`，`lib/` 已重建；
     Windows 与 Linux 两个 Node 版本复验 26/26，真实服务栈连续 3 次 `ALL CHECKS PASSED`。
-    **源码已变动**：`feba7b8` / `2a5ef36` 之后的改动需要一个新候选提交，提交后才重跑干净检出产物门。
+    **源码修复已提交**：新修复候选为 `922408d`；Codex 已对该 SHA 重跑 Linux Node 20/22 完整干净矩阵，含提交后构建产物门，全部通过。
+
+## 本地收尾规则更新（2026-10-01）
+
+用户已持续授权每个任务/阶段完成后的本地 commit，不再等待审阅认可才提交。规则见 AGENTS.md；线上推送、合并、tag、npm 发布和社区消息仍使用各自的授权。当前修复候选 922408d 的 Linux Node 20/22 完整干净矩阵已通过，模型会话、候选远端 CI 与双渠道安装仍待完成。

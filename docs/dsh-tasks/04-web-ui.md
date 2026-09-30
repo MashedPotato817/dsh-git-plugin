@@ -31,4 +31,4 @@ packages/client/tsdown.client.ts 和 apps/web/tests/fixtures/plugins/fixture-liv
 
 给出修改文件、构建说明、实际 npm 清单、外部依赖契约、测试结果与未验证项。
 需要变更包 03 契约时同步修改/复验，不在 UI 内静默兜底改变语义。
-提交后干净重建 lib 必须一致；提交/推送等按现有授权处理。
+验证通过后立即执行已持续授权的本地 commit；提交后干净重建 lib 必须一致。推送等按各自授权处理。

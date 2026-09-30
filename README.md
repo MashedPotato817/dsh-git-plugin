@@ -179,7 +179,7 @@ npm test        # node --test（单元 + 真实 git 集成测试）
 | 集成（临时目录真实 `git init`/`commit`/`stash`） | `node test/integration.test.js` | 16 通过 |
 | 全部测试（与 CI 同一条命令） | `npm test` | 26 通过 / 0 失败（Windows、Linux Node 20.20.2、Linux Node 22.23.3） |
 | 打包内容 | `npm pack --dry-run` | 仅 `lib/`、README、LICENSE、package.json（5 文件） |
-| Linux 构建与测试 | WSL2 Ubuntu 24.04，隔离 Node 20.20.2 / 22.23.3 | 旧候选产物门 exit 0，但测试 5 cancelled；修复后 build/check/test exit 0，26/26；新修复提交后的产物门与完整矩阵待执行 |
+| Linux 构建与测试 | WSL2 Ubuntu 24.04，隔离 Node 20.20.2 / 22.23.3 | 旧候选产物门 exit 0，但测试 5 cancelled；修复后 build/check/test exit 0，26/26；修复候选 922408d 的完整干净矩阵与产物门通过 |
 | 真实 DSH 服务栈 | `node scripts/verify-real-dsh.mjs --dsh-root <隔离安装>` | `ALL CHECKS PASSED`（28 项，连续 3 次） |
 | 独立 DSH profile | 独立 `DSH_HOME` + `headless` 模板 | 安装 / 加载 / schema / 禁用 / 重新启用全部通过 |
 

@@ -10,14 +10,14 @@
 | 任务包指定候选 | `feba7b8`（`chore(release): 0.2.0 candidate`） |
 | 执行时 HEAD | `2a5ef36`（`docs(maintenance): 核查维护进度并拆分 DSH 后续任务`） |
 | 两者差异 | **仅文档**：`AGENTS.md`、`docs/dsh-tasks/*`、`docs/maintenance-plan.md`；`git diff feba7b8..2a5ef36 -- src lib test package.json package-lock.json tsconfig.json scripts` 为空 → Linux 矩阵在 `feba7b8` 上的结果对 `2a5ef36` 同样成立 |
-| 本轮未提交的修复 | `src/index.ts`、`lib/index.js`、`scripts/verify-real-dsh.mjs`（见第 3、4 节）；**尚未提交**，故新候选 SHA 待定 |
+| 本轮修复 | 包 01 执行时未提交；随后源码、产物、验证脚本及报告提交为 `922408d7c6425efa7856c2cd512e2d7d9a23d242`，见第 9 节 |
 
 ## 2. 证据表（各层次不得互相替代）
 
 | 层次 | 平台 / 工具链 | 结果 |
 |---|---|---|
 | Windows 本地 | Windows，Node v24.19.0，npm 12.0.2，git 2.53.0.windows.2 | 全部 PASS（见 2.1） |
-| Linux 本地 | WSL2 Ubuntu 24.04.4 LTS x86_64，git 2.43.0，隔离 Node v20.20.2 / v22.23.3 | 修复后 build/check/test PASS；新修复提交后的产物门与完整矩阵待执行（见 2.2） |
+| Linux 本地 | WSL2 Ubuntu 24.04.4 LTS x86_64，git 2.43.0，隔离 Node v20.20.2 / v22.23.3 | 修复候选 922408d 完整干净矩阵 PASS，含产物门（见第 9 节）；修复前后对照见 2.2 |
 | 真实 DSH 服务栈 | 隔离安装 `@deepseek-ai/dsh@0.2.0-rc.2`（Windows） | ALL CHECKS PASSED ×3（见 2.3） |
 | 独立 DSH profile | 独立 `DSH_HOME` + `--from-default-profile headless` | 安装/加载/schema/禁用/重新启用 PASS（见 2.4） |
 | GitHub Actions | `ubuntu-latest`，Node 20/22 | **未执行**（推送前无法触发；已有 History 属于旧提交） |
@@ -62,8 +62,8 @@
 | `npm run check` | exit 0 | exit 0 |
 | `npm test` | **26 pass / 0 fail / 0 cancelled** | **26 pass / 0 fail / 0 cancelled** |
 
-产物门说明：修复未提交，因此克隆里 `git diff --stat -- lib` 显示 `lib/index.js` 有 7 处差异
-（`+7 -2`），这是预期；构建产物门对**提交**有效（`feba7b8` 上 exit 0），新候选提交后需重跑。
+产物门说明：包 01 执行时修复未提交，因此当时克隆里 `git diff --stat -- lib` 显示 `lib/index.js` 有 7 处差异
+（`+7 -2`），这是预期；构建产物门对**提交**有效。随后已对 922408d 重跑，见第 9 节。
 
 ### 2.3 真实 DSH 服务栈（隔离安装）
 
@@ -131,7 +131,7 @@ host side   dsh-tools@0.2.0-rc.2 at C:\...\.tmp-dsh-verify\dsh\node_modules\@dee
 | `0.2.x` 中除 `0.2.0-rc.2` 外的版本 | **未验证**（peer 允许范围 ≠ 实测范围） |
 | Git < 2.24（无 `--end-of-options`） | 未验证 |
 | DSH 0.1.x | 已从 peer 范围移除，不再宣称兼容 |
-| 新候选提交后的干净检出产物门 | 待新提交存在后执行（本轮 `feba7b8` 上已 PASS） |
+| 新候选提交后的干净检出产物门 | 922408d 上 Linux Node 20/22 均 PASS，见第 9 节 |
 
 ## 6. 真实模型会话：手动验收单（未验证）
 
@@ -158,9 +158,7 @@ dsh --profile gitcompat headless "用 git-status、git-diff、git-log、git-show
 
 ## 7. 交接给包 02
 
-1. **新候选提交**：`src/index.ts`（unref 修复）+ 重建的 `lib/index.js` + 加固后的
-   `scripts/verify-real-dsh.mjs` 尚未提交，需要一个新的审阅提交；提交后重跑干净检出产物门
-   （`git clone` → `checkout <新 SHA>` → `npm ci` → `npm run build` → `git diff --exit-code lib`）。
+1. **新修复候选已提交**：922408d 包含源码、重建的 lib、验证脚本与报告；Linux Node 20/22 的提交后完整干净检出验证已完成，见第 9 节。后续进入包 02，本地 commit 按用户持续授权自动执行。
 2. 发布流程沿用 `docs/maintenance-plan.md` §9：候选提交 → 干净检出产物门 → 最终发布提交（CHANGELOG 日期定稿）
    → PR 合并到 `main` → `npm publish --tag next`（唯一一次）→ 验证 → `npm dist-tag add … latest` →
    tag `v0.2.0` + GitHub Release，四者对应同一发布点。
@@ -171,3 +169,15 @@ dsh --profile gitcompat headless "用 git-status、git-diff、git-log、git-show
 2026-10-01，Codex 审阅当前未提交修复，独立运行 Windows 的 npm run check、npm test（26 pass / 0 fail / 0 cancelled）、node --check scripts/verify-real-dsh.mjs、git diff --check，均 exit 0。--dsh-root 缺值与 --bogus 分别 exit 2。
 
 Linux 矩阵、真实 DSH 服务栈三次通过与独立 profile 结果来自包 01 执行报告，本次未重复执行。已修正文档中“修复后产物门全绿”的提前宣称；新修复提交后的干净检出产物门仍待执行。
+
+## 9. 修复提交后的独立干净矩阵（已完成）
+
+测试提交：922408d7c6425efa7856c2cd512e2d7d9a23d242。Codex 从本地主仓库分别干净克隆到 WSL 专用临时目录，checkout 该 SHA，使用隔离 Linux Node 20.20.2（npm 10.8.2）与 22.23.3（npm 10.9.9）、Git 2.43.0。
+
+两组 npm ci、npm run build、git diff --exit-code -- lib、npm run check、node --check lib/index.js、node --check scripts/verify-real-dsh.mjs、npm test（26 pass / 0 fail / 0 cancelled）、npm pack --dry-run --ignore-scripts 以及测试后工作树干净检查全部通过；最终整条验证命令 exit 0。打包五文件，shasum 5c1f7da50fe5e37c5854ee699ae31f4eec4168da。专用 /tmp/dsh-candidate-verify.* 目录自动回收，隔离 Node 运行时保留。
+
+第一次 Windows→WSL 脚本传递末尾 CR 导致包装命令 exit 127（两组检查已完成），修正输入换行后完整重跑，最终 exit 0；不把第一次包装命令算成功。
+
+Node 20 的 npm ci 有 EBADENGINE 警告：undici@8.11.2 要求 Node >=22.19.0，来源为开发 peer 链 @deepseek-ai/dsh-subprocess → @deepseek-ai/dsh-http-proxy → undici。以上检查仍通过；本次未验证该代理链或真实 Linux DSH 宿主，因此不据此宣称完整宿主兼容 Node 20。包 02 发布前需核查目标宿主及实际依赖。
+
+本节之后的自动提交规则与报告更新只改 AGENTS/README/docs，不改变受测源码、lib、脚本、版本或锁文件；用 git diff 922408d HEAD -- src lib scripts package.json package-lock.json tsconfig.json test .github 核对。模型会话、当前候选的远端 CI、发布后的双渠道安装仍未完成。
