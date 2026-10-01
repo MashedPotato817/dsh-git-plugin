@@ -6,7 +6,7 @@ Actual changes to `dsh-git-plugin`, following [Keep a Changelog](https://keepach
 
 ## [Unreleased]
 
-## [0.3.0] - 待发布
+## [0.3.0] - 2026-10-01
 
 ### Added
 
