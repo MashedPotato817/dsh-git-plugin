@@ -5,6 +5,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- DSH bundle 安装元数据与 cordis.patch.yml；新安装自动注册插件，patch 同步导出并纳入发布包。
+- dsh-market 收录条件、Git 分类条目草稿与旧 profile 迁移说明。
+
+### Changed
+
+- README：原创 SVG 横幅、清晰的安装/使用步骤、能力表与文档入口；修正发布后 CI 状态，区分已发布 0.2.0 与开发中 bundle。
+
 ## [0.2.0] - 2026-10-01
 
 适配目标：DeepSeek Harness（DSH）0.2.0-rc.2。允许版本范围与实际验证版本分开记录；真实模型会话仍未验证。
