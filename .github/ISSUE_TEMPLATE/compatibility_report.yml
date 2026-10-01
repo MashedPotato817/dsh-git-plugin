@@ -1,73 +1,97 @@
-name: 兼容性反馈
-description: 报告 DSH 更新、安装准入或平台兼容性验证
-title: "[Compatibility] "
+name: Compatibility report / 兼容性反馈
+description: DSH upgrade, installation or platform verification / 报告 DSH 更新、安装准入或平台兼容性验证
+title: '[Compatibility] '
 body:
-  - type: markdown
-    attributes:
-      value: |
-        允许加载的版本范围不等于全部版本已经实测。请区分安装、服务栈、profile、模型会话与 Web 验证；没有执行的项目写未验证。
-        不必上传完整配置或账号凭据。
-  - type: input
-    id: plugin-version
-    attributes:
-      label: 插件精确版本或 SHA
-    validations:
+- type: markdown
+  attributes:
+    value: 'Please search existing issues, provide exact versions and reproducible steps. Remove credentials/private
+      content. Separate actually executed checks from unverified claims. See README and CONTRIBUTING.
+
+
+      允许加载的版本范围不等于全部版本已经实测。请区分安装、服务栈、profile、模型会话与 Web 验证；没有执行的项目写未验证。
+
+      不必上传完整配置或账号凭据。
+
+      '
+- type: input
+  id: plugin-version
+  attributes:
+    label: Exact plugin version or SHA / 插件精确版本或 SHA
+  validations:
+    required: true
+- type: input
+  id: dsh-version
+  attributes:
+    label: Exact DSH version / DSH 精确版本
+    description: Describe exact observed behavior, configuration and evidence; mark unknown or unexecuted items.
+      / 如有上一个可用版本，可同时注明。
+  validations:
+    required: true
+- type: textarea
+  id: environment
+  attributes:
+    label: Platform, toolchain and install method / 平台、工具链与安装方式
+    placeholder: 'Exact versions / steps / expected vs actual / evidence; use either language.
+
+      操作系统 / WSL / 容器：
+
+      Node / npm / Git：
+
+      npm / GitHub tag / link / tgz：
+
+      CLI / headless / Web / desktop：
+
+      官方版本来源或安装命令：
+
+      '
+  validations:
+    required: true
+- type: dropdown
+  id: result
+  attributes:
+    label: Overall result / 总体结果
+    options:
+    - Passed (scope below) / 已验证通过（下方写明范围）
+    - Install/load failed / 安装或加载失败
+    - Loads but behavior is incorrect / 加载成功但行为异常
+    - Not verified; requesting support / 尚未验证，希望增加支持
+  validations:
+    required: true
+- type: textarea
+  id: evidence
+  attributes:
+    label: Scope, steps and evidence / 验证范围、步骤与证据
+    description: Describe exact observed behavior, configuration and evidence; mark unknown or unexecuted items.
+      / 可以报告部分验证结果，未执行的项目无需勾选或猜测。
+    placeholder: 'Exact versions / steps / expected vs actual / evidence; use either language.
+
+      安装与 schema：
+
+      命令 / 工具：
+
+      禁用 / 重新启用：
+
+      超时 / 取消：
+
+      模型会话或 Web：
+
+      命令、退出码、异常输出：
+
+      '
+  validations:
+    required: true
+- type: textarea
+  id: upstream
+  attributes:
+    label: Upstream changes or links / 上游变更或补充链接
+    description: Describe exact observed behavior, configuration and evidence; mark unknown or unexecuted items.
+      / 可填 DSH Release、接口变更或已有问题链接。
+- type: checkboxes
+  id: checklist
+  attributes:
+    label: Before submitting / 提交前确认
+    options:
+    - label: I searched existing issues and PRs / 我已搜索已有 Issue 和 PR
       required: true
-  - type: input
-    id: dsh-version
-    attributes:
-      label: DSH 精确版本
-      description: 如有上一个可用版本，可同时注明。
-    validations:
+    - label: I separated executed and unverified checks and removed sensitive data / 我区分了实际执行与未验证项目，并移除了敏感信息
       required: true
-  - type: textarea
-    id: environment
-    attributes:
-      label: 平台、工具链与安装方式
-      placeholder: |
-        操作系统 / WSL / 容器：
-        Node / npm / Git：
-        npm / GitHub tag / link / tgz：
-        CLI / headless / Web / desktop：
-        官方版本来源或安装命令：
-    validations:
-      required: true
-  - type: dropdown
-    id: result
-    attributes:
-      label: 总体结果
-      options:
-        - 已验证通过（下方写明范围）
-        - 安装或加载失败
-        - 加载成功但行为异常
-        - 尚未验证，希望增加支持
-    validations:
-      required: true
-  - type: textarea
-    id: evidence
-    attributes:
-      label: 验证范围、步骤与证据
-      description: 可以报告部分验证结果，未执行的项目无需勾选或猜测。
-      placeholder: |
-        安装与 schema：
-        命令 / 工具：
-        禁用 / 重新启用：
-        超时 / 取消：
-        模型会话或 Web：
-        命令、退出码、异常输出：
-    validations:
-      required: true
-  - type: textarea
-    id: upstream
-    attributes:
-      label: 上游变更或补充链接
-      description: 可填 DSH Release、接口变更或已有问题链接。
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: 提交前确认
-      options:
-        - label: 我已搜索已有 Issue 和 PR
-          required: true
-        - label: 我区分了实际执行与未验证项目，并移除了敏感信息
-          required: true

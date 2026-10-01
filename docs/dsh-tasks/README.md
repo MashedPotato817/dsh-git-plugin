@@ -1,5 +1,7 @@
 # DSH 后续任务包
 
+> Current handoff / 当前交接（2026-10-01）：0.2.1 已发布；包 03/04 的只读 Host 与 TSX 面板已实现，包 05 已完成 Windows 真实 Web 主要流程。剩余逐项验证见 [验收记录](../web-panel-validation.md)，不要重复执行历史发布任务。English/中文使用见 [Web guide](../web-panel.md) / [中文指南](../web-panel_ZH.md)。
+
 核查日期：2026-10-01。主仓库：`C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`。
 基线：`feat/release-0.2.0` @ `feba7b80b0942a7a5733511ac0b9cf918ef8d2a8`。
 本目录是执行提示词与审查记录。下表为创建任务包时的历史快照；2026-10-01 当前进展见 [发布记录](../release-report-0.2.0.md)：PR #2 已保留历史合并，当前 SHA CI 与双渠道实装通过；npm 0.2.0 和 GitHub Release 已发布，latest=next=0.2.0，发布完成，Web 未实现。

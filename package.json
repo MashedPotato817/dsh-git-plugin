@@ -17,6 +17,7 @@
   "files": [
     "lib",
     "README.md",
+    "README_ZH.md",
     "LICENSE",
     "cordis.patch.yml",
     "assets/readme/hero.svg"

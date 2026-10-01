@@ -1,5 +1,7 @@
 # dsh-git-plugin 只读 Web Git 面板方案（Issue #1 / P2）
 
+> Historical design snapshot / 历史方案快照：以下“方案、未实现”指编写方案时。当前开发首期已实现，使用见 [English](web-panel.md) / [中文](web-panel_ZH.md)，实际验证见 [验收记录](web-panel-validation.md)。已发布 0.2.1 不包含新面板。
+
 本文是 [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的**下一阶段（P2）方案**：
 在 DSH Web 端提供一个**只读**的可视化 Git 面板（状态 / diff / 历史）。
 

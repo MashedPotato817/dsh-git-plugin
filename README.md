@@ -1,7 +1,9 @@
 # dsh-git-plugin
 
+English · [简体中文](README_ZH.md)
+
 <p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="Git 工作流进入 DeepSeek Harness 会话：查看改动、新建分支、提交和可恢复快照">
+  <img src="./assets/readme/hero.svg" width="100%" alt="Git in your DeepSeek Harness session: inspect, branch, commit and keep a recoverable snapshot">
 </p>
 
 <p align="center">
@@ -12,32 +14,32 @@
 </p>
 
 <p align="center">
-  <a href="#安装">安装</a> · <a href="#使用">使用</a> · <a href="#文档与反馈">文档与反馈</a>
+  <a href="#install">Install</a> · <a href="#use">Use</a> · <a href="#docs-and-feedback">Docs & feedback</a>
 </p>
 
-## 让 Git 工作流留在 DSH 会话里
+## Keep Git in your DSH session
 
-查看改动、创建分支、提交前检查、保存可恢复快照。**5 个斜杠命令 + 4 个模型只读工具**，让你和模型看到同一份仓库状态。
+Inspect changes, create branches, run pre-commit checks, and keep recoverable snapshots. **5 slash commands + 4 read-only model tools** give you and your agent the same view of the repository.
 
-- **看清改动** — 分支、工作区状态、已暂存 / 未暂存 diff 与提交历史。
-- **顺手提交** — 创建分支，配置提交前检查，在会话中完成提交。
-- **留一份快照** — 用 stash 暂存工作区，随时查看与恢复。
+- **See the changes** — branch, working tree, staged / unstaged diff, and history.
+- **Commit with checks** — branch and commit directly in your session.
+- **Keep a snapshot** — stash current changes, then list or restore them.
 
-本页对应 **0.2.1**，实测宿主为 **DSH 0.2.0-rc.2**；需要 Node.js ≥20、Git ≥2.24。[完整兼容与验证记录](CONTRIBUTING.md#兼容性与验证记录)。
+Published version: **0.2.1**. Verified host: **DSH 0.2.0-rc.2**. Requires Node.js ≥20 and Git ≥2.24. [Compatibility and validation](CONTRIBUTING.md#compatibility-and-validation).
 
-## 安装
+## Install
 
-在需要使用插件的 profile 中执行，将 `web` 替换为实际名称：
+Use your active profile; replace `web` as needed:
 
 ```bash
 dsh plugin --profile web add dsh-git-plugin@0.2.1
 ```
 
-安装后自动注册插件。重启对应 profile 的 DSH；使用 Web 时刷新页面。
+New installations register the plugin automatically. Restart that profile's DSH process and refresh the browser when using Web.
 
-从手工启用的 0.2.0 升级时，先按[迁移说明](docs/marketplace-submission.md#从手工启用的-020-迁移)调整原配置，避免重复注册。[GitHub 固定 tag 与源码安装](CONTRIBUTING.md#其他安装方式)。
+Upgrading a manually enabled 0.2.0 profile? Follow the [migration steps](docs/marketplace-submission.md#从手工启用的-020-迁移) to avoid duplicate registration. [Fixed GitHub tag and source installation](CONTRIBUTING.md#other-installation-methods).
 
-## 使用
+## Use
 
 ```text
 /status
@@ -46,33 +48,34 @@ dsh plugin --profile web add dsh-git-plugin@0.2.1
 /commit feat: 完成一项修改
 ```
 
-| 命令 | 用途 |
+| Command | Purpose |
 |---|---|
-| `/status` | 查看当前分支与工作区 |
-| `/diff` | 查看已暂存、未暂存的改动 |
-| `/branch [<name>]` | 查看分支，或新建并切换 |
-| `/commit [<message>]` | 查看提交指引，或运行检查并提交 |
-| `/undo [list\|pop]` | 创建、列出或恢复 stash 快照 |
+| `/status` | Current branch and working-tree status |
+| `/diff` | Staged and unstaged change summaries |
+| `/branch [<name>]` | List branches, or create and switch |
+| `/commit [<message>]` | Show commit guidance, or run checks and commit |
+| `/undo [list\|pop]` | Create, list, or restore stash snapshots |
 
-模型可以使用 `git-status`、`git-diff`、`git-log`、`git-show` 四个只读工具。例如：
+The model can use `git-status`, `git-diff`, `git-log`, and `git-show`. For example:
 
-> 先查看 Git 状态、diff 和最近 5 条提交，说明哪些改动已暂存，并指出提交前需要检查的内容。
+> Check Git status, diff, and the last five commits. Explain what is staged and what to verify before committing.
 
-**提交范围：** `/commit <message>` 会暂存目标仓库的全部改动再提交；执行前确认范围。不带参数只显示指引与改动。
+**Commit scope:** `/commit <message>` stages all changes in the target repository before committing. Check the scope first. Without a message it only shows guidance and changes.
 
-**快照含义：** `/undo` 保存工作区改动（含未跟踪文件），不是回退 commit；`pop` 恢复时可能遇到冲突。
+**Snapshots:** `/undo` stashes working-tree changes, including untracked files. It does not revert commits. Restoring with `pop` may produce conflicts.
 
-需要提交前跑测试、调大超时？见[插件配置](CONTRIBUTING.md#插件配置)。
+Need longer timeouts or a test hook? See [configuration](CONTRIBUTING.md#configuration).
 
-## 文档与反馈
+## Docs and feedback
 
-- [贡献指南](CONTRIBUTING.md) · 配置、源码安装、开发与验证
-- [CHANGELOG](CHANGELOG.md) · 版本变更
-- [Issues](https://github.com/MashedPotato817/dsh-git-plugin/issues) · 缺陷与功能建议
-- [市场收录准备](docs/marketplace-submission.md) · dsh-market 收录进展
-- [Web 面板计划](docs/web-panel-plan.md) · 后续只读 Git 界面
+- [Contributing](CONTRIBUTING.md) · configuration, source installation, development and validation
+- [CHANGELOG](CHANGELOG.md) · release changes
+- [Issues](https://github.com/MashedPotato817/dsh-git-plugin/issues) · bugs and feature requests
+- [Market submission](docs/marketplace-submission.md) · catalog progress (Chinese audit record)
+- [Web panel](docs/web-panel.md) · development preview and validation
+- [Maintenance instructions](AGENTS.md) · engineering constraints
 
-当前提供命令与工具，Web Git 面板尚未实现，dsh-market 尚未收录。页面设计参考 [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams)，横幅为原创 SVG。
+Published 0.2.1 provides commands and tools. The development branch now implements the read-only Web panel for Issue #1; **it is not released yet**. Market inclusion is tracked separately above. Presentation inspired by [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams); the SVG banner is original.
 
 ## License
 

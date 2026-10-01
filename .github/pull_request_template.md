@@ -1,36 +1,33 @@
-## 问题与改后行为
+## Problem and behavior / 问题与改后行为
 
-<!-- 说明具体触发场景、原来的行为和修改后的行为。 -->
+<!-- Explain the trigger and before/after behavior. / 说明触发场景与修改前后行为。 -->
 
-## 关联与范围
+## Reference and scope / 关联与范围
 
-<!-- Refs #编号；完整解决才使用 Closes #编号。无关联 Issue 写“无”。 -->
-<!-- 列出主要文件、兼容性影响及本次排除的工作。 -->
+<!-- Refs #n; use Closes only when fully resolved. List files and compatibility impact. / 完整解决才使用 Closes，写明主要文件及兼容性影响。 -->
 
-## 验证证据
+## Validation / 验证证据
 
-<!-- 只填写实际运行的检查；不适用写原因，未运行写原因和补验计划。 -->
-<!-- 源码变更要先 build，测试针对 lib。写清提交 SHA、平台与 Node/Git/DSH 版本。 -->
+<!-- Only report executed checks. Give SHA, OS, Node/Git/DSH versions; explain omissions. / 仅填写实际执行项，注明 SHA、环境及未执行原因。 -->
 
-| 检查 | 结果 / 退出码 | 环境或未执行原因 |
+| Check / 检查 | Result / 结果与退出码 | Environment or omission / 环境或未执行原因 |
 |---|---|---|
-| build / type / syntax | | |
-| 单元与真实 Git 回归 | | |
-| 提交后干净构建产物门 | | |
-| npm 打包内容 | | |
-| DSH 服务栈 / profile | | |
-| 模型会话 / Web（相关时） | | |
-| 当前 PR SHA 的 CI | | |
+| Build / types / syntax | | |
+| Unit / real Git | | |
+| Clean post-commit artifact gate / 提交后干净产物门 | | |
+| Pack file list / 打包内容 | | |
+| DSH services / profile | | |
+| Model / Web (if relevant) | | |
+| CI for this PR SHA | | |
 
-## 风险与未验证项
+## Risks and unverified items / 风险与未验证项
 
-<!-- 参数边界、目录、超时/取消、启停清理、依赖范围或迁移影响；无则写“无”。 -->
-<!-- 发布 PR 还需列出版本/日期/发布点/双渠道安装验证，不把发布前结果写成已发布。 -->
+<!-- Paths/argv, deadlines/cancellation, lifecycle, migration and declared vs tested range. Release PRs also list version/date/release-point/channel installs. / 参数目录、超时取消、启停、迁移和实测范围；发布 PR 另列版本日期、发布点及渠道安装证据。 -->
 
-## 提交前确认
+## Before submitting / 提交前确认
 
-- [ ] 已阅读 CONTRIBUTING.md；范围集中，未混入无关改动。
-- [ ] 源码、构建产物、文档与必要回归一致；不适用项已说明。
-- [ ] 日志与提交中没有凭据、缓存或独立测试数据。
-- [ ] 允许版本范围与实际验证范围分开记录。
-- [ ] 本任务改动已及时本地 commit，工作区状态与剩余任务已说明。
+- [ ] Read CONTRIBUTING; focused scope, no unrelated changes. / 已读贡献指南，范围集中。
+- [ ] Source, generated output, paired English/Chinese docs and regressions agree. / 源码、产物、英中文档与回归一致。
+- [ ] No credentials, caches or independent test data in the commit. / 无凭据、缓存及独立测试数据。
+- [ ] Declared support and tested versions are separate. / 声明范围与实测范围分列。
+- [ ] Changes committed promptly; workspace and remaining work reported. / 已及时 commit 并说明工作区与待办。
