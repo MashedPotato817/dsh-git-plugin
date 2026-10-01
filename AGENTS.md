@@ -2,8 +2,9 @@
 
 English · [简体中文](AGENTS_ZH.md)
 
-## Baseline (2026-10-01)
+## Baseline (2026-10-02)
 
+- Published **0.3.0**, latest=next=0.3.0 (2026-10-02 audit). PR #6 release point 85fa7d1c4a7e6f7c274d83df242d10c65e319d24 matches npm gitHead, annotated v0.3.0 and public GitHub Release/tgz. Both channel installs passed all thirteen file comparisons, 28 official-service checks each and real Web acceptance. See docs/release-report-0.3.0.md.
 - Working repository: `C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`. Check the actual checkout; do not edit another worktree inadvertently.
 - Previous published package: **0.2.1**. PR #4 preserved history; release point `084a767aa3055d5cb0e06ddf4fb42dda4156458c` matches npm gitHead, annotated v0.2.1, and public GitHub Release. At the last release audit, latest=next=0.2.1. Channel installs and 28 official-service checks per installed entry passed. See `docs/release-report-0.2.1.md`.
 - Historical 0.2.0 release point: `c83f3322950b0892022d6b3efd1e4f6edbed5be8`, PR #2. Its package contained five files; do not replace it or move its tag. See `docs/release-report-0.2.0.md`.
@@ -14,7 +15,7 @@ English · [简体中文](AGENTS_ZH.md)
 
 ## Current development
 
-- PR #6 merged the first read-only right-sidebar panel for Issue #1 as **0.3.0**, release point 85fa7d1c4a7e6f7c274d83df242d10c65e319d24. GitHub v0.3.0 is public and its installed entry passed 28 service checks plus real Web acceptance. npm accepted the upload (202); registry availability and latest promotion remain pending. See docs/release-report-0.3.0.md. Do not overwrite npm 0.2.1 or add GUI writes.
+- PR #6 merged the first read-only right-sidebar panel for Issue #1 as **0.3.0**, release point 85fa7d1c4a7e6f7c274d83df242d10c65e319d24. GitHub v0.3.0 is public and its installed entry passed 28 service checks plus real Web acceptance. npm registry availability, installed-package acceptance and latest=next=0.3.0 are confirmed. See docs/release-report-0.3.0.md. Do not overwrite npm 0.2.1 or add GUI writes.
 - Source: `src/index.ts`, `src/web-host.ts`, browser-safe `src/panel-types.ts`, `src/client/`. Build Host declarations/JS and generated `lib/client.js`; keep ESM and existing commands/tools.
 - English primary documents and `_ZH.md` counterparts: README, CONTRIBUTING, AGENTS; also paired Web usage documents. Synchronize facts, commands and validation boundaries. README stays a short product page; engineering details belong in CONTRIBUTING/docs and maintenance constraints here. Do not add a skill just for a documentation edit.
 - Web evidence: `docs/web-panel-validation.md`. Old release CI does not certify a new development SHA.
@@ -49,10 +50,11 @@ English · [简体中文](AGENTS_ZH.md)
 
 ## Roadmap and releases
 
-- The 0.2.1 channels, bundle registration and presentation are complete. Follow the market submission through review and catalog sync, then verify search and actual install spec.
-- P2 / Issue #1: read-only status, diff and history; reuse the sidebar carrier, not turn-based workspace-change summaries. That summary excludes pre-existing edits and is not an index/worktree Git source.
+- The 0.3.0 dual channels, bundle registration and read-only panel are released. Market PR #6296 closed unmerged and the 2026-10-02 public catalog has zero exact repository matches; investigate separately before claiming search/install availability.
+- P2 / Issue #1 is released: read-only status, diff and history; reuse the sidebar carrier, not turn-based workspace-change summaries. That summary excludes pre-existing edits and is not an index/worktree Git source.
 - P3: review stage/commit/branch/stash buttons separately. Turn-bound approval is unresolved for clicks outside an open turn; read authentication is not write authorization.
-- Stage prompts: `docs/dsh-tasks/README.md` and packages 03–05. Adapt them to actual completed evidence rather than repeating historical instructions. Plan/history documents remain clearly dated.
+- Stage prompts: `docs/dsh-tasks/README.md`; 03–05 are complete, 06 has mount-prefix/slow Web cancellation remaining, 07 is write approval/recovery design. Adapt them to actual completed evidence rather than repeating historical instructions. Plan/history documents remain clearly dated.
+- A successful publish exit/HTTP 202 is acceptance, not installability. Allow official scanning and registry propagation; check actual availability/gitHead/tarball and installed behavior before latest promotion. A successful dist-tag write also requires a confirming tag read; do not repeat publish to address delays.
 - Finalize release date before publish. Version/lock/CHANGELOG/source/types/lib and tag/Release/npm gitHead/artifacts identify one release point. Publish each version once to next, verify, then promote with dist-tag. Changed published content needs a new version.
 - AGENTS/docs/team state are engineering resources, not npm runtime files. Pack only closed runtime outputs, bilingual READMEs, license, patch and referenced assets; verify actual file list. Published 0.2.0/0.2.1 contents are immutable.
 

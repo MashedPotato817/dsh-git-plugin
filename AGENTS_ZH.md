@@ -2,8 +2,9 @@
 
 [English](AGENTS.md) · 简体中文
 
-## 当前基线（2026-10-01）
+## 当前基线（2026-10-02）
 
+- 当前 **0.3.0 已完成双渠道发布**，latest=next=0.3.0（2026-10-02 核对）。PR #6 发布点 85fa7d1c4a7e6f7c274d83df242d10c65e319d24 与 npm gitHead、annotated v0.3.0、公开 Release/tgz 一致；两个实际安装 spec 均通过十三文件对比、各 28 项官方服务和真实 Web 验收，详见 docs/release-report-0.3.0.md。
 - 上一已发布包版本 0.2.1；PR #4 已保留历史合并，发布点为 084a767aa3055d5cb0e06ddf4fb42dda4156458c。npm latest=next=0.2.1、annotated tag 与公开 GitHub Release 均已核对该发布点，双渠道独立实装和各 28 项服务栈通过。市场 PR #6296 已于 2026-10-01 关闭且未合并、无说明评论，不宣称已收录，详见 docs/release-report-0.2.1.md。
 
 - 主工作目录：`C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`；先确认所在 checkout，避免把改动写到另一 worktree。
@@ -16,7 +17,7 @@
 
 ## 当前开发任务
 
-- PR #6 已保留历史合并 Issue #1 首版只读面板为 0.3.0，发布点 85fa7d1c4a7e6f7c274d83df242d10c65e319d24；GitHub v0.3.0 已公开，固定 tag 实装的 28 项服务及真实 Web 通过。npm 已接受上传（202），注册表可见及 latest 推广待核对；实际状态见 docs/release-report-0.3.0.md；不覆盖 npm 0.2.1，不混入 GUI 写操作。
+- PR #6 已保留历史合并 Issue #1 首版只读面板为 0.3.0，发布点 85fa7d1c4a7e6f7c274d83df242d10c65e319d24；GitHub v0.3.0 已公开，固定 tag 实装的 28 项服务及真实 Web 通过。npm 注册表可见、正式实装及 latest=next=0.3.0 已确认；实际状态见 docs/release-report-0.3.0.md；不覆盖 npm 0.2.1，不混入 GUI 写操作。
 - README / CONTRIBUTING / AGENTS 采用英文主文档和 `_ZH.md` 中文对应页；面板使用文档同样配对，修改时同步事实、命令和验收边界。
 - 新 Web 证据见 `docs/web-panel-validation.md`；不能将旧发布点的 CI 当作本分支 CI。
 - 当前源码为 src/index.ts、src/web-host.ts、src/panel-types.ts 和 src/client/；客户端通过小型构建生成官方 loader 包装，复用宿主 React，不手改 lib/client.js、不捆绑第二份 React。
@@ -54,20 +55,22 @@
 - `AGENTS.md`、`docs/`、`.agent-teams/` 不进入 npm files；已发布 0.2.1 实际为 7 文件；当前开发包增加 Web 产物及 README_ZH，按实际 pack 文件表核验。原 0.2.0 发布包仍为 5 文件，不可覆盖；缓存与独立测试目录保持忽略。
 - 本地 commit 已获持续授权：每个任务或可审阅阶段完成验证后，立即执行 commit，不再请求用户认可。合并、推送、打 tag、发布及社区消息仍按各自授权执行；已有授权不重复询问。结束报告提交 SHA、文件与原因、验证结果、未验证项和工作区状态。
 
-## README 与市场安装（0.2.1 已发布）
+## README 与市场安装（0.3.0 已发布）
 
 - README 保持简洁的产品首页：用途、能力、最短安装步骤、使用示例与文档入口。配置细节、源码安装、架构、测试和发布流程放 CONTRIBUTING.md / docs；代理维护约束放 AGENTS.md。无需为一次文档调整新增 skill。
 - 精简时保留已发布版本的真实启用方式、提交全部改动和 stash 的含义，以及实际验证宿主版本；不将开发中 bundle、未实现 GUI 或市场草稿描述为已经发布/收录。
 
-- README 与 bundle 自动注册已进入 main，用户已授权全部上线步骤；npm latest=next=0.2.1，GitHub Release 已公开，双渠道验证通过。市场 PR #6296 已关闭且未合并，不宣称已收录；不能重发 0.2.0 / 0.2.1。
+- README、bundle 自动注册和只读 Web 面板已进入 main，0.3.0 的 npm latest=next=0.3.0，GitHub Release/tgz 已公开，双渠道验证通过。市场 PR #6296 已关闭且未合并，2026-10-02 实际目录精确匹配为 0，不宣称已收录；不能重发 0.2.0 / 0.2.1。
 - 根 screenshots.json 包含能力示意横幅及 docs/images 下已发布的真实只读面板截图；图片来自独立测试仓库，不将横幅当作 GUI 截图。该声明由目录读取 GitHub，无需进入 npm files。
 - 市场来源是 `awesome-dsh-plugin/awesome-dsh-plugin`；条目、验证和旧 profile 迁移见 `docs/marketplace-submission.md`。老 insert 与新 bundle 同时启用会出现两个插件行，必须迁移为按 id 覆盖；DSH 0.2.0-rc.2 对旧依赖升级不自动补 bundle 层。
 
 ## 后续任务入口（2026-10-01 核查）
 
-- 任务分包见 [docs/dsh-tasks/README.md](docs/dsh-tasks/README.md)：验证补齐 → 发布 → Web Host → TSX UI → 真实 Web 验收；逐包完成与交接，不一次混做。
-- 原候选 feba7b8，定时器修复 922408d，发布点 c83f332；PR/main 当前 SHA CI 均通过，协作文档与模板已进入默认分支。包 02 的 npm、GitHub、latest 推广与双渠道安装均完成；随后按 03–05 实施只读 Web，另开功能分支。
+- 任务分包见 [docs/dsh-tasks/README.md](docs/dsh-tasks/README.md)：03–05 已完成并发布；06 仅余挂载前缀/真实慢 Web 请求取消，07 先设计 GUI 写操作审批和恢复；逐包推进。
+- 原候选 feba7b8，定时器修复 922408d，发布点 c83f332；PR/main 当前 SHA CI 均通过，协作文档与模板已进入默认分支。包 02 的 npm、GitHub、latest 推广与双渠道安装均完成；随后 03–05 的只读 Web 已实现为 0.3.0，继续 06/07 的剩余项目。
 - Linux Node 20/22 已用**隔离运行时**（WSL2 Ubuntu 24.04，`~/dsh-node-runtimes/node-v20.20.2-linux-x64`、`node-v22.23.3-linux-x64`）完成修复后 build/check/test 复验；修复候选 922408d 的 npm ci/build/产物门/check/语法/test/pack 全部通过。系统 Node 18.19.1 未用于验证。证据见 `docs/validation-report-0.2.0.md`。未推送 SHA 的干净检出从本地主仓库克隆。
+
+- publish exit 0 / HTTP 202 只表示上传被接受；等待官方扫描及注册表传播后，核对真实可用、gitHead/tarball 并实际安装，通过后才推广 latest。dist-tag 写入成功也需实际标签读取确认，延迟不重复 publish。
 
 ## 自动本地提交与收尾
 
