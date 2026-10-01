@@ -2,6 +2,12 @@
 
 > 记录为 DeepSeek Harness（DSH）开发并发布 `dsh-git-plugin` 的完整过程：从对比 Claude Code / Codex 找差距，到摸清插件系统，到实现、测试与发布。
 
+> **维护说明（2026-09 更新，正文保留当时的历史描述）**
+> - 适配目标已更新为 DSH **0.2.0-rc.2**：peer 范围为 `>=0.2.0-rc.2 <0.3.0-0`，旧的 `^0.1.0-rc.6` 会被 0.2.0-rc.2 的 peer 准入检查拒绝。
+> - 源码已迁移为严格模式 TypeScript：`src/index.ts` 编译到 `lib/`（`lib/` 随仓库提交，保证 npm 与 GitHub 安装都不需要安装期构建）。
+> - CI 从 `node --check` 改为「构建 + `lib/` 新鲜度检查 + `tsc --noEmit` + `node --test`」。
+> - 新增修复：`git-show` 的 ref 选项注入、`timeoutMs` 对斜杠命令与 preCommit 生效、自动发现子仓库后 preCommit 与 Git 操作共用同一目录。细节见 [maintenance-plan.md](maintenance-plan.md)。
+
 ## 1. 为什么做这个插件
 
 DSH 的核心是「一切皆插件」（Cordis 架构），它的底座其实相当完整：文件系统、终端、网页搜索、Skill、MCP client、子代理、Workflow、Goal、Plan Mode、沙箱与审批……但仔细对照成熟的编程 Harness（Claude Code、Codex）会发现，程序员最日常的「手感」还有明显缺口：

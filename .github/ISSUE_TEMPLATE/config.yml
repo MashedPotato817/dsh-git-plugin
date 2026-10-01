@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 安装说明与支持范围
+    url: https://github.com/MashedPotato817/dsh-git-plugin#readme
+    about: 提问前请先核对实际插件与 DSH 版本
+  - name: 贡献与协作指南
+    url: https://github.com/MashedPotato817/dsh-git-plugin/blob/main/CONTRIBUTING.md
+    about: 开发环境、提交规范、验证与 PR 流程
