@@ -19,7 +19,7 @@
 
 独立安装官方 DSH 0.2.0-rc.2：scripts/verify-real-dsh.mjs 实际 28 项 PASS、ALL CHECKS PASSED（exit 0），覆盖命令、工具、提示词、参数边界、启停清理与真实钩子超时。
 
-候选 SHA 的独立干净检出、当前 CI 与发布渠道验证尚待执行。
+候选 dd06ec0ad670025e8c687c649627225f62e98c1f 的独立干净克隆：npm ci/build、重建后 git diff --exit-code lib、严格类型、语法及 26 项测试全部 exit 0（0 failed / cancelled）。当前 SHA 的 GitHub Actions 与双渠道发布实装尚待执行。
 
 ## 未验证边界
 
