@@ -25,7 +25,7 @@
 - **顺手提交** — 创建分支，配置提交前检查，在会话中完成提交。
 - **留一份快照** — 用 stash 暂存工作区，随时查看与恢复。
 
-本页对应候选 **0.3.0**（上线完成前已发布版本仍为 0.2.1），实测宿主为 **DSH 0.2.0-rc.2**；需要 Node.js ≥20、Git ≥2.24。[完整兼容与验证记录](CONTRIBUTING_ZH.md#兼容性与验证记录)。
+本页对应 **0.3.0**，实测宿主为 **DSH 0.2.0-rc.2**；需要 Node.js ≥20、Git ≥2.24。[完整兼容与验证记录](CONTRIBUTING_ZH.md#兼容性与验证记录)。
 
 ## 安装
 
@@ -79,7 +79,7 @@ dsh plugin --profile web add dsh-git-plugin@0.3.0
 - [Web 面板](docs/web-panel_ZH.md) · 开发版的使用与验收
 - [维护指引](AGENTS_ZH.md) · 工程约束
 
-0.3.0 新增 Issue #1 的只读 Web 首期面板，正在上线；上述安装版本在 npm 发布后可用。市场收录状态见上述进展文档。页面设计参考 [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams)，横幅为原创 SVG。
+0.3.0 新增 Issue #1 的只读 Web 首期面板。市场收录状态见上述进展文档。页面设计参考 [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams)，横幅为原创 SVG。
 
 ## License
 

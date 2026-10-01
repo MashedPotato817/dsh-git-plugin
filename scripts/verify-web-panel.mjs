@@ -111,11 +111,28 @@ try {
 		const button = page.getByRole("button", { name, exact: true });
 		if (await button.count()) await button.click();
 	}
+
+	const workspaceTitle = get("--workspace-title") || "sample-repo";
 	await page
 		.getByLabel("会话", { exact: true })
-		.getByText(get("--workspace-title") || "sample-repo", { exact: true })
+		.getByText(workspaceTitle, { exact: true })
+		.hover();
+	const creation = page.waitForResponse((response) =>
+		new URL(response.url()).pathname.endsWith("/api/session/create"),
+	);
+	await page
+		.getByLabel("会话", { exact: true })
+		.getByRole("button", {
+			name: `在“${workspaceTitle}”中新建会话`,
+			exact: true,
+		})
 		.click();
+	await creation;
+	await page
+		.getByRole("button", { name: "打开右侧边栏", exact: true })
+		.waitFor();
 	await page.getByRole("button", { name: "打开右侧边栏", exact: true }).click();
+	await page.getByRole("button", { name: /^Git/ }).waitFor();
 	await page.getByRole("button", { name: /^Git/ }).click();
 	const panel = page.locator("[data-git-panel]");
 	await panel.locator(".gp-file").first().waitFor();

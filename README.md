@@ -25,7 +25,7 @@ Inspect changes, create branches, run pre-commit checks, and keep recoverable sn
 - **Commit with checks** — branch and commit directly in your session.
 - **Keep a snapshot** — stash current changes, then list or restore them.
 
-Release candidate: **0.3.0** (published version remains 0.2.1 until rollout). Verified host: **DSH 0.2.0-rc.2**. Requires Node.js ≥20 and Git ≥2.24. [Compatibility and validation](CONTRIBUTING.md#compatibility-and-validation).
+Version: **0.3.0**. Verified host: **DSH 0.2.0-rc.2**. Requires Node.js ≥20 and Git ≥2.24. [Compatibility and validation](CONTRIBUTING.md#compatibility-and-validation).
 
 ## Install
 
@@ -79,7 +79,7 @@ Need longer timeouts or a test hook? See [configuration](CONTRIBUTING.md#configu
 - [Web panel](docs/web-panel.md) · development preview and validation
 - [Maintenance instructions](AGENTS.md) · engineering constraints
 
-Version 0.3.0 adds the first read-only Web panel for Issue #1. Publication is in progress; the install spec above becomes available after npm rollout. Market inclusion is tracked separately. Presentation inspired by [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams); the SVG banner is original.
+Version 0.3.0 adds the first read-only Web panel for Issue #1. Market inclusion is tracked separately. Presentation inspired by [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams); the SVG banner is original.
 
 ## License
 

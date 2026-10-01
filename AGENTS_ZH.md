@@ -16,7 +16,7 @@
 
 ## 当前开发任务
 
-- `feat/web-git-panel` 已实现 Issue #1 的首版只读右侧面板、Host 路由和 TSX 构建；属于 Unreleased，不覆盖 npm 0.2.1，不混入 GUI 写操作。
+- `feat/web-git-panel` 已实现 Issue #1 的首版只读右侧面板、Host 路由和 TSX 构建；正在发布为 0.3.0，实际状态以 docs/release-report-0.3.0.md 为准；不覆盖 npm 0.2.1，不混入 GUI 写操作。
 - README / CONTRIBUTING / AGENTS 采用英文主文档和 `_ZH.md` 中文对应页；面板使用文档同样配对，修改时同步事实、命令和验收边界。
 - 新 Web 证据见 `docs/web-panel-validation.md`；不能将旧发布点的 CI 当作本分支 CI。
 - 当前源码为 src/index.ts、src/web-host.ts、src/panel-types.ts 和 src/client/；客户端通过小型构建生成官方 loader 包装，复用宿主 React，不手改 lib/client.js、不捆绑第二份 React。

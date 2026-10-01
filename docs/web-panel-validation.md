@@ -68,3 +68,7 @@ Node 20 npm ci warns that upstream `undici@8.11.2` requires Node >=22.19.0. This
 ## Handoff / 交接
 
 [Usage / 使用](web-panel.md) · [中文](web-panel_ZH.md) · [PR and Issue drafts / 草稿](issue-1-delivery.md). Use Refs #1 and keep the issue open. P3 needs an approval contract outside an open turn and recovery design before adding writes. / 保持 Issue 开放，写操作先审审批及恢复。
+
+## 0.3.0 release-candidate extension / 新候选补验
+
+The historical 0.2.1-development tarball and hashes above remain a dated snapshot. New 0.3.0 candidate checks are in [release record](release-report-0.3.0.md): Linux exact-host 28 services, installed real Web, edge repositories and dark/narrow rendering passed. A real contrast defect was found and fixed at 176aeec; the updated optional script includes actual rendered contrast and reliable workspace/session navigation. / 前文开发包及哈希保留历史；0.3.0 补验与真实缺陷修正见发布记录，不冒充未执行项。

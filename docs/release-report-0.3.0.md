@@ -25,3 +25,14 @@ Baseline and pre-release development checks are in [Web validation](web-panel-va
 DSH 0.2.0-rc.2 only has actual host evidence; declared range is separate. Real model sessions, other DSH versions and GUI writes remain unverified. User's instruction to continue through publication authorizes push/PR/merge/tag/npm/GitHub Release for this release; it does not claim the user already personally tested the panel. / 只声明实测宿主，授权发布不等于用户已经亲自试用。
 
 No credentials or daily profiles are used in test data. / 测试不包含账号凭据、不修改日常 profile。
+
+## Candidate verification / 候选验收
+
+- d956aac: Windows clean npm ci/build/artifact/check/38 tests passed; branch and PR Node 20/22 CI passed (runs 36876828315 / 36877460612). / 干净门及候选远端矩阵通过。
+- 176aeec fixes an actual dark-theme defect found in browser screenshots: nonexistent background token caused white text on pale selected/detail surfaces. Uses the official bg-layer-2 token, dark diff colors and actual rendered text contrast >=4.5:1. / 真实截图先发现缺陷，修正后对比度回归通过。
+- Linux WSL2 Ubuntu 24.04, Node 22.23.3/npm 10.9.9, pnpm 11.7.0, Git 2.43.0; official DSH 0.2.0-rc.2, Cordis 4.0.4; exact-host 28 checks passed. / 实测版本及服务栈。
+- Installed local 0.3.0 tgz on Linux: real UI/status/both diffs/history, anonymous 401/foreign Origin 403/unknown Session 404/invalid parameters 400, two disable/enable cycles and dark contrast passed; pageErrors=0. / Linux 真实安装、读取边界、启停与暗色通过。
+- Actual clean/empty/detached/conflicted/renamed/deleted/submodule/newline/literal pathspec/binary/oversize cases and narrow 343px sidebar passed via browser/Host reads. / 实际边缘仓库与窄面板通过。
+- WSL /tmp did not persist between separate invocations; an owned home directory was used. A Windows pnpm was initially selected by inherited PATH and failed with UNC EPERM; isolated Linux pnpm and a Linux-only child PATH resolved it without global changes. / 临时路径与包管理器问题均局限于独立测试环境。
+- Full native dump-config-schema returns exit 1 for four shipped Loader carriers (/179–/182), plus two upstream warnings. The actual Web and plugin activation run successfully; this is recorded as a host/schema-tool limitation, not an all-schema PASS. / 保留上游 schema 工具诊断，不将其写成全 schema 通过。
+- Mount-prefix deployment and real slow Web subprocess navigation remain unexecuted; controlled cancellation and real preCommit process deadline are separate evidence. Real model calls, other host versions and GUI writes remain outside this release's claims. / 前缀与慢 Web 进程仍待专项验收，严格区分证据。

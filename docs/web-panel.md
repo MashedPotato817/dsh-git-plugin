@@ -2,13 +2,21 @@
 
 English · [简体中文](web-panel_ZH.md)
 
-The development branch `feat/web-git-panel` implements the first read-only phase of [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1). **Unreleased:** the published npm/GitHub `0.2.1` has commands and tools, without this panel. The new 0.3.0 release candidate contains the panel; it must never overwrite the published 0.2.1 package.
+Version **0.3.0** implements the first read-only phase of [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1). Earlier 0.2.1 provides commands/tools without the panel. Do not overwrite any published package or move existing tags.
 
 ![Actual development panel in DSH Web](images/git-panel.png)
 
-This is a screenshot from an independent DSH 0.2.0-rc.2 Web profile and a temporary Git repository. It is development evidence, not a published feature announcement.
+This actual screenshot is from an independent DSH 0.2.0-rc.2 Web profile and a temporary Git repository. No private repository content is shown.
 
-## Try the development checkout
+## Install
+
+```bash
+dsh plugin --profile web add dsh-git-plugin@0.3.0
+```
+
+Replace web with the active profile. Restart that DSH process and refresh the browser. Existing bundle configuration is retained; manually inserted 0.2.0 profiles follow the migration guide.
+
+## Try a source checkout
 
 Use an independent `DSH_HOME` and profile. Do not replace your daily profile while testing. From this checkout:
 
@@ -78,6 +86,6 @@ The script reads the official local authentication URL into memory, closes its b
 
 ## Validation and next phase
 
-See the [validation record](web-panel-validation.md) for test levels, exact environments and remaining checks. Windows real Web reads and live enable/disable passed; unit/real-Git evidence is separate from browser evidence. The current implementation is not marked stable before actual user acceptance.
+See the [validation record](web-panel-validation.md) for test levels, exact environments and remaining checks. Windows and Linux real Web reads and live enable/disable passed; unit/real-Git evidence is separate from browser evidence. The current implementation is not marked stable before actual user acceptance.
 
 P3 must first resolve write approval for a sidebar click without an open model turn, define recoverability, and add focused regressions. Keep Issue #1 open with `Refs #1`; a read-only first phase does not close the entire request.

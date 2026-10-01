@@ -2,13 +2,21 @@
 
 [English](web-panel.md) · 简体中文
 
-开发分支 `feat/web-git-panel` 已实现 [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的首期只读面板。**尚未发布：** npm/GitHub 已发布的 `0.2.1` 仅有命令与工具，没有这个面板。新的 0.3.0 候选包含面板，绝不能覆盖已发布的 0.2.1 包。
+**0.3.0** 实现了 [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的首期只读面板。旧版 0.2.1 仅有命令／工具，不含面板；不要覆盖任何已发布包或移动旧标签。
 
 ![真实 DSH Web 开发版面板](images/git-panel.png)
 
-截图来自独立 DSH 0.2.0-rc.2 Web profile 与临时 Git 仓库，是开发验收证据，不代表已发布。
+截图来自独立 DSH 0.2.0-rc.2 Web profile 与临时 Git 仓库，不含私人仓库内容。
 
-## 试用开发版
+## 安装
+
+```bash
+dsh plugin --profile web add dsh-git-plugin@0.3.0
+```
+
+将 web 替换为实际 profile，重启对应 DSH 并刷新页面。原 bundle 配置保留；手工 insert 的 0.2.0 profile 先按迁移说明调整。
+
+## 试用源码 checkout
 
 使用独立 `DSH_HOME` 与 profile；不要替换日常配置。在当前开发 checkout 中执行：
 
@@ -78,6 +86,6 @@ node scripts/verify-web-panel.mjs --dsh-log /test/server.log --session-id <fixtu
 
 ## 验证与下一阶段
 
-[验收记录](web-panel-validation.md) 区分测试层级、实际环境与未验证项。Windows 真实 Web 读取与在线启停已通过；单元／真实 Git 结果与浏览器证据分别记录。用户实际验收前，不标为“暂定稳定”。
+[验收记录](web-panel-validation.md) 区分测试层级、实际环境与未验证项。Windows 和 Linux 真实 Web 读取与在线启停已通过；单元／真实 Git 结果与浏览器证据分别记录。用户实际验收前，不标为“暂定稳定”。
 
 P3 首先要解决无模型 open turn 时点击按钮的写审批契约，确定可恢复性并补针对性回归。Issue #1 保持开放，使用 `Refs #1`；只读首期不等于整个 GUI 需求完成。
