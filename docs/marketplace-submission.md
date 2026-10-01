@@ -1,5 +1,7 @@
 # dsh-market 收录准备
 
+> Status refresh / 状态更新（2026-10-02）：PR #6296 closed at 12:05:03 UTC, not merged, no explanatory comments. Earlier ready/check evidence below is historical. The public plugins.json has zero exact repository matches at this audit. 0.3.0 is independently published on npm/GitHub. / 已关闭未合并，无说明评论；实际目录精确匹配 0。0.3.0 已独立完成 npm/GitHub 发布；下文 0.2.1 可审查/检查通过为历史记录，不宣称已收录。
+
 ## 当前状态（2026-10-01）
 
 - 目标市场：[dsh-market/dsh-market](https://github.com/dsh-market/dsh-market)。它使用 [awesome-dsh-plugin/awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 的目录，不是 DshMarketPlace 同名仓库。
@@ -26,7 +28,7 @@ description:
 
 ## 市场详情页图片
 
-根目录的 [screenshots.json](../screenshots.json) 指定现有的原创能力横幅：
+根目录的 [screenshots.json](../screenshots.json) 当前包含能力横幅及 0.3.0 实际只读面板的明/暗截图。下面列表是最初 0.2.1 的历史示例：
 
 ```json
 [
@@ -34,7 +36,7 @@ description:
 ]
 ```
 
-上游按仓库默认分支解析相对路径，图片声明必须与真实文件一起推送。使用这一显式列表可控制详情页展示顺序，避免依赖 README 图片自动提取。当前图片是能力示意图，不是 DSH 界面截图，不宣称已有 Web Git 面板。该声明由目录从 GitHub 读取，无需加入 npm files；横幅本身仍随 npm 包分发，以供 README 使用。
+上游按仓库默认分支解析相对路径，图片声明必须与真实文件一起推送。使用这一显式列表可控制详情页展示顺序，避免依赖 README 图片自动提取。横幅是能力示意图；新增的 docs/images/git-panel.png 与 git-panel-dark.png 来自独立测试 profile，展示已发布的 0.3.0 只读面板。该声明由目录从 GitHub 读取，无需加入 npm files；横幅本身仍随 npm 包分发，以供 README 使用。
 
 上游允许 1–8 张图片，路径不能跳出插件目录；规则和解析器分别见 [contributing.md](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/contributing.md#screenshots--截图optional-recommended--可选推荐) 与 [probe-screenshots.mjs](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/scripts/probe-screenshots.mjs)。收录合并与下一次目录构建后才能核验线上显示。
 

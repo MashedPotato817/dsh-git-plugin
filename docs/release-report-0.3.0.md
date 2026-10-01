@@ -1,6 +1,6 @@
 # 0.3.0 release record / 发布记录
 
-Date / 日期：2026-10-01 (Asia/Shanghai). Status / 状态：**Preparing / 准备中**, not yet published / 尚未发布。
+Release date / 发布日期：2026-10-01 (Asia/Shanghai); final audit / 最终核对：2026-10-02. Status / 状态：**Published on both channels / 双渠道发布完成**. latest=next=0.3.0.
 
 ## Scope / 范围
 
@@ -36,3 +36,26 @@ No credentials or daily profiles are used in test data. / 测试不包含账号�
 - WSL /tmp did not persist between separate invocations; an owned home directory was used. A Windows pnpm was initially selected by inherited PATH and failed with UNC EPERM; isolated Linux pnpm and a Linux-only child PATH resolved it without global changes. / 临时路径与包管理器问题均局限于独立测试环境。
 - Full native dump-config-schema returns exit 1 for four shipped Loader carriers (/179–/182), plus two upstream warnings. The actual Web and plugin activation run successfully; this is recorded as a host/schema-tool limitation, not an all-schema PASS. / 保留上游 schema 工具诊断，不将其写成全 schema 通过。
 - Mount-prefix deployment and real slow Web subprocess navigation remain unexecuted; controlled cancellation and real preCommit process deadline are separate evidence. Real model calls, other host versions and GUI writes remain outside this release's claims. / 前缀与慢 Web 进程仍待专项验收，严格区分证据。
+
+## Release-point evidence / 发布点证据
+
+- Final feature SHA: 6c5ba25926130f5983901ba11325d730ef5f92ba; current-SHA Node 20/22 CI 36883924919 / 36883915839 passed. / 最终分支 SHA 的矩阵通过。
+- PR #6 merge point: 85fa7d1c4a7e6f7c274d83df242d10c65e319d24; feature and merged trees identical. Main CI 36884910720 passed. Windows clean build/artifact gate and thirteen-file pack closure passed. / 合并树一致，main CI 与干净产物门通过。
+- Publish used official npm 10.9.9 browser authentication; exactly one successful 0.3.0 upload, HTTP 202 and exit 0. Availability was checked after scanning/registry propagation; no repeat publish while processing. / 官方认证、一次成功上传，处理中不重发。
+- Annotated v0.3.0 and public GitHub Release identify the merge point. Independent Linux DSH profile installed github:MashedPotato817/dsh-git-plugin#v0.3.0. Actual installed entry passed all 28 service checks and real Web acceptance (both diffs/history/boundaries/two lifecycle cycles/dark contrast), Edge 154.0.4258.48, pageErrors=0. / 固定 tag 实装服务及真实 Web 通过。
+- Installed runtime SHA-256 matches the release tree: index.js 4e30776d21b31ee94de0a5cf44d933468ee01603ab5e13bc8411383ef2216402; client.js 09d8d340ce5a4233f991efb348a8e6102038d33b424d4191de0f0e432c896d31; web-host.js a7603bf30976c33c058c7bcb7cec00021fac3fd3d07a2512bf40381fdf73c59b; panel-types.js 8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881; patch 5e87b7a971fb0c5b5944dff6f1f96eb27340aeb61d0743a821707c70d5e9fc2c. / 实装产物与发布点哈希一致。
+- Installed-entry service validation used a temporary Node resolution hook binding only dsh-tools to the official host, reflecting the Loader peer seam; the published package was not modified. / 临时钩子仅解析官方宿主 peer，未改发布包。
+- Market PR #6296 is closed unmerged, no comments; independent catalog inclusion is not claimed. / 市场申请关闭未合并。
+
+## Published-channel acceptance / 正式渠道验收
+
+- npm registry version 0.3.0 gitHead equals 85fa7d1c4a7e6f7c274d83df242d10c65e319d24. Official published time is 2026-10-01T15:56:05.28Z (23:56 Asia/Shanghai); first confirmed available after midnight. CHANGELOG was finalized before upload and remains 2026-10-01. / 上传前定稿、实际注册时间仍为 10 月 1 日；可见性在跨日后确认，不事后改包。
+- Public npm tarball equals the final pack byte hash: sha512-yyZD8bkradVdX73xmjVWbA/Db6W7gRG7qLctNP1pKJazvvBCLn2PPFKB/rgE1ErkJ17eyGn13XS41sRMQqADtA==; 13 files, 24475 bytes packed / 85849 unpacked. GitHub Release also carries that tgz. / 公开 npm 包与最终包一致，GitHub 同步提供 tgz。
+- In the same independent Linux DSH_HOME/profile, the explicit fixed GitHub spec was tested first, then replaced by dsh-git-plugin@0.3.0 and restarted. Each installed entry passed 28 official-service checks, and each channel passed all 13 file byte comparisons plus real browser status/both diffs/history/carrier/query boundaries/two lifecycle cycles/dark contrast. Browser errors=0. No daily profiles or model credentials were used. / 同一独立测试 profile 顺序更换两个明确 spec 并重启；每个渠道分别完成实际入口服务、文件及浏览器验收，不碰日常配置。
+- npm dist-tag add dsh-git-plugin@0.3.0 latest used a separate official browser authentication and returned 204/exit 0. A later no-cache read of both the tag endpoint and package metadata confirmed latest=next=0.3.0. Registry modified time: 2026-10-01T16:08:07.001Z. No second publish. / 独立认证推广，写成功后仍等待真实读取确认，无第二次 publish。
+- Reproducibility: final-source 38 tests, feature CI 36883924919 / 36883915839 and release-point main CI 36884910720 passed; the release-point clean artifact gate and both public installs match lib. / 源码测试、最终分支/main CI、干净产物及正式实装形成证据闭环。
+- Links: [npm 0.3.0](https://www.npmjs.com/package/dsh-git-plugin/v/0.3.0), [GitHub Release](https://github.com/MashedPotato817/dsh-git-plugin/releases/tag/v0.3.0), [implementation PR #6](https://github.com/MashedPotato817/dsh-git-plugin/pull/6), [evidence PR #7](https://github.com/MashedPotato817/dsh-git-plugin/pull/7).
+
+## Cleanup / 清理
+
+Owned Linux Web process, isolated host/profile/fixture repositories/cache and the Windows temporary clone/tarballs/screenshots/private authentication logs were removed after absolute-path checks. Shared WSL Node 20/22 runtimes, the daily profile and upstream checkout were preserved. Public Release tgz hash matches npm/final pack. / 已核对绝对路径后清理本次全部独立测试环境及私有认证日志；保留共享 Node 运行时、日常 profile 与只读上游。公开 GitHub tgz 哈希与 npm/最终包一致。
