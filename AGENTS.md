@@ -32,13 +32,22 @@
 
 ## 后续顺序与发布
 
-- P1：先准备 `0.2.0` 发布候选，补验证、修正文档状态、核对安装包与发布流程；GUI 不混入此阶段。
+- P1：`0.2.0` 双渠道发布已完成；当前优先准备下个补丁版本的 bundle 自动启用与市场收录，补验证并核对安装包与发布流程，GUI 不混入此阶段。
 - P2：[Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的 Web 只读 Git 面板：状态、diff、历史；先评估 DSH 既有变更审阅与 client slots。
 - P3：再考虑 stage/commit/branch/stash 等写操作，核对 DSH 权限与审批及恢复方式。
 - 版本文件、CHANGELOG、源码、编译配置、测试和 `lib/` 一起纳入发布提交；确保 tag、Release、npm gitHead 与包内产物对应同一提交。
 - 同一版本只 `npm publish --tag next` 一次；验证通过后用 `npm dist-tag add dsh-git-plugin@<版本> latest` 推广。需要修改已发布内容时提升版本。
-- `AGENTS.md` 作为项目指引纳入版本控制，但不加入 npm files（发布包只含 `files = ["lib", "README.md", "LICENSE"]`，因此 `AGENTS.md`、`docs/`、`.agent-teams/` 都不会进入 tarball）；`.agent-teams/`、缓存和独立测试目录保持忽略。
+- `AGENTS.md`、`docs/`、`.agent-teams/` 不进入 npm files；当前开发分支的 files 包含 lib、README、LICENSE、cordis.patch.yml 与 assets/readme/hero.svg（7 个实际文件）。原 0.2.0 发布包仍为 5 文件，不可覆盖；缓存与独立测试目录保持忽略。
 - 本地 commit 已获持续授权：每个任务或可审阅阶段完成验证后，立即执行 commit，不再请求用户认可。合并、推送、打 tag、发布及社区消息仍按各自授权执行；已有授权不重复询问。结束报告提交 SHA、文件与原因、验证结果、未验证项和工作区状态。
+
+## README 与市场安装准备（0.2.1 发布中）
+
+- README 保持简洁的产品首页：用途、能力、最短安装步骤、使用示例与文档入口。配置细节、源码安装、架构、测试和发布流程放 CONTRIBUTING.md / docs；代理维护约束放 AGENTS.md。无需为一次文档调整新增 skill。
+- 精简时保留已发布版本的真实启用方式、提交全部改动和 stash 的含义，以及实际验证宿主版本；不将开发中 bundle、未实现 GUI 或市场草稿描述为已经发布/收录。
+
+- `feat/readme-market-ready` 优化 README 并新增 bundle patch 自动注册；用户已授权推送、保留历史合并、发布 0.2.1 与社区收录 PR。版本文件已提升至 0.2.1，正在发布验证；未成功 publish / 目录合并前不宣称已发布/收录。不能重发 0.2.0。
+- 市场图片声明在根 screenshots.json，指向原创能力横幅；实际界面尚未实现时不得将示意图当作功能截图。该声明由目录读取 GitHub，无需进入 npm files。
+- 市场来源是 `awesome-dsh-plugin/awesome-dsh-plugin`；条目、验证和旧 profile 迁移见 `docs/marketplace-submission.md`。老 insert 与新 bundle 同时启用会出现两个插件行，必须迁移为按 id 覆盖；DSH 0.2.0-rc.2 对旧依赖升级不自动补 bundle 层。
 
 ## 后续任务入口（2026-10-01 核查）
 

@@ -1,6 +1,6 @@
 {
   "name": "dsh-git-plugin",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Git workflow plugin for DeepSeek Harness: slash commands and read-only git tools",
   "type": "module",
   "main": "lib/index.js",
@@ -10,12 +10,15 @@
       "types": "./lib/index.d.ts",
       "default": "./lib/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
   },
   "files": [
     "lib",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "cordis.patch.yml",
+    "assets/readme/hero.svg"
   ],
   "keywords": [
     "dsh",
@@ -39,7 +42,10 @@
     "dsh": ">=0.2.0-rc.2 <0.3.0-0"
   },
   "dsh": {
-    "manifestVersion": 1
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

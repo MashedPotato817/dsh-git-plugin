@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" role="img" aria-labelledby="title desc">
+  <title id="title">Git. In your DSH session.</title>
+  <desc id="desc">An original Git branch illustration for dsh-git-plugin: inspect, branch, commit, and recoverable snapshots. This is a capability illustration, not a product screenshot.</desc>
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M 32 0 L 0 0 0 32" fill="none" stroke="#243746" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="340" rx="24" fill="#101E2A"/>
+  <rect width="1200" height="340" rx="24" fill="url(#grid)" opacity=".32"/>
+  <rect x="48" y="43" width="210" height="30" rx="15" fill="#203445"/>
+  <text x="64" y="63" fill="#9DB7C9" font-family="Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="1.4">DEEPSEEK HARNESS / GIT</text>
+  <text x="48" y="140" fill="#F3F5F4" font-family="Arial, sans-serif" font-size="60" font-weight="700" letter-spacing="-2">Git.</text>
+  <text x="48" y="204" fill="#F3F5F4" font-family="Arial, sans-serif" font-size="54" font-weight="700" letter-spacing="-1.5">In your DSH session.</text>
+  <text x="50" y="246" fill="#A8BECF" font-family="Arial, sans-serif" font-size="18">Inspect changes. Commit with checks. Keep a snapshot.</text>
+  <text x="50" y="294" fill="#DCA181" font-family="Arial, sans-serif" font-size="13" letter-spacing="1">5 COMMANDS</text>
+  <circle cx="166" cy="289" r="2" fill="#5F7B8F"/>
+  <text x="181" y="294" fill="#A8BECF" font-family="Arial, sans-serif" font-size="13" letter-spacing="1">4 READ-ONLY TOOLS</text>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 780 236 H 1130" stroke="#7593A5" stroke-width="6"/>
+    <path d="M 820 236 C 856 236 847 111 886 111 H 1043 C 1081 111 1074 236 1110 236" stroke="#E79C78" stroke-width="6"/>
+    <circle cx="820" cy="236" r="13" fill="#101E2A" stroke="#C0D8D1" stroke-width="5"/>
+    <circle cx="914" cy="111" r="13" fill="#101E2A" stroke="#E79C78" stroke-width="5"/>
+    <circle cx="1005" cy="111" r="13" fill="#E79C78" stroke="#E79C78" stroke-width="5"/>
+    <circle cx="1110" cy="236" r="13" fill="#101E2A" stroke="#C0D8D1" stroke-width="5"/>
+  </g>
+  <g fill="#A8BECF" font-family="Arial, sans-serif" font-size="13">
+    <text x="794" y="274">inspect</text>
+    <text x="893" y="77">branch</text>
+    <text x="984" y="77">commit</text>
+    <text x="1080" y="274">snapshot</text>
+  </g>
+</svg>

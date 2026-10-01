@@ -1,230 +1,79 @@
 # dsh-git-plugin
 
-[![npm version](https://img.shields.io/npm/v/dsh-git-plugin)](https://www.npmjs.com/package/dsh-git-plugin)
-[![npm downloads](https://img.shields.io/npm/dm/dsh-git-plugin)](https://www.npmjs.com/package/dsh-git-plugin)
-[![License](https://img.shields.io/npm/l/dsh-git-plugin)](https://github.com/MashedPotato817/dsh-git-plugin)
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="Git 工作流进入 DeepSeek Harness 会话：查看改动、新建分支、提交和可恢复快照">
+</p>
 
-给 DeepSeek Harness（DSH）的 Git 工作流插件：补齐 DSH 相比 Claude Code / Codex 缺失的「程序员手感」——diff 感知、自动分支、规范提交、可恢复撤销。全部通过 `ctx.subprocess` seam 以纯 argv 调用 `git`，不经过 shell 层，每次运行（含 preCommit 钩子）都受输出字节上限与插件自身的超时截止时间约束。
+<p align="center">
+  <a href="https://www.npmjs.com/package/dsh-git-plugin"><img src="https://img.shields.io/npm/v/dsh-git-plugin?style=flat-square&amp;color=E76F51" alt="npm version"></a>
+  <a href="https://github.com/MashedPotato817/dsh-git-plugin/actions/workflows/ci.yml"><img src="https://github.com/MashedPotato817/dsh-git-plugin/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI on main"></a>
+  <a href="https://www.npmjs.com/package/dsh-git-plugin"><img src="https://img.shields.io/npm/dm/dsh-git-plugin?style=flat-square&amp;color=218C74" alt="npm downloads"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-218C74?style=flat-square" alt="MIT license"></a>
+</p>
 
-## 支持版本
+<p align="center">
+  <a href="#安装">安装</a> · <a href="#使用">使用</a> · <a href="#文档与反馈">文档与反馈</a>
+</p>
 
-**区分「允许范围」与「已实测版本」**：`peerDependencies` / `engines.dsh` 声明的是允许加载的范围；
-只有真正跑过验证的版本才算「已验证兼容」。
+## 让 Git 工作流留在 DSH 会话里
 
-| 项目 | 允许范围（声明） | 实际验证版本 |
-|---|---|---|
-| DSH | `>=0.2.0-rc.2 <0.3.0-0` | **仅 `0.2.0-rc.2`**（官方 npm 包、本机桌面运行时、独立测试 profile 三处） |
-| Node.js | `>=20` | 24.19.0（Windows）；**20.20.2 与 22.23.3（Linux，隔离运行时，2026-10-01）**；GitHub Actions 的 20/22 矩阵**尚未实跑** |
-| Git | 需支持 `--end-of-options`（Git 2.24+） | 2.53.0.windows.2（Windows）、2.43.0（Linux） |
+查看改动、创建分支、提交前检查、保存可恢复快照。**5 个斜杠命令 + 4 个模型只读工具**，让你和模型看到同一份仓库状态。
 
-- 范围内的 `0.2.x` 其他版本（`0.2.0`、`0.2.1-rc.1` …）**未验证**：能被加载不代表行为正确。
-  换版本使用时请按下面的「真实 DSH 服务栈验证」重跑一次再判断。
-- DSH 0.1.x 与低于下限的 `0.2.0-rc.1` 不在允许范围内，也不宣称兼容（旧的 `^0.1.0-rc.6` 会被 0.2.0-rc.2 的 peer 准入检查拒绝加载）。
-- Git < 2.24 未验证。
+- **看清改动** — 分支、工作区状态、已暂存 / 未暂存 diff 与提交历史。
+- **顺手提交** — 创建分支，配置提交前检查，在会话中完成提交。
+- **留一份快照** — 用 stash 暂存工作区，随时查看与恢复。
 
-0.2.0-rc.2 的证据：官方 Release [`dsh-v0.2.0-rc.2`](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.0-rc.2)（2026-09-29，提交 `639ed015`），npm `@deepseek-ai/dsh` 的 `next`/`latest` 均为 `0.2.0-rc.2`，本机 `@deepseek-ai/dsh-desktop-runtime@0.2.0-rc.2`。
-注意 4 个子包（`dsh-commands`、`dsh-tools`、`dsh-subprocess`、`dsh-system-prompt`）的 **`latest` 标签仍停在 `0.0.1-rc.1`**，安装与开发请使用 `next` 或精确版本 `0.2.0-rc.2`，不要用 `@latest`。
-
-> **插件 `0.1.0` 面向 DSH 0.1.x**，在 DSH 0.2.0-rc.2 上不兼容。
-> 本源码版本为 `0.2.0`，已适配并实测 DSH `0.2.0-rc.2`；安装时请核对精确版本，见 [CHANGELOG.md](CHANGELOG.md)。
-
-## 能力
-
-### 命令（面向人 / 斜杠命令）
-
-| 命令 | 作用 |
-|---|---|
-| `/status` | 显示当前分支与工作区状态（porcelain v1） |
-| `/diff` | 摘要显示已暂存 / 未暂存的改动 |
-| `/branch [<name>]` | 不带参数列出分支；带参数则 `git switch -c <name>` 新建并切换 |
-| `/commit [<message>]` | 带参数则运行 preCommit 钩子 + `git add -A` + 提交；不带参数显示提交规范与当前改动 |
-| `/undo [list\|pop]` | 默认 `git stash push -u` 做可恢复快照；`list` 查看、`pop` 恢复 |
-
-### 工具（面向模型 / 只读）
-
-| 工具 | 作用 |
-|---|---|
-| `git-status` | 分支 + 工作区状态 |
-| `git-diff` | 未暂存（默认）或已暂存（`staged=true`）的 diff |
-| `git-log` | 最近提交历史（`count` 控制条数，`path` 过滤文件） |
-| `git-show` | 查看某个提交（默认 HEAD）的 message / author / diff |
-
-插件还会注入一段 system-prompt 指引，让模型主动用 git 工具查看状态、并遵循仓库的提交与分支规范。
-
-### 仓库发现
-
-当会话工作目录不是 git 仓库时，插件会：若其**直接子目录**里只有一个 git 仓库，自动使用它；有多个则列出让用户选择；一个都没有才报 `not a git repository`。这让它能在「项目集合」式的工作区根目录下正常工作。
-
-`/commit` 会先解析一次目标仓库目录，**preCommit 钩子与 `git add` / `git commit` 使用同一个目录**，因此在自动发现子仓库的场景下钩子也运行在正确的仓库里。
+本页对应 **0.2.1**，实测宿主为 **DSH 0.2.0-rc.2**；需要 Node.js ≥20、Git ≥2.24。[完整兼容与验证记录](CONTRIBUTING.md#兼容性与验证记录)。
 
 ## 安装
 
-> DSH 0.2.0-rc.2 请安装插件 `0.2.0`；插件 `0.1.0` 的旧 peer 范围会被新版宿主拒绝。
-> npm 版本、dist-tag 和 GitHub Release 的在线状态以对应渠道为准。
-
-### 本地 / 源码安装
+在需要使用插件的 profile 中执行，将 `web` 替换为实际名称：
 
 ```bash
-dsh plugin --profile <name> add /path/to/dsh-git-plugin
+dsh plugin --profile web add dsh-git-plugin@0.2.1
 ```
 
-本地路径安装直接使用工作区里的 `lib/`，包含本轮全部修复。
+安装后自动注册插件。重启对应 profile 的 DSH；使用 Web 时刷新页面。
 
-### 从 GitHub 安装
+从手工启用的 0.2.0 升级时，先按[迁移说明](docs/marketplace-submission.md#从手工启用的-020-迁移)调整原配置，避免重复注册。[GitHub 固定 tag 与源码安装](CONTRIBUTING.md#其他安装方式)。
 
-编译产物 `lib/` 随源码提交，因此从 Git 安装不需要在安装期构建。
-使用已推送的固定发布 tag，避免拿到中间状态：
+## 使用
 
-```bash
-dsh plugin --profile <name> add github:MashedPotato817/dsh-git-plugin#v0.2.0
+```text
+/status
+/diff
+/branch feat/my-change
+/commit feat: 完成一项修改
 ```
 
-### 从 npm 安装
-
-```bash
-dsh plugin --profile <name> add dsh-git-plugin@0.2.0
-```
-
-建议固定版本；需要默认渠道时先确认 `npm view dsh-git-plugin dist-tags` 中 `latest` 已指向兼容版本。
-
-### 启用
-
-安装只是把包装进 profile 的依赖；还需要在 profile 的 `cordis.patch.yml` 中用 `insert` 声明启用：
-
-```yaml
-- insert:
-    - id: dsh-git-plugin
-      name: dsh-git-plugin
-```
-
-需要配置时加上 `config`：
-
-```yaml
-- insert:
-    - id: dsh-git-plugin
-      name: dsh-git-plugin
-      config:
-        preCommit: [npm, test]
-        timeoutMs: 300000
-```
-
-改完在 Web 里重载（或重启 profile）后：模型侧出现 4 个只读工具，人侧出现 5 个 `/` 命令。
-
-## 配置
-
-| 键 | 默认值 | 含义 |
-|---|---|---|
-| `maxBytes` | `1048576` | 单次 git 调用 stdout 的上限字节数 |
-| `stderrMaxBytes` | `65536` | 单次 git 调用 stderr 的上限字节数 |
-| `graceMs` | `3000` | 子进程终止前等待其静默的宽限毫秒数（超时后调用 `terminate()` 并最多等这么久） |
-| `timeoutMs` | `30000` | **每一次运行的截止时间**：斜杠命令、4 个只读工具、preCommit 钩子都受此约束；超时后终止进程并返回 `<命令> timed out after <N>ms (process terminated)` |
-| `preCommit` | `[]` | 提交前要运行的 argv 命令（如 `["npm","test"]`）；非零退出、超时或启动失败都会中止 `/commit` |
-
-`timeoutMs` 现在对 preCommit 同样生效。若钩子是 `npm test` 这类慢任务，请显式调大（例如 `300000`），
-否则默认 30 秒会被判定超时并终止钩子。
-
-## 提交规范
-
-`/commit` 默认提示 MAA 风格的提交信息，与本仓库约定一致：
-
-```
-<类型>(<可选作用域>): <中文主体>
-feat / fix / docs / chore / style / refactor / test / perf
-```
-
-若仓库根目录存在 `AGENTS.md` / `CLAUDE.md`，模型会读取并遵循其中的自定义规范。
-
-## 开发
-
-源码是严格模式的 TypeScript（`src/`），编译产物为 `lib/`（`lib/index.js` + `lib/index.d.ts`），
-`lib/` 随仓库提交，保证 npm 与 GitHub 两种安装渠道都不需要安装期构建。
-
-```bash
-npm install
-npm run build   # tsc -p tsconfig.json  → lib/
-npm run check   # tsc -p tsconfig.json --noEmit（类型检查）
-npm test        # node --test（单元 + 真实 git 集成测试）
-```
-
-目录：
-
-| 路径 | 内容 |
+| 命令 | 用途 |
 |---|---|
-| `src/index.ts` | 唯一的源码（严格模式 TypeScript） |
-| `lib/` | 编译产物（`index.js` + `index.d.ts`），随仓库提交 |
-| `test/` | `smoke.test.js`（模拟 seam）、`integration.test.js`（真实 Git） |
-| `scripts/verify-real-dsh.mjs` | 按需运行的真实 DSH 服务栈验证，不进入 `npm test` / CI |
-| `docs/maintenance-plan.md` | 版本证据、兼容核对、验证结果与发布步骤 |
+| `/status` | 查看当前分支与工作区 |
+| `/diff` | 查看已暂存、未暂存的改动 |
+| `/branch [<name>]` | 查看分支，或新建并切换 |
+| `/commit [<message>]` | 查看提交指引，或运行检查并提交 |
+| `/undo [list\|pop]` | 创建、列出或恢复 stash 快照 |
 
-- 分支工作流：所有开发在功能分支进行，稳定后才合并到 `main`。
-- 分支命名：`feat/xxx`、`fix/xxx`、`docs/xxx`、`chore/xxx`。
-- 提交消息：`<类型>(<可选作用域>): <中文主体>`。
-- 测试针对**编译产物** `lib/index.js` 运行，因此改完 `src/` 必须先 `npm run build`。
-- 发布纪律：同一版本只 `npm publish` 一次，`latest` 用 `npm dist-tag add` 推广；
-  版本文件、CHANGELOG 与 `lib/` 必须在同一个提交里，tag / GitHub Release / npm 包的 `gitHead` 指向该提交。
-  完整流程见 [docs/maintenance-plan.md](docs/maintenance-plan.md) 第 9 节。
+模型可以使用 `git-status`、`git-diff`、`git-log`、`git-show` 四个只读工具。例如：
 
-> 在受限沙箱中 `npm test`（`node --test`）可能因禁止管道捕获子进程输出而报 `spawn EPERM`；
-> 此时可直接运行测试文件：`node test/smoke.test.js`、`node test/integration.test.js`。
+> 先查看 Git 状态、diff 和最近 5 条提交，说明哪些改动已暂存，并指出提交前需要检查的内容。
 
-## 验证
+**提交范围：** `/commit <message>` 会暂存目标仓库的全部改动再提交；执行前确认范围。不带参数只显示指引与改动。
 
-| 层次 | 命令 / 方式 | 0.2.0 发布前验证结果 |
-|---|---|---|
-| 类型与语法 | `npm run build`、`npm run check` | 0 错误；两次构建产物哈希一致 |
-| 单元（模拟 subprocess seam） | `node test/smoke.test.js` | 10 通过 |
-| 集成（临时目录真实 `git init`/`commit`/`stash`） | `node test/integration.test.js` | 16 通过 |
-| 全部测试（与 CI 同一条命令） | `npm test` | 26 通过 / 0 失败（Windows、Linux Node 20.20.2、Linux Node 22.23.3） |
-| 打包内容 | `npm pack --dry-run` | 仅 `lib/`、README、LICENSE、package.json（5 文件） |
-| Linux 构建与测试 | WSL2 Ubuntu 24.04，隔离 Node 20.20.2 / 22.23.3 | 旧候选产物门 exit 0，但测试 5 cancelled；修复后 build/check/test exit 0，26/26；修复候选 922408d 的完整干净矩阵与产物门通过 |
-| 真实 DSH 服务栈 | `node scripts/verify-real-dsh.mjs --dsh-root <隔离安装>` | `ALL CHECKS PASSED`（28 项，连续 3 次） |
-| 独立 DSH profile | 独立 `DSH_HOME` + `headless` 模板 | 安装 / 加载 / schema / 禁用 / 重新启用全部通过 |
+**快照含义：** `/undo` 保存工作区改动（含未跟踪文件），不是回退 commit；`pop` 恢复时可能遇到冲突。
 
-以上为发布前本地验证记录；真实模型会话与 Linux 上完整 DSH 宿主仍未验证。
-当前提交的远端 CI、发布渠道安装和四者一致性以发布记录为准；历史证据见 [docs/validation-report-0.2.0.md](docs/validation-report-0.2.0.md)。
+需要提交前跑测试、调大超时？见[插件配置](CONTRIBUTING.md#插件配置)。
 
-### 真实 DSH 服务栈验证（按需运行，不纳入 `npm test` / CI）
+## 文档与反馈
 
-`scripts/verify-real-dsh.mjs` 会用官方 DSH 包组装真实 Cordis 上下文（`cordis` + `dsh-commands` +
-`dsh-tools` + `dsh-system-prompt` + `dsh-subprocess-local`），挂载本插件的 `lib/index.js`，
-在临时 Git 仓库里跑完：5 个斜杠命令、4 个只读工具、`tool:git` 提示词段落、工具 schema 进入组装、
-选项注入防护、**禁用后注册清理**、**重新启用无重复注册**、超时终止真实 preCommit 进程。
+- [贡献指南](CONTRIBUTING.md) · 配置、源码安装、开发与验证
+- [CHANGELOG](CHANGELOG.md) · 版本变更
+- [Issues](https://github.com/MashedPotato817/dsh-git-plugin/issues) · 缺陷与功能建议
+- [市场收录准备](docs/marketplace-submission.md) · dsh-market 收录进展
+- [Web 面板计划](docs/web-panel-plan.md) · 后续只读 Git 界面
 
-```bash
-npm install --prefix .tmp-dsh-verify --no-save @deepseek-ai/dsh@0.2.0-rc.2
-node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
-```
-
-退出码 0 = 全部通过，1 = 有检查失败（逐行 PASS/FAIL），2 = 无法从该 root 解析 DSH 包。
-换 DSH 版本做兼容核对的步骤见 [docs/maintenance-plan.md](docs/maintenance-plan.md) 第 5.2 / 9 节。
-
-回归测试专门覆盖：`git-show` 的选项形式 ref（不得写文件）、仍接受 `HEAD` / `HEAD~1` / 分支名、
-斜杠命令 / 只读工具 / preCommit 三处超时终止、调用方取消不被误报为超时、
-以及自动发现子仓库后 preCommit 与 Git 操作共用同一工作目录。
-
-**验证边界**：运行中 DSH 会话的模型调用、Linux 上完整 DSH 服务栈、
-DSH 0.1.x、`0.2.x` 中除 `0.2.0-rc.2` 外的版本、Git < 2.24 均不作已验证兼容宣称。
-远端 CI 与 npm/GitHub 安装在发布过程中单独核对，不以发布前本地测试替代。
-详细证据见 [docs/validation-report-0.2.0.md](docs/validation-report-0.2.0.md) 与
-[docs/maintenance-plan.md](docs/maintenance-plan.md) 第 5 节。
-
-## Hook 与 CI
-
-- **插件 pre-commit 钩子**：通过 `config.preCommit` 配置一个 argv 命令，`/commit` 会在 `git add` 前运行它，失败或超时即中止提交。
-- **仓库 `commit-msg` 钩子**：`.githooks/commit-msg` 强制 MAA 提交格式。启用：
-
-  ```bash
-  git config core.hooksPath .githooks
-  ```
-
-- **CI**：`.github/workflows/ci.yml` 在 push / PR 时跑 `npm ci`、构建、`lib/` 新鲜度检查（`git diff --exit-code lib`）、类型检查、`node --check lib/index.js` 和 `node --test`（Node 20 / 22）。
-
-## 参与贡献
-
-缺陷、功能建议与 DSH 兼容性反馈可通过 [Issues](https://github.com/MashedPotato817/dsh-git-plugin/issues) 提交。
-开发环境、及时本地提交、验证与审查要求见 [CONTRIBUTING.md](CONTRIBUTING.md)，PR 使用仓库模板。
-Issue / PR 模板进入默认分支后生效。
+当前提供命令与工具，Web Git 面板尚未实现，dsh-market 尚未收录。页面设计参考 [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams)，横幅为原创 SVG。
 
 ## License
 
-MIT
+[MIT](LICENSE)
