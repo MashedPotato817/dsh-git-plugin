@@ -32,7 +32,7 @@
 
 ## 后续顺序与发布
 
-- P1：先准备 `0.2.0` 发布候选，补验证、修正文档状态、核对安装包与发布流程；GUI 不混入此阶段。
+- P1：`0.2.0` 双渠道发布已完成；当前优先准备下个补丁版本的 bundle 自动启用与市场收录，补验证并核对安装包与发布流程，GUI 不混入此阶段。
 - P2：[Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的 Web 只读 Git 面板：状态、diff、历史；先评估 DSH 既有变更审阅与 client slots。
 - P3：再考虑 stage/commit/branch/stash 等写操作，核对 DSH 权限与审批及恢复方式。
 - 版本文件、CHANGELOG、源码、编译配置、测试和 `lib/` 一起纳入发布提交；确保 tag、Release、npm gitHead 与包内产物对应同一提交。
@@ -46,6 +46,7 @@
 - 精简时保留已发布版本的真实启用方式、提交全部改动和 stash 的含义，以及实际验证宿主版本；不将开发中 bundle、未实现 GUI 或市场草稿描述为已经发布/收录。
 
 - `feat/readme-market-ready` 优化 README 并新增 bundle patch 自动注册；仅本地 tarball 与独立 profile 通过，不等于新版本已经发布或市场已经收录。下一次发布需提升版本，不能重发 0.2.0。
+- 市场图片声明在根 screenshots.json，指向原创能力横幅；实际界面尚未实现时不得将示意图当作功能截图。该声明由目录读取 GitHub，无需进入 npm files。
 - 市场来源是 `awesome-dsh-plugin/awesome-dsh-plugin`；条目、验证和旧 profile 迁移见 `docs/marketplace-submission.md`。老 insert 与新 bundle 同时启用会出现两个插件行，必须迁移为按 id 覆盖；DSH 0.2.0-rc.2 对旧依赖升级不自动补 bundle 层。
 
 ## 后续任务入口（2026-10-01 核查）

@@ -9,6 +9,7 @@
 
 - DSH bundle 安装元数据与 cordis.patch.yml；新安装自动注册插件，patch 同步导出并纳入发布包。
 - dsh-market 收录条件、Git 分类条目草稿与旧 profile 迁移说明。
+- screenshots.json 市场展示图片声明，使用现有原创能力横幅。
 
 ### Changed
 
