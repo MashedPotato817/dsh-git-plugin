@@ -31,8 +31,10 @@ DSH 主包 latest/next 都是 0.2.0-rc.2，commands/tools 子包 latest 仍旧�
 3. [03 Web Host](03-web-host.md)：独立功能分支，完成只读接口与必要测试。
 4. [04 Web UI](04-web-ui.md)：沿用 03 的分支与契约，完成 TSX 与客户端构建。
 5. [05 Web 联调验收](05-web-acceptance.md)：真实 DSH Web 验证、修复、交付。
+6. [06 剩余 Web 验收 / Remaining acceptance](06-web-edge-acceptance.md)：补 Linux、边缘状态、布局与真实慢请求证据。
+7. [07 GUI 写审批设计 / Write design](07-gui-write-design.md)：先确认无 open turn 的审批与恢复契约，再拆实现包。
 
-不要把五包一次性合并为一个大任务。每包通过后再给 DSH 下一包。
+不要把这些包一次性合并为一个大任务。每包通过后再给 DSH 下一包。
 03–05 的功能不得混进 0.2.0 发布候选；默认在 02 完成后开始。
 GUI 写操作留给下一阶段，另做审批与恢复方案。
 

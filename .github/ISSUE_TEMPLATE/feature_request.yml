@@ -4,48 +4,40 @@ title: '[Feature] '
 body:
 - type: markdown
   attributes:
-    value: 'Please search existing issues, provide exact versions and reproducible steps. Remove credentials/private
-      content. Separate actually executed checks from unverified claims. See README and CONTRIBUTING.
-
+    value: |
+      Discuss large features before implementation and split them into verifiable stages. Add related Git panel suggestions to the existing Issue #1 linked below.
 
       大功能请先讨论，再拆成可验收阶段。已有 [只读 Web 面板需求 #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1)，相关建议可补充到该讨论。
-
-      '
 - type: textarea
   id: problem
   attributes:
     label: Use case and current problem / 使用场景与当前困难
-    description: Describe exact observed behavior, configuration and evidence; mark unknown or unexecuted items.
-      / 描述你想完成的任务，以及现在如何处理。
+    description: Describe the task you want to complete and how you currently handle it. / 描述你想完成的任务，以及现在如何处理。
   validations:
     required: true
 - type: textarea
   id: proposal
   attributes:
     label: Proposed behavior and minimum scope / 建议行为与最小范围
-    description: Describe exact observed behavior, configuration and evidence; mark unknown or unexecuted items.
-      / 请说明 CLI / Web / desktop 入口；若涉及 Git 写操作，说明用户确认与恢复需求。
+    description: Specify CLI/Web/desktop; for Git writes, describe confirmation and recovery needs. / 请说明 CLI /
+      Web / desktop 入口；若涉及 Git 写操作，说明用户确认与恢复需求。
   validations:
     required: true
 - type: textarea
   id: acceptance
   attributes:
     label: Acceptance criteria / 验收标准
-    placeholder: 'Exact versions / steps / expected vs actual / evidence; use either language.
-
+    placeholder: |
+      Exact versions / steps / expected vs actual / evidence; use either language.
       - 用户执行……后能看到……
-
       - 禁用插件后……
-
-      '
   validations:
     required: true
 - type: textarea
   id: alternatives
   attributes:
     label: Alternatives and references / 已有方案与参考
-    description: Describe exact observed behavior, configuration and evidence; mark unknown or unexecuted items.
-      / 可填替代方法、上游公开接口、原型或相关链接。
+    description: Include alternatives, public upstream interfaces, prototypes or relevant links. / 可填替代方法、上游公开接口、原型或相关链接。
 - type: checkboxes
   id: checklist
   attributes:

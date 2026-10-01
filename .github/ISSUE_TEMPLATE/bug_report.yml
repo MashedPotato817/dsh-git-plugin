@@ -4,41 +4,31 @@ title: '[Bug] '
 body:
 - type: markdown
   attributes:
-    value: 'Please search existing issues, provide exact versions and reproducible steps. Remove credentials/private
-      content. Separate actually executed checks from unverified claims. See README and CONTRIBUTING.
-
+    value: |
+      Provide a minimal reproduction and search existing issues. Remove tokens, account information and private repository content from logs. See the support matrix in CONTRIBUTING.
 
       请提供最小复现，并搜索已有 Issue。日志中请移除 token、账号信息和私人仓库内容。
-
       支持范围见 [README](https://github.com/MashedPotato817/dsh-git-plugin/blob/main/CONTRIBUTING_ZH.md#兼容性与验证记录)。
-
-      '
 - type: input
   id: plugin-version
   attributes:
     label: Plugin version or commit SHA / 插件版本或提交 SHA
-    placeholder: 'Exact versions / steps / expected vs actual / evidence; use either language.
-
-      npm 精确版本，或本地 / GitHub checkout 的 SHA'
+    placeholder: |-
+      Exact versions / steps / expected vs actual / evidence; use either language.
+      npm 精确版本，或本地 / GitHub checkout 的 SHA
   validations:
     required: true
 - type: textarea
   id: environment
   attributes:
     label: Environment / 运行环境
-    description: Describe exact observed behavior, configuration and evidence; mark unknown or unexecuted items.
-      / 请写实际版本；不确定的项注明未知。
-    placeholder: 'Exact versions / steps / expected vs actual / evidence; use either language.
-
+    description: Give actual versions; mark unknown items. / 请写实际版本；不确定的项注明未知。
+    placeholder: |
+      Exact versions / steps / expected vs actual / evidence; use either language.
       DSH 版本：
-
       操作系统（含 WSL / 容器）：
-
       Node / npm / Git 版本：
-
       入口（CLI / headless / Web / desktop）：
-
-      '
   validations:
     required: true
 - type: dropdown
@@ -57,40 +47,31 @@ body:
   id: reproduction
   attributes:
     label: Minimal reproduction / 最小复现步骤
-    description: Describe exact observed behavior, configuration and evidence; mark unknown or unexecuted items.
-      / 写明命令或工具、相关配置，以及会话 cwd 是否为仓库或含子仓库。
-    placeholder: 'Exact versions / steps / expected vs actual / evidence; use either language.
-
+    description: Specify command/tool, configuration, and whether Session cwd is a repository or contains child
+      repositories. / 写明命令或工具、相关配置，以及会话 cwd 是否为仓库或含子仓库。
+    placeholder: |
+      Exact versions / steps / expected vs actual / evidence; use either language.
       1. 在临时 Git 仓库中……
-
       2. 执行……
-
       3. 出现……
-
-      '
   validations:
     required: true
 - type: textarea
   id: expected-actual
   attributes:
     label: Expected and actual behavior / 预期与实际结果
-    placeholder: 'Exact versions / steps / expected vs actual / evidence; use either language.
-
+    placeholder: |
+      Exact versions / steps / expected vs actual / evidence; use either language.
       预期：
-
       实际：
-
       是否修改了文件 / 分支 / stash：
-
-      '
   validations:
     required: true
 - type: textarea
   id: logs
   attributes:
     label: Redacted logs or exit code / 脱敏日志或退出码
-    description: Describe exact observed behavior, configuration and evidence; mark unknown or unexecuted items.
-      / 无日志可留空；截图也可附在复现步骤中。
+    description: Leave blank if no logs; screenshots may accompany reproduction steps. / 无日志可留空；截图也可附在复现步骤中。
     render: text
 - type: checkboxes
   id: checklist

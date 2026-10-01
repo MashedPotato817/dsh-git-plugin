@@ -25,10 +25,27 @@ Date / 日期：2026-10-01. Scope / 范围：Issue #1 read-only first phase on `
 | Live lifecycle / 在线启停 | PASS | Two disable/enable cycles: UI/styles/routes disappear and recover; no duplicates / 两轮清理恢复，无重复 |
 | Pending subprocess / 请求子进程 | PASS (controlled test) | Disable cancellation and configured timeout checked through runner mocks. Existing preCommit timeout uses a real process. Not an actual slow Web browser process test / 区分受控 runner 与真实 preCommit，未冒充慢 Web 进程 |
 | Official service stack / 官方服务栈 | PASS, 28 checks / 28 项 | Independent official DSH 0.2.0-rc.2 packages + Cordis 4.0.4; 5 commands, 4 tools, prompt, lifecycle and real preCommit deadline. The initial desktop-bundle SDK root returned exit 2; the independent install passed / 内置 bundle SDK 解析失败后，独立官方服务栈通过 |
-| New-SHA clean gate and Linux matrix / 新 SHA 干净门及 Linux | Pending / 待补 | Updated after final document commit / 文档提交后记录 |
+| Windows clean checkout / Windows 干净检出 | PASS, SHA 4327d3e | npm ci → build → git diff --exit-code lib → check → both entry/script syntax → 38 tests → pack; checkout stayed clean / 全部 exit 0，检出干净 |
+| Linux Node 20/22 matrix / Linux 矩阵 | PASS, SHA 4327d3e | WSL2 Ubuntu 24.04, Git 2.43.0; Node 20.20.2/npm 10.8.2 and Node 22.23.3/npm 10.9.9; each ci/build/artifact/check/syntax/38 tests/pack exit 0 / 两套完整矩阵通过 |
 | Pack closure / 打包闭包 | PASS | 13 files: entries/types, panel types, bilingual README, patch, original SVG, license/package metadata. No source, profile, credentials or docs data / 无源码、profile、凭据及测试数据 |
 
 The optional [repository script](../scripts/verify-web-panel.mjs) was run against the latest installed tarball and passed. It is outside CI; logs/authentication remain local. / 可选仓库脚本已对最新已安装 tgz 实跑通过，不进入 CI，认证与日志留在本地。
+
+## Reproducibility and platform limits / 可复现性与平台边界
+
+Clean local clones checked out `4327d3e16488c74b720c27aaeba0a175da3c4824`. The tested tarball's 13 files match the committed checkout byte-for-byte. Rebuilds and prepack left lib unchanged. Later evidence/template edits affect only documentation; no runtime, dependency or build changes / 干净克隆核对该提交，实测 tgz 13 文件逐字节一致；重建与 prepack 未改 lib，后续仅证据和模板。
+
+Runtime SHA-256 / 产物哈希：
+
+```text
+lib/index.js    4e30776d21b31ee94de0a5cf44d933468ee01603ab5e13bc8411383ef2216402
+lib/web-host.js a7603bf30976c33c058c7bcb7cec00021fac3fd3d07a2512bf40381fdf73c59b
+lib/client.js   2acb86aafb5d7982151f6843ddb16d22f73665d727da9bf53b699e2b588b5005
+```
+
+The first Linux npm ci failed with EACCES in the existing root-owned global npm cache. Re-running with a task-specific `/tmp` cache passed; no chown/global-cache modifications were made / 首次全局缓存权限失败，改独立缓存通过，未改全局权限。
+
+Node 20 npm ci warns that upstream `undici@8.11.2` requires Node >=22.19.0. This matrix demonstrates this plugin's build/tests, not full Linux DSH hosting on Node 20. Do not suppress the warning or claim complete host support from it / 上游 engine 警告保留；不能把插件矩阵等同 Node 20 的完整 DSH 宿主验证。
 
 ## Real-Web procedure / 真实 Web 操作
 
