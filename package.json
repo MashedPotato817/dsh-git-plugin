@@ -1,7 +1,7 @@
 {
   "name": "dsh-git-plugin",
-  "version": "0.2.1",
-  "description": "Git workflow plugin for DeepSeek Harness: slash commands and read-only git tools",
+  "version": "0.3.0",
+  "description": "Git workflow for DeepSeek Harness: read-only Web panel, slash commands and Git tools",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -11,11 +11,13 @@
       "default": "./lib/index.js"
     },
     "./package.json": "./package.json",
-    "./cordis.patch.yml": "./cordis.patch.yml"
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./client": "./lib/client.js"
   },
   "files": [
     "lib",
     "README.md",
+    "README_ZH.md",
     "LICENSE",
     "cordis.patch.yml",
     "assets/readme/hero.svg"
@@ -26,7 +28,9 @@
     "deepseek-harness",
     "git",
     "commit",
-    "workflow"
+    "workflow",
+    "git-panel",
+    "diff"
   ],
   "license": "MIT",
   "repository": {
@@ -45,13 +49,22 @@
     "manifestVersion": 1,
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar-right",
+        "@deepseek-ai/dsh-client-ui-slots"
+      ]
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "check": "tsc -p tsconfig.json --noEmit",
+    "build": "npm run build:host && npm run build:client",
+    "check": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.client.json",
     "test": "node --test",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "build:host": "tsc -p tsconfig.json",
+    "build:client": "node scripts/build-client.mjs"
   },
   "dependencies": {
     "@deepseek-ai/schemastery": "^3.18.1"
@@ -65,11 +78,26 @@
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-client-connection": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-session": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-sidebar-right": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.0-rc.2",
     "@deepseek-ai/dsh-commands": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-fs": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sandbox-policy": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-session": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-session-persistence": "0.2.0-rc.2",
     "@deepseek-ai/dsh-subprocess": "0.2.0-rc.2",
     "@deepseek-ai/dsh-system-prompt": "0.2.0-rc.2",
     "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
     "@types/node": "^20.19.43",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "esbuild": "0.28.2",
+    "jsdom": "26.1.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
     "typescript": "^6.0.3"
   }
 }

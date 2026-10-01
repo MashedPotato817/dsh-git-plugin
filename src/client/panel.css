@@ -1,0 +1,263 @@
+[data-git-panel] {
+	--gp-line: var(--dsw-alias-border-l3, #dadde3);
+	--gp-muted: var(--dsw-alias-label-secondary, #747b88);
+	--gp-accent: #c06a37;
+	--gp-add: #298253;
+	--gp-delete: #bc4a4a;
+	--gp-hunk: #5585b0;
+	--gp-warning: #aa7431;
+	--gp-surface: var(--dsw-alias-bg-layer-2, #f5f6f8);
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	height: 100%;
+	color: var(--dsw-alias-label-primary, #243044);
+	font-size: 13px;
+	line-height: 1.5;
+	font-family: var(--dsh-content-font-family, inherit);
+}
+[data-git-panel] * {
+	box-sizing: border-box;
+}
+[data-git-panel] button {
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+	background: none;
+	border: 0;
+}
+[data-git-panel] button:focus-visible {
+	outline: 2px solid var(--gp-accent);
+	outline-offset: -2px;
+}
+[data-git-panel] button:disabled {
+	opacity: 0.45;
+	cursor: default;
+}
+.gp-head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 14px;
+	border-bottom: 1px solid var(--gp-line);
+}
+.gp-brand {
+	color: var(--gp-accent);
+	font-weight: 800;
+	font-size: 19px;
+	letter-spacing: -1px;
+}
+.gp-repo {
+	min-width: 0;
+	flex: 1;
+}
+.gp-repo strong {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.gp-branch {
+	color: var(--gp-muted);
+	font:
+		11px/1.5 ui-monospace,
+		Consolas,
+		monospace;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.gp-refresh {
+	padding: 6px 8px !important;
+	border: 1px solid var(--gp-line) !important;
+	border-radius: 5px;
+}
+.gp-nav {
+	display: flex;
+	gap: 16px;
+	border-bottom: 1px solid var(--gp-line);
+	padding: 0 14px;
+}
+.gp-nav button {
+	padding: 10px 0 !important;
+	border-bottom: 2px solid transparent !important;
+}
+.gp-nav button[aria-pressed="true"] {
+	border-color: var(--gp-accent) !important;
+	font-weight: 700;
+}
+.gp-body {
+	overflow: auto;
+	min-height: 0;
+	flex: 1;
+}
+.gp-note {
+	padding: 20px 16px;
+	color: var(--gp-muted);
+}
+.gp-error {
+	border-left: 3px solid #cc5656;
+	margin: 12px;
+	background: var(--gp-surface);
+	padding: 10px;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+.gp-group h3 {
+	margin: 0;
+	padding: 12px 14px 6px;
+	font-size: 11px;
+	letter-spacing: 0.04em;
+	color: var(--gp-muted);
+}
+.gp-count {
+	float: right;
+	font:
+		11px ui-monospace,
+		Consolas,
+		monospace;
+}
+.gp-files {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.gp-file {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	width: 100%;
+	text-align: left;
+	padding: 8px 14px !important;
+}
+.gp-file:hover,
+.gp-file[aria-pressed="true"] {
+	background: var(--gp-surface);
+}
+.gp-code {
+	color: var(--gp-accent);
+	font:
+		12px ui-monospace,
+		Consolas,
+		monospace;
+	min-width: 16px;
+}
+.gp-file-path {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+.gp-old {
+	display: block;
+	font-size: 11px;
+	color: var(--gp-muted);
+}
+.gp-detail {
+	border-top: 1px solid var(--gp-line);
+}
+.gp-detail-head {
+	position: sticky;
+	top: 0;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	padding: 10px 14px;
+	background: var(--gp-surface);
+}
+.gp-detail-title {
+	min-width: 0;
+	flex: 1;
+	font:
+		12px ui-monospace,
+		Consolas,
+		monospace;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+.gp-tag {
+	font-size: 10px;
+	color: var(--gp-muted);
+	text-transform: uppercase;
+}
+.gp-patch {
+	margin: 0;
+	padding: 8px 0 14px;
+	font:
+		12px/1.65 ui-monospace,
+		SFMono-Regular,
+		Consolas,
+		monospace;
+	overflow: auto;
+	tab-size: 4;
+}
+.gp-line {
+	display: block;
+	white-space: pre;
+	min-width: max-content;
+	padding: 0 14px;
+}
+.gp-line-add {
+	background: rgba(40, 160, 93, 0.1);
+	color: var(--gp-add);
+}
+.gp-line-del {
+	background: rgba(201, 61, 61, 0.1);
+	color: var(--gp-delete);
+}
+.gp-line-hunk {
+	background: rgba(71, 130, 195, 0.08);
+	color: var(--gp-hunk);
+}
+.gp-history {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.gp-commit {
+	display: block;
+	text-align: left;
+	width: 100%;
+	padding: 12px 14px !important;
+	border-bottom: 1px solid var(--gp-line) !important;
+}
+.gp-subject {
+	display: block;
+	overflow-wrap: anywhere;
+}
+.gp-meta {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-top: 5px;
+	font-size: 11px;
+	color: var(--gp-muted);
+}
+.gp-sha {
+	color: var(--gp-accent);
+	font-family: ui-monospace, Consolas, monospace;
+}
+.gp-pager {
+	display: flex;
+	justify-content: space-between;
+	padding: 12px 14px;
+}
+.gp-footer {
+	padding: 7px 14px;
+	border-top: 1px solid var(--gp-line);
+	color: var(--gp-muted);
+	font-size: 10px;
+	letter-spacing: 0.04em;
+}
+.gp-warning {
+	padding: 8px 14px;
+	color: var(--gp-warning);
+	background: var(--gp-surface);
+}
+
+/* The shell publishes this attribute when its active palette is dark. */
+body[data-ds-dark-theme] [data-git-panel] {
+	--gp-accent: #e09e72;
+	--gp-add: #75d29b;
+	--gp-delete: #f39090;
+	--gp-hunk: #96c4ed;
+	--gp-warning: #e4b875;
+}

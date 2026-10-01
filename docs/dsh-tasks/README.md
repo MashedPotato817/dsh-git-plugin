@@ -1,5 +1,7 @@
 # DSH 后续任务包
 
+> Current handoff / 当前交接（2026-10-01）：0.2.1 已发布；包 03/04 的只读 Host 与 TSX 面板已实现，包 05 已完成 Windows 真实 Web 主要流程。剩余逐项验证见 [验收记录](../web-panel-validation.md)，不要重复执行历史发布任务。English/中文使用见 [Web guide](../web-panel.md) / [中文指南](../web-panel_ZH.md)。
+
 核查日期：2026-10-01。主仓库：`C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`。
 基线：`feat/release-0.2.0` @ `feba7b80b0942a7a5733511ac0b9cf918ef8d2a8`。
 本目录是执行提示词与审查记录。下表为创建任务包时的历史快照；2026-10-01 当前进展见 [发布记录](../release-report-0.2.0.md)：PR #2 已保留历史合并，当前 SHA CI 与双渠道实装通过；npm 0.2.0 和 GitHub Release 已发布，latest=next=0.2.0，发布完成，Web 未实现。
@@ -29,8 +31,10 @@ DSH 主包 latest/next 都是 0.2.0-rc.2，commands/tools 子包 latest 仍旧�
 3. [03 Web Host](03-web-host.md)：独立功能分支，完成只读接口与必要测试。
 4. [04 Web UI](04-web-ui.md)：沿用 03 的分支与契约，完成 TSX 与客户端构建。
 5. [05 Web 联调验收](05-web-acceptance.md)：真实 DSH Web 验证、修复、交付。
+6. [06 剩余 Web 验收 / Remaining acceptance](06-web-edge-acceptance.md)：补 Linux、边缘状态、布局与真实慢请求证据。
+7. [07 GUI 写审批设计 / Write design](07-gui-write-design.md)：先确认无 open turn 的审批与恢复契约，再拆实现包。
 
-不要把五包一次性合并为一个大任务。每包通过后再给 DSH 下一包。
+不要把这些包一次性合并为一个大任务。每包通过后再给 DSH 下一包。
 03–05 的功能不得混进 0.2.0 发布候选；默认在 02 完成后开始。
 GUI 写操作留给下一阶段，另做审批与恢复方案。
 

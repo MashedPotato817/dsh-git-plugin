@@ -1,3 +1,4 @@
+import type { Context } from "@deepseek-ai/cordis";
 import z from "@deepseek-ai/schemastery";
 import type { ToolDefinition } from "@deepseek-ai/dsh-tools";
 import type { CommandDefinition } from "@deepseek-ai/dsh-commands";
@@ -31,6 +32,14 @@ declare const Config: z<Schemastery.ObjectS<NoInfer<{
 }>>, "plain">;
 /** The validated plugin config, as Schemastery's own output type. */
 type GitConfig = Schemastery.TypeT<typeof Config>;
+/** Resolved per-run limits: the plugin's own copy of the validated config. */
+export interface Caps {
+    maxBytes: number;
+    stderrMaxBytes: number;
+    graceMs: number;
+    timeoutMs: number;
+    preCommit: string[];
+}
 /**
  * The subprocess capability this plugin calls: one collect-mode spawn whose
  * `stdout`/`stderr` are buffered, plus the exit outcome and the provider
@@ -72,7 +81,8 @@ interface SubprocessCapability {
  * members here keeps `apply` assignable from a real Cordis context and from the
  * partial stand-ins the tests mount.
  */
-interface PluginContext {
+export interface PluginContext {
+    readonly inject?: Context["inject"];
     readonly commands: {
         register(definition: CommandDefinition): unknown;
     };
@@ -84,6 +94,29 @@ interface PluginContext {
     };
     readonly subprocess: SubprocessCapability;
 }
+/** Options for one `runProcess` call. */
+export interface RunOptions {
+    acceptedExitCodes?: readonly number[];
+    cwd: string;
+    signal?: AbortSignal | undefined;
+    caps: Caps;
+}
+/**
+ * One process result. Failures carry the plugin's own cause flags so a caller
+ * that falls back on failure — repository discovery — can tell a cancellation
+ * or an expired deadline apart from a genuinely absent repository.
+ */
+export type RunOutcome = {
+    ok: true;
+    text: string;
+    rawText?: string;
+    truncated?: boolean;
+} | {
+    ok: false;
+    text: string;
+    aborted?: true;
+    timedOut?: true;
+};
 /**
  * Register the plugin's commands, tools, and system-prompt section.
  * @param ctx - the Cordis context carrying the four injected services.

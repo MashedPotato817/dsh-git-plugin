@@ -1,5 +1,7 @@
 # dsh-git-plugin 维护计划
 
+> 历史维护方案：下文的 0.2.0 版本、5 文件清单与“GUI 未实现”是当时快照。当前 0.3.0 只读 Web 发布进展见 [发布记录](release-report-0.3.0.md)。新发布复用“候选 → 干净门 → 定稿 → PR merge → 单次 publish next → 实装验证 → dist-tag latest → tag/Release”的顺序，版本号与实际文件表以本次记录为准。
+
 本轮工作按「审查 → 适配 → 验证 → 交付」推进，本文记录证据、结论、剩余问题与后续安排。
 2026-10-01 发布执行更新：PR #2 已保留历史合并，统一发布点为 `c83f332`；npm 0.2.0 与 GitHub v0.2.0 Release 已发布，tag/npm gitHead/包内 lib 一致。PR/main 的 Node 20/22 CI 及双渠道实装验证通过；latest=next=0.2.0，详见 [发布记录](release-report-0.2.0.md)。第 2 节保留版本调查时的历史证据。
 
