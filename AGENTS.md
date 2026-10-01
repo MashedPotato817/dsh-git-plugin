@@ -5,9 +5,9 @@
 - 主工作目录：`C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`；先确认所在 checkout，避免把改动写到另一 worktree。
 - 适配已提交：`8181856`，包含严格 TypeScript 迁移、DSH 0.2.0-rc.2 适配、Git 参数安全/超时/钩子目录修复、测试与文档。
 - 源码为 `src/index.ts`；`npm run build` 生成 `lib/index.js`、`lib/index.d.ts`，构建产物随 Git 提交并用于 npm 安装。保持 ESM 与现有命令/工具行为。
-- 当前包版本（本地）为 `0.2.0`：发布准备分支 `feat/release-0.2.0`（从 `2f80cb3` 创建）上已提升 `package.json` / `package-lock.json`，`CHANGELOG` 的 `[Unreleased]` 内容已整理进 `## [0.2.0] - 待发布`；发布候选已按授权在该分支提交（SHA 以 Git 历史为准），**未推送、未打 tag、未发布**，npm 上仍是 `0.1.0`（只有 `latest`，无 `next`）。
+- 当前版本为 `0.2.0`，CHANGELOG 日期 2026-10-01；PR #2 已以 merge commit 保留历史合并，统一发布点为 `c83f3322950b0892022d6b3efd1e4f6edbed5be8`。远端 annotated tag `v0.2.0`、公开 GitHub Release 与 npm 0.2.0 的 gitHead 均指向它，tarball 与双渠道实装产物一致。npm latest=next=0.2.0，双渠道发布完成；不重复 publish 或移动 tag。证据见 `docs/release-report-0.2.0.md`。
 - 已验证：严格类型检查、26 项测试、构建产物一致性，以及 **Linux Node 20.20.2 / 22.23.3 的隔离矩阵**（WSL2 Ubuntu 24.04；修复后 build/check/test 通过；修复候选 922408d 的提交后干净产物门与完整 Linux 矩阵已通过）。仅 DSH `0.2.0-rc.2` 有适配验证记录；服务栈/profile 验证不等于真实模型会话验证。完整证据见 `docs/validation-report-0.2.0.md`。
-- Linux 上的真实 DSH 服务栈、GitHub Actions Node 20/22、GitHub 安装、运行中 DSH 会话里的模型调用、以及 `0.2.x` 中除 `0.2.0-rc.2` 之外的版本均仍**待验证**。依赖允许范围不等于实测范围；旧版本与在线状态需重新查询（2026-10-01 复核：最新 DSH Release 仍是 `dsh-v0.2.0-rc.2`，无新增版本）。
+- 发布点 GitHub Actions Ubuntu Node 20/22 已通过；npm 0.2.0 与固定 GitHub tag 的独立 profile 安装/启用/schema，以及官方 peer 下各 28 项服务栈验证已通过。Linux 完整 DSH 服务栈、真实模型会话及除 `0.2.0-rc.2` 外的 DSH 版本仍待验证；允许范围不等于实测范围。
 - 包 01 复查发现并修复了一个真实缺陷：截止时间/宽限定时器曾被 `unref`，在被等待的 promise 只由该定时器推进时超时会被跳过（Linux 上稳定复现）。修复和重建的 `lib/`、验证脚本加固已提交为 `922408d`；该 SHA 的 Linux Node 20/22 干净检出产物门与完整矩阵已通过。
 
 ## 必看参考
@@ -43,7 +43,7 @@
 ## 后续任务入口（2026-10-01 核查）
 
 - 任务分包见 [docs/dsh-tasks/README.md](docs/dsh-tasks/README.md)：验证补齐 → 发布 → Web Host → TSX UI → 真实 Web 验收；逐包完成与交接，不一次混做。
-- 原候选基线为 feba7b8；最新修复候选为 922408d（后续文档提交不改变源码与产物，实际 HEAD 以 Git 为准）；适配与 Windows 回归已完成，Web 仍只有方案。当前远端 main 与 Actions 成功记录不含此候选，不能替代候选 CI。
+- 原候选 feba7b8，定时器修复 922408d，发布点 c83f332；PR/main 当前 SHA CI 均通过，协作文档与模板已进入默认分支。包 02 的 npm、GitHub、latest 推广与双渠道安装均完成；随后按 03–05 实施只读 Web，另开功能分支。
 - Linux Node 20/22 已用**隔离运行时**（WSL2 Ubuntu 24.04，`~/dsh-node-runtimes/node-v20.20.2-linux-x64`、`node-v22.23.3-linux-x64`）完成修复后 build/check/test 复验；修复候选 922408d 的 npm ci/build/产物门/check/语法/test/pack 全部通过。系统 Node 18.19.1 未用于验证。证据见 `docs/validation-report-0.2.0.md`。未推送 SHA 的干净检出从本地主仓库克隆。
 
 ## 自动本地提交与收尾

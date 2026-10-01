@@ -2,7 +2,7 @@
 
 核查日期：2026-10-01。主仓库：`C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`。
 基线：`feat/release-0.2.0` @ `feba7b80b0942a7a5733511ac0b9cf918ef8d2a8`。
-本目录是执行提示词与审查记录，不代表这些任务已经完成。
+本目录是执行提示词与审查记录。下表为创建任务包时的历史快照；2026-10-01 当前进展见 [发布记录](../release-report-0.2.0.md)：PR #2 已保留历史合并，当前 SHA CI 与双渠道实装通过；npm 0.2.0 和 GitHub Release 已发布，latest=next=0.2.0，发布完成，Web 未实现。
 
 ## 核查结果
 
