@@ -11,7 +11,7 @@
 - latest 推广正在等待官方认证；不会再次 publish。
 - annotated tag v0.2.1 已推送且指向发布点；GitHub Release 草稿已创建，待推广后公开。
 - GitHub 默认分支的 README、SVG、screenshots.json、manifest 和 patch 与本地发布点逐字节一致；搜索 topics 为 deepseek/deepseek-harness/dsh/dsh-plugin/git/git-plugin，简介与 npm 入口已核对。
-- [市场 PR #6296](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/6296) 已提交为草稿，仅新增 data/plugins/MashedPotato817__dsh-git-plugin.yml；上游 CI 尚在运行，尚未收录。发布/推广验证完成后转为可审查。
+- [市场 PR #6296](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/6296) 已提交为草稿，仅新增 data/plugins/MashedPotato817__dsh-git-plugin.yml；上游 [PR check](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/actions/runs/36828910934) 与 Submission gate 均已通过，尚未收录。latest 推广后转为可审查。
 
 ## 已执行的验证
 
