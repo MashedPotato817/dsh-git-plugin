@@ -1,7 +1,7 @@
 # dsh-git-plugin 维护计划
 
 本轮工作按「审查 → 适配 → 验证 → 交付」推进，本文记录证据、结论、剩余问题与后续安排。
-2026-10-01 发布执行更新：PR #2 已保留历史合并，统一发布点为 `c83f332`，远端 tag `v0.2.0` 已建立；PR/main 的 Node 20/22 CI 与 GitHub 实装验证通过。GitHub Release 尚为草稿，npm 发布因账号未开启 2FA 返回 E403；待认证完成后继续，详见 [发布记录](release-report-0.2.0.md)。第 2 节保留版本调查时的证据。
+2026-10-01 发布执行更新：PR #2 已保留历史合并，统一发布点为 `c83f332`；npm 0.2.0 与 GitHub v0.2.0 Release 已发布，tag/npm gitHead/包内 lib 一致。PR/main 的 Node 20/22 CI 及双渠道实装验证通过；latest 推广仍待官方 2FA 认证，详见 [发布记录](release-report-0.2.0.md)。第 2 节保留版本调查时的历史证据。
 
 ## 1. 当前状态
 
@@ -9,8 +9,8 @@
 |---|---|
 | 仓库 | `MashedPotato817/dsh-git-plugin`，默认分支 main；0.2.0 发布点 c83f332（PR #2 merge commit） |
 | 工作分支 | `feat/release-0.2.0` 已推送并合并；后续报告提交用独立分支，不改 tag |
-| npm | `dsh-git-plugin@0.1.0`，2026-08-13T16:31:32Z 发布，`gitHead b9cfbd9`（**npm 上仍只有这一个版本**；0.2.0 尚不存在，dist-tags 只有 `latest=0.1.0`） |
-| GitHub Release | v0.2.0 为草稿，尚未公开；annotated tag 已推送并指向 c83f332；原 v0.1.0 不变 |
+| npm | 0.2.0 已于 2026-10-01T05:28:14.177Z 发布，gitHead=c83f332；next=0.2.0，latest=0.1.0（推广待 2FA） |
+| GitHub Release | [v0.2.0](https://github.com/MashedPotato817/dsh-git-plugin/releases/tag/v0.2.0) 已公开，annotated tag 指向 c83f332，原 v0.1.0 不变 |
 | 本地包版本 | 0.2.0，版本与 CHANGELOG 日期已提交到发布点 |
 | 目标 DSH | 0.2.0-rc.2（本机运行中的桌面运行时版本，见第 2 节） |
 | **实际验证版本** | **仅 `0.2.0-rc.2`**：官方 npm 包、本机桌面运行时、独立测试 profile 三处均只验证了这一个版本。允许范围内的其他版本（如 0.2.0 / 0.2.1-rc.1）**未验证**；0.2.0-rc.1 低于下限，不在允许范围内。 |
@@ -18,7 +18,7 @@
 | Git 要求 | 需支持 `--end-of-options`（Git 2.24+）；实测 Git 2.53.0.windows.2，更老版本未验证 |
 | 源码形态 | `src/index.ts`（严格模式 TypeScript）→ `npm run build` → `lib/index.js` + `lib/index.d.ts`；`lib/` 随仓库提交，npm 与 GitHub 两种安装渠道都不需要安装期构建 |
 | 已提交适配 | **本轮已提交到 `fix/git-show-option-injection`（`8181856`、`2f80cb3`），本次发布准备在其之上继续**：`8181856` 包含 TypeScript 源码、配置、编译产物、测试与维护文档；`2f80cb3` 更新 `AGENTS.md` 的维护指引与发布安排。`AGENTS.md` 作为项目指引纳入版本控制，不进入 npm 发布包（`files = ["lib","README.md","LICENSE"]`）。`.agent-teams/` 与临时测试目录已忽略 |
-| **状态三态** | **已完成**：适配、安全/超时修复、Linux 本地矩阵、PR/main CI、GitHub 固定 tag 实装及官方服务栈；**待验证**：真实模型会话、Linux 完整 DSH、其他 DSH 版本、Web GUI；**待发布**：npm 因 2FA 阻塞，GitHub Release 为草稿，见发布记录 |
+| **状态三态** | **已完成**：适配、修复、Linux 本地矩阵、PR/main CI、npm/GitHub 发布、双渠道实装；**待验证**：真实模型会话、Linux 完整 DSH、其他 DSH 版本、Web GUI；**待完成**：npm latest 推广的官方 2FA 认证 |
 
 ## 2. 版本核实（证据，2026-09-29 采集）
 
@@ -183,7 +183,7 @@ node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
 | DSH 0.1.x 旧版本 | 已从 peer 范围移除，不再宣称兼容；如需回退需另开分支验证。 |
 | Git < 2.24（无 `--end-of-options`） | 未实测。 |
 | GitHub 安装渠道 | 固定 v0.2.0 的独立 DSH profile 安装/启用/schema 与官方 peer 下服务栈均通过，见发布记录；不用未固定的 main 替代 tag 证据。 |
-| 从 npm 安装 `0.2.0` | npm 发布因 2FA 返回 E403，尚未实装；成功发布后按第 9.4 节验证，不把预检算作注册表证据。 |
+| 从 npm 安装 `0.2.0` | 独立 DSH profile 的实装/启用/schema 无诊断与官方 peer 下 28 项服务栈已通过；实际 tarball 与发布点哈希一致，见发布记录。 |
 | **Web 面板（Issue #1）** | 本轮只交付方案文档 [docs/web-panel-plan.md](web-panel-plan.md)，**GUI 未实现**（本插件仍无 `dsh.client` 字段与 client 入口）；三视图实现、真实 Web GUI 内的显示与启停清理验证、客户端包体与构建门均待后续阶段（P2）。 |
 
 ## 6. 社区反馈（2026-09-29 采集）
@@ -383,13 +383,12 @@ Issue #1 的只读 Web 面板完整方案（能力复用、入口落位、Host �
 
 ## 10. 剩余问题与风险
 
-1. **npm 上的 0.1.0 与 DSH 0.2.0-rc.2 不兼容**：在 0.2.0 发布前，README 的安装说明必须明确
-   这一点；用户从 npm 安装会拿到被 DSH 拒绝的旧版本。
+1. **旧 npm 0.1.0 与新版 DSH 不兼容**：0.2.0 已发布并实测；latest 推广待 2FA，当前使用精确版本 0.2.0，避免取到旧版。
 2. **子包 `latest` 滞后**：任何安装/开发命令不要使用 `@latest`，用 `next` 或精确版本。
 3. **`timeoutMs` 语义变化**：现在对 preCommit 也生效，默认 30s 可能对 `preCommit: ["npm","test"]`
    这类慢钩子偏紧，需要在配置里调大，README 已注明。
 4. **当前 SHA CI 已通过**：PR #2 与发布点 c83f332 的 Ubuntu Node 20/22 构建、产物门、类型与测试均通过；具体 run 链接见发布记录。
-5. **GitHub 固定 tag 实装已通过**：v0.2.0 的独立 profile 与官方 peer 下真实服务栈通过；npm 0.2.0 实装尚待发布后验证。
+5. **GitHub 固定 tag 实装已通过**：v0.2.0 的独立 profile 与官方 peer 下真实服务栈通过；npm 0.2.0 实装同样通过，两个渠道产物哈希一致。
 6. **发布纪律**：同一版本号只能 `npm publish` 一次；`latest` 必须用 `npm dist-tag add` 推广。
    任何发布后修复都提升补丁版本重走第 9 节，不要覆盖已发布版本。
 7. **兼容声明纪律**：peer/`engines` 的 `>=0.2.0-rc.2 <0.3.0-0` 只是允许范围；
