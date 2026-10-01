@@ -22,7 +22,7 @@
 ### 固定 GitHub tag
 
 ```bash
-dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.2.1
+dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.3.0
 ```
 
 npm 0.2.1 与此 tag 都携带编译产物与 bundle patch，无需安装期构建；新安装自动注册，重启对应 profile 即可。旧 0.2.0 profile 按迁移说明调整，不能保留重复 insert。

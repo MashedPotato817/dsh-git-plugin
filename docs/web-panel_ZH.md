@@ -2,7 +2,7 @@
 
 [English](web-panel.md) · 简体中文
 
-开发分支 `feat/web-git-panel` 已实现 [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的首期只读面板。**尚未发布：** npm/GitHub 已发布的 `0.2.1` 仅有命令与工具，没有这个面板。开发版 tgz 为隔离测试暂沿用该版本号，绝不能覆盖已发布包。
+开发分支 `feat/web-git-panel` 已实现 [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的首期只读面板。**尚未发布：** npm/GitHub 已发布的 `0.2.1` 仅有命令与工具，没有这个面板。新的 0.3.0 候选包含面板，绝不能覆盖已发布的 0.2.1 包。
 
 ![真实 DSH Web 开发版面板](images/git-panel.png)
 
@@ -24,7 +24,7 @@ npm pack
 
 ```bash
 dsh --profile git-panel-test --from-default-profile web --dump-config
-dsh plugin --profile git-panel-test add /absolute/path/dsh-git-plugin-0.2.1.tgz
+dsh plugin --profile git-panel-test add /absolute/path/dsh-git-plugin-0.3.0.tgz
 ```
 
 在临时 Git 仓库内启动：

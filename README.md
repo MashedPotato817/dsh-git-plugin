@@ -19,25 +19,29 @@ English · [简体中文](README_ZH.md)
 
 ## Keep Git in your DSH session
 
-Inspect changes, create branches, run pre-commit checks, and keep recoverable snapshots. **5 slash commands + 4 read-only model tools** give you and your agent the same view of the repository.
+Inspect changes, create branches, run pre-commit checks, and keep recoverable snapshots. **Read-only Web panel + 5 slash commands + 4 read-only model tools** give you and your agent the same view of the repository.
 
 - **See the changes** — branch, working tree, staged / unstaged diff, and history.
 - **Commit with checks** — branch and commit directly in your session.
 - **Keep a snapshot** — stash current changes, then list or restore them.
 
-Published version: **0.2.1**. Verified host: **DSH 0.2.0-rc.2**. Requires Node.js ≥20 and Git ≥2.24. [Compatibility and validation](CONTRIBUTING.md#compatibility-and-validation).
+Release candidate: **0.3.0** (published version remains 0.2.1 until rollout). Verified host: **DSH 0.2.0-rc.2**. Requires Node.js ≥20 and Git ≥2.24. [Compatibility and validation](CONTRIBUTING.md#compatibility-and-validation).
 
 ## Install
 
 Use your active profile; replace `web` as needed:
 
 ```bash
-dsh plugin --profile web add dsh-git-plugin@0.2.1
+dsh plugin --profile web add dsh-git-plugin@0.3.0
 ```
 
 New installations register the plugin automatically. Restart that profile's DSH process and refresh the browser when using Web.
 
 Upgrading a manually enabled 0.2.0 profile? Follow the [migration steps](docs/marketplace-submission.md#从手工启用的-020-迁移) to avoid duplicate registration. [Fixed GitHub tag and source installation](CONTRIBUTING.md#other-installation-methods).
+
+## Git in the Web sidebar
+
+Open a repository workspace/session, expand the right sidebar and select **Git**. See branch/file states, switch between staged and unstaged diffs, and browse commit history/detail. The panel is read-only; Git writes use the existing slash commands. [Panel guide](docs/web-panel.md).
 
 ## Use
 
@@ -75,7 +79,7 @@ Need longer timeouts or a test hook? See [configuration](CONTRIBUTING.md#configu
 - [Web panel](docs/web-panel.md) · development preview and validation
 - [Maintenance instructions](AGENTS.md) · engineering constraints
 
-Published 0.2.1 provides commands and tools. The development branch now implements the read-only Web panel for Issue #1; **it is not released yet**. Market inclusion is tracked separately above. Presentation inspired by [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams); the SVG banner is original.
+Version 0.3.0 adds the first read-only Web panel for Issue #1. Publication is in progress; the install spec above becomes available after npm rollout. Market inclusion is tracked separately. Presentation inspired by [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams); the SVG banner is original.
 
 ## License
 

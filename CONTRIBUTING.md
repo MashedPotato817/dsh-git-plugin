@@ -19,7 +19,7 @@ Bug reports, compatibility evidence, documentation, and focused implementations 
 ### Fixed GitHub tag
 
 ```bash
-dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.2.1
+dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.3.0
 ```
 
 npm 0.2.1 and this tag contain compiled outputs and the bundle patch. They need no installation-time build. New installations register automatically; restart the profile. Migrate older manual 0.2.0 inserts instead of keeping duplicate rows.

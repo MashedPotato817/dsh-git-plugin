@@ -1,7 +1,7 @@
 {
   "name": "dsh-git-plugin",
-  "version": "0.2.1",
-  "description": "Git workflow plugin for DeepSeek Harness: slash commands and read-only git tools",
+  "version": "0.3.0",
+  "description": "Git workflow for DeepSeek Harness: read-only Web panel, slash commands and Git tools",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,7 +28,9 @@
     "deepseek-harness",
     "git",
     "commit",
-    "workflow"
+    "workflow",
+    "git-panel",
+    "diff"
   ],
   "license": "MIT",
   "repository": {

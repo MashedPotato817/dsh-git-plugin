@@ -6,6 +6,8 @@ Actual changes to `dsh-git-plugin`, following [Keep a Changelog](https://keepach
 
 ## [Unreleased]
 
+## [0.3.0] - 待发布
+
 ### Added
 
 - Issue #1 read-only Git sidebar: branch/file states, independent staged/unstaged diff, untracked content preview, paginated history and commit detail. Fixed authenticated routes derive the repository from a Session.
@@ -19,7 +21,7 @@ Actual changes to `dsh-git-plugin`, following [Keep a Changelog](https://keepach
 
 ### Notes
 
-- The panel is unreleased; published 0.2.1 has no GUI. Current UI labels are Chinese; translated documents do not imply English UI support.
+- This release introduces the read-only panel; UI labels are Chinese, and translated documents do not imply English UI support.
 - GUI writes and approval without an open turn remain P3. The read-only first phase does not close the whole Issue #1.
 
 ## [0.2.1] - 2026-10-01

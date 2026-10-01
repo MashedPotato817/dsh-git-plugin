@@ -19,25 +19,29 @@
 
 ## 让 Git 工作流留在 DSH 会话里
 
-查看改动、创建分支、提交前检查、保存可恢复快照。**5 个斜杠命令 + 4 个模型只读工具**，让你和模型看到同一份仓库状态。
+查看改动、创建分支、提交前检查、保存可恢复快照。**只读 Web 面板 + 5 个斜杠命令 + 4 个模型只读工具**，让你和模型看到同一份仓库状态。
 
 - **看清改动** — 分支、工作区状态、已暂存 / 未暂存 diff 与提交历史。
 - **顺手提交** — 创建分支，配置提交前检查，在会话中完成提交。
 - **留一份快照** — 用 stash 暂存工作区，随时查看与恢复。
 
-本页对应 **0.2.1**，实测宿主为 **DSH 0.2.0-rc.2**；需要 Node.js ≥20、Git ≥2.24。[完整兼容与验证记录](CONTRIBUTING_ZH.md#兼容性与验证记录)。
+本页对应候选 **0.3.0**（上线完成前已发布版本仍为 0.2.1），实测宿主为 **DSH 0.2.0-rc.2**；需要 Node.js ≥20、Git ≥2.24。[完整兼容与验证记录](CONTRIBUTING_ZH.md#兼容性与验证记录)。
 
 ## 安装
 
 在需要使用插件的 profile 中执行，将 `web` 替换为实际名称：
 
 ```bash
-dsh plugin --profile web add dsh-git-plugin@0.2.1
+dsh plugin --profile web add dsh-git-plugin@0.3.0
 ```
 
 安装后自动注册插件。重启对应 profile 的 DSH；使用 Web 时刷新页面。
 
 从手工启用的 0.2.0 升级时，先按[迁移说明](docs/marketplace-submission.md#从手工启用的-020-迁移)调整原配置，避免重复注册。[GitHub 固定 tag 与源码安装](CONTRIBUTING_ZH.md#其他安装方式)。
+
+## Web 侧栏里的 Git
+
+进入仓库工作区／会话，展开右侧栏，点击 **Git**。查看分支／文件状态、已暂存与未暂存 diff，以及提交历史和详情。面板只读，Git 写操作继续使用现有斜杠命令。见[面板指南](docs/web-panel_ZH.md)。
 
 ## 使用
 
@@ -75,7 +79,7 @@ dsh plugin --profile web add dsh-git-plugin@0.2.1
 - [Web 面板](docs/web-panel_ZH.md) · 开发版的使用与验收
 - [维护指引](AGENTS_ZH.md) · 工程约束
 
-已发布的 0.2.1 提供命令与工具。当前开发分支已实现 Issue #1 的只读 Web 面板，但尚未发布；见[面板使用与边界](docs/web-panel_ZH.md)。市场收录状态见上述进展文档。页面设计参考 [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams)，横幅为原创 SVG。
+0.3.0 新增 Issue #1 的只读 Web 首期面板，正在上线；上述安装版本在 npm 发布后可用。市场收录状态见上述进展文档。页面设计参考 [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams)，横幅为原创 SVG。
 
 ## License
 

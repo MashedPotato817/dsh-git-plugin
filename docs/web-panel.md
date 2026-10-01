@@ -2,7 +2,7 @@
 
 English · [简体中文](web-panel_ZH.md)
 
-The development branch `feat/web-git-panel` implements the first read-only phase of [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1). **Unreleased:** the published npm/GitHub `0.2.1` has commands and tools, without this panel. The development tarball still carries that version for isolated testing; it must never overwrite the published package.
+The development branch `feat/web-git-panel` implements the first read-only phase of [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1). **Unreleased:** the published npm/GitHub `0.2.1` has commands and tools, without this panel. The new 0.3.0 release candidate contains the panel; it must never overwrite the published 0.2.1 package.
 
 ![Actual development panel in DSH Web](images/git-panel.png)
 
@@ -24,7 +24,7 @@ Set `DSH_HOME` to a new test directory using your shell. Replace the paths below
 
 ```bash
 dsh --profile git-panel-test --from-default-profile web --dump-config
-dsh plugin --profile git-panel-test add /absolute/path/dsh-git-plugin-0.2.1.tgz
+dsh plugin --profile git-panel-test add /absolute/path/dsh-git-plugin-0.3.0.tgz
 ```
 
 Start DSH from a temporary Git repository:
