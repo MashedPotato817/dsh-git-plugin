@@ -1,7 +1,7 @@
 # dsh-git-plugin 维护计划
 
 本轮工作按「审查 → 适配 → 验证 → 交付」推进，本文记录证据、结论、剩余问题与后续安排。
-2026-10-01 发布执行更新：PR #2 已保留历史合并，统一发布点为 `c83f332`；npm 0.2.0 与 GitHub v0.2.0 Release 已发布，tag/npm gitHead/包内 lib 一致。PR/main 的 Node 20/22 CI 及双渠道实装验证通过；latest 推广仍待官方 2FA 认证，详见 [发布记录](release-report-0.2.0.md)。第 2 节保留版本调查时的历史证据。
+2026-10-01 发布执行更新：PR #2 已保留历史合并，统一发布点为 `c83f332`；npm 0.2.0 与 GitHub v0.2.0 Release 已发布，tag/npm gitHead/包内 lib 一致。PR/main 的 Node 20/22 CI 及双渠道实装验证通过；latest=next=0.2.0，详见 [发布记录](release-report-0.2.0.md)。第 2 节保留版本调查时的历史证据。
 
 ## 1. 当前状态
 
@@ -9,7 +9,7 @@
 |---|---|
 | 仓库 | `MashedPotato817/dsh-git-plugin`，默认分支 main；0.2.0 发布点 c83f332（PR #2 merge commit） |
 | 工作分支 | `feat/release-0.2.0` 已推送并合并；后续报告提交用独立分支，不改 tag |
-| npm | 0.2.0 已于 2026-10-01T05:28:14.177Z 发布，gitHead=c83f332；next=0.2.0，latest=0.1.0（推广待 2FA） |
+| npm | 0.2.0 已于 2026-10-01T05:28:14.177Z 发布，gitHead=c83f332；latest=next=0.2.0 |
 | GitHub Release | [v0.2.0](https://github.com/MashedPotato817/dsh-git-plugin/releases/tag/v0.2.0) 已公开，annotated tag 指向 c83f332，原 v0.1.0 不变 |
 | 本地包版本 | 0.2.0，版本与 CHANGELOG 日期已提交到发布点 |
 | 目标 DSH | 0.2.0-rc.2（本机运行中的桌面运行时版本，见第 2 节） |
@@ -18,7 +18,7 @@
 | Git 要求 | 需支持 `--end-of-options`（Git 2.24+）；实测 Git 2.53.0.windows.2，更老版本未验证 |
 | 源码形态 | `src/index.ts`（严格模式 TypeScript）→ `npm run build` → `lib/index.js` + `lib/index.d.ts`；`lib/` 随仓库提交，npm 与 GitHub 两种安装渠道都不需要安装期构建 |
 | 已提交适配 | **本轮已提交到 `fix/git-show-option-injection`（`8181856`、`2f80cb3`），本次发布准备在其之上继续**：`8181856` 包含 TypeScript 源码、配置、编译产物、测试与维护文档；`2f80cb3` 更新 `AGENTS.md` 的维护指引与发布安排。`AGENTS.md` 作为项目指引纳入版本控制，不进入 npm 发布包（`files = ["lib","README.md","LICENSE"]`）。`.agent-teams/` 与临时测试目录已忽略 |
-| **状态三态** | **已完成**：适配、修复、Linux 本地矩阵、PR/main CI、npm/GitHub 发布、双渠道实装；**待验证**：真实模型会话、Linux 完整 DSH、其他 DSH 版本、Web GUI；**待完成**：npm latest 推广的官方 2FA 认证 |
+| **状态三态** | **已完成**：适配、修复、Linux 本地矩阵、PR/main CI、npm/GitHub 发布、双渠道实装；**待验证**：真实模型会话、Linux 完整 DSH、其他 DSH 版本、Web GUI；**后续**：按包 03–05 实现与验收只读 Web 面板 |
 
 ## 2. 版本核实（证据，2026-09-29 采集）
 
@@ -143,7 +143,7 @@
 禁用后命令/工具/提示词段落全部消失，重新启用后恢复且无重复；
 `timeoutMs: 400` 的真实 30 秒钩子被判定 `timed out after 400ms` 且未产生提交。
 
-验证脚本已随仓库提供：[scripts/verify-real-dsh.mjs](scripts/verify-real-dsh.mjs)。它从 `--dsh-root`
+验证脚本已随仓库提供：[scripts/verify-real-dsh.mjs](../scripts/verify-real-dsh.mjs)。它从 `--dsh-root`
 指定的 DSH 安装里加载官方服务包，再从本仓库加载 `lib/index.js`（插件自身的 `@deepseek-ai/dsh-tools`
 仍解析到本包的 devDependency，两处同为 0.2.0-rc.2，已实测可共存）。它刻意**不纳入 `npm test`/CI**，
 按需运行：
@@ -383,7 +383,7 @@ Issue #1 的只读 Web 面板完整方案（能力复用、入口落位、Host �
 
 ## 10. 剩余问题与风险
 
-1. **旧 npm 0.1.0 与新版 DSH 不兼容**：0.2.0 已发布并实测；latest 推广待 2FA，当前使用精确版本 0.2.0，避免取到旧版。
+1. **旧 npm 0.1.0 与新版 DSH 不兼容**：0.2.0 已发布并实测；latest 已推广为 0.2.0，固定精确版本或 GitHub tag 保持复现。
 2. **子包 `latest` 滞后**：任何安装/开发命令不要使用 `@latest`，用 `next` 或精确版本。
 3. **`timeoutMs` 语义变化**：现在对 preCommit 也生效，默认 30s 可能对 `preCommit: ["npm","test"]`
    这类慢钩子偏紧，需要在配置里调大，README 已注明。

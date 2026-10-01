@@ -7,7 +7,7 @@
 - 统一发布点：`c83f3322950b0892022d6b3efd1e4f6edbed5be8`，两个 parent 为 `3bbb2534bd1d9ab4dcd46faf0ef4f0182797dfbd` 和上述最终提交；两者发布树相同。
 - 远端 annotated tag `v0.2.0` 已指向发布点；[GitHub Release](https://github.com/MashedPotato817/dsh-git-plugin/releases/tag/v0.2.0) 已于 2026-10-01T05:31:43Z 公开。
 - [npm 0.2.0](https://www.npmjs.com/package/dsh-git-plugin/v/0.2.0) 已于 2026-10-01T05:28:14.177Z 成功发布到 next，gitHead 为上述发布点。此前认证请求失败，未产生版本；维护者开启 2FA 并完成官方浏览器挑战后只成功发布一次。没有收集密码、OTP、token 或恢复码。
-- dist-tags：next=0.2.0，latest=0.1.0；latest 推广命令正在等待官方浏览器 2FA 认证。推广通过 dist-tag 完成，不再 publish。
+- dist-tags：latest=0.2.0，next=0.2.0（认证后查询确认）。推广通过 dist-tag 完成，不再 publish。
 
 ## 当前提交的证据
 
@@ -39,8 +39,8 @@
 
 ## 收尾与边界
 
-维护状态与发布报告通过单独的文档分支/PR 更新并及时 commit，不移动 v0.2.0。独立测试目录保留至 latest 推广与收尾完成，不修改日常 DSH profile。
+维护状态与发布报告通过单独的文档分支/PR 更新并及时 commit，不移动 v0.2.0。本轮独立发布克隆、DSH 运行时、测试 profile、注册表 tarball 与临时验证文件已清理；日常 DSH profile 未修改。
 
-包 01 的适配与本地/Linux/CI 验证已完成；包 02 的 npm、GitHub 与双渠道安装已完成；latest 推广仍待认证完成。后续工作交给 [包 03：只读 Web Host](dsh-tasks/03-web-host.md)，在独立功能分支实施，再执行包 04 TSX UI 与包 05 真实 Web 验收。
+包 01 的适配与本地/Linux/CI 验证已完成；包 02 的 npm、GitHub 与双渠道安装已完成。后续工作交给 [包 03：只读 Web Host](dsh-tasks/03-web-host.md)，在独立功能分支实施，再执行包 04 TSX UI 与包 05 真实 Web 验收。
 
 用户已授权本次发布与保留历史的合并；真实模型会话、Linux 完整 DSH 服务栈、其他 DSH 版本仍未验证，发布说明保留限制。Node 20 的开发 peer 链 undici engine 警告见 [原验证报告](validation-report-0.2.0.md)。Web 面板仅有方案；社区消息尚未发送。
