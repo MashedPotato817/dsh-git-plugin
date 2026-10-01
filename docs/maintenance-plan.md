@@ -250,6 +250,8 @@ Issue #1 的只读 Web 面板完整方案（能力复用、入口落位、Host �
 
 ## 9. 发布步骤（本地 commit 自动执行，线上动作按授权执行）
 
+本节命令保留 0.2.0 已完成发布的示例；后续版本替换版本号和发布分支。0.2.1 的当前证据与渠道状态见 [发布记录](release-report-0.2.1.md)，含 bundle 的新安装无需再追加 insert；旧 profile 迁移见 [市场收录准备](marketplace-submission.md)。
+
 原则：**一个版本只 `npm publish` 一次**；`next` 验证通过后用 `npm dist-tag add` 把同一版本推广到 `latest`，
 不再发布第二次（同一版本号无法重复发布）。
 

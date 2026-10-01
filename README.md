@@ -23,27 +23,19 @@
 - **顺手提交** — 创建分支，配置提交前检查，在会话中完成提交。
 - **留一份快照** — 用 stash 暂存工作区，随时查看与恢复。
 
-已发布 **[0.2.0](https://www.npmjs.com/package/dsh-git-plugin/v/0.2.0)**，实测宿主为 **DSH 0.2.0-rc.2**；需要 Node.js ≥20、Git ≥2.24。[完整兼容与验证记录](CONTRIBUTING.md#兼容性与验证记录)。
+本页对应 **0.2.1**，实测宿主为 **DSH 0.2.0-rc.2**；需要 Node.js ≥20、Git ≥2.24。[完整兼容与验证记录](CONTRIBUTING.md#兼容性与验证记录)。
 
 ## 安装
 
 在需要使用插件的 profile 中执行，将 `web` 替换为实际名称：
 
 ```bash
-dsh plugin --profile web add dsh-git-plugin@0.2.0
+dsh plugin --profile web add dsh-git-plugin@0.2.1
 ```
 
-**0.2.0 安装后需要手动启用。** 在 `<DSH_HOME>/profiles/web/cordis.patch.yml` 追加：
+安装后自动注册插件。重启对应 profile 的 DSH；使用 Web 时刷新页面。
 
-```yaml
-- insert:
-    - id: dsh-git-plugin
-      name: dsh-git-plugin
-```
-
-重启对应 profile 的 DSH；使用 Web 时刷新页面。
-
-也可通过 [GitHub 固定 tag 或源码安装](CONTRIBUTING.md#其他安装方式)。下一版本的自动启用正在准备中，迁移说明见[市场收录准备](docs/marketplace-submission.md)。
+从手工启用的 0.2.0 升级时，先按[迁移说明](docs/marketplace-submission.md#从手工启用的-020-迁移)调整原配置，避免重复注册。[GitHub 固定 tag 与源码安装](CONTRIBUTING.md#其他安装方式)。
 
 ## 使用
 

@@ -5,6 +5,8 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 待发布
+
 ### Added
 
 - DSH bundle 安装元数据与 cordis.patch.yml；新安装自动注册插件，patch 同步导出并纳入发布包。

@@ -20,10 +20,10 @@
 ### 固定 GitHub tag
 
 ```bash
-dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.2.0
+dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.2.1
 ```
 
-npm 0.2.0 与此 tag 都携带编译产物，无需安装期构建；安装后仍按 README 的 insert 步骤启用。
+npm 0.2.1 与此 tag 都携带编译产物与 bundle patch，无需安装期构建；新安装自动注册，重启对应 profile 即可。旧 0.2.0 profile 按迁移说明调整，不能保留重复 insert。
 
 ### 从源码安装
 
@@ -35,7 +35,7 @@ npm run build
 dsh plugin --profile web add .
 ```
 
-先核对 checkout：v0.2.0 需要手动 insert；当前开发分支新增 dsh.bundle.patch，供下一版本自动注册插件，尚未发布。从含 bundle 的新源码安装时，不要再追加同名 insert；配置使用按 id 覆盖。旧 profile 升级不会自动补 bundle 层，保留原 insert 后再添加 bundle 会重复注册，迁移步骤见[市场收录准备](docs/marketplace-submission.md)。
+先核对 checkout：v0.2.0 需要手动 insert；v0.2.1 含 dsh.bundle.patch，可自动注册插件。从含 bundle 的新源码安装时，不要再追加同名 insert；配置使用按 id 覆盖。旧 profile 升级不会自动补 bundle 层，保留原 insert 后再添加 bundle 会重复注册，迁移步骤见[市场收录准备](docs/marketplace-submission.md)。
 
 修改源码后重新构建，并重启对应 profile。配置、运行行为及实际验证范围见下文。
 
@@ -60,7 +60,7 @@ dsh plugin --profile web add .
         timeoutMs: 300000
 ```
 
-使用 bundle 的新源码时，插件行已由 bundle 提供，用户 patch 只覆盖配置：
+使用 0.2.1 的 bundle 时，插件行已由 bundle 提供，用户 patch 只覆盖配置：
 
 ```yaml
 - id: dsh-git-plugin
