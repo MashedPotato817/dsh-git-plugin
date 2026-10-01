@@ -8,10 +8,12 @@
 - 最终版本提交：aea3815e32cf9036df05a2c6c0c270960d716048；CHANGELOG 日期在 publish 前定稿。
 - 统一发布点：084a767aa3055d5cb0e06ddf4fb42dda4156458c；parents 为 eaadaf755a7513f2e56b129c3c45223734a609d6 与上述最终提交，两者发布树完全一致。
 - npm 0.2.1 已成功发布到 next，注册表 gitHead 对应发布点；只成功 publish 一次。首次无交互请求需要 EOTP，一次浏览器会话返回 404 未创建版本，后续官方挑战通过并成功发布。
-- latest 推广正在等待官方认证；不会再次 publish。
-- annotated tag v0.2.1 已推送且指向发布点；GitHub Release 草稿已创建，待推广后公开。
+- latest 已通过官方浏览器认证推广，注册表 latest=next=0.2.1；没有再次 publish。
+- annotated tag v0.2.1 已推送且指向发布点；[GitHub Release](https://github.com/MashedPotato817/dsh-git-plugin/releases/tag/v0.2.1) 已公开（非预发布），publishedAt=2026-10-01T07:32:31Z。
 - GitHub 默认分支的 README、SVG、screenshots.json、manifest 和 patch 与本地发布点逐字节一致；搜索 topics 为 deepseek/deepseek-harness/dsh/dsh-plugin/git/git-plugin，简介与 npm 入口已核对。
-- [市场 PR #6296](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/6296) 已提交为草稿，仅新增 data/plugins/MashedPotato817__dsh-git-plugin.yml；上游 [PR check](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/actions/runs/36828910934) 与 Submission gate 均已通过，尚未收录。latest 推广后转为可审查。
+- [市场 PR #6296](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/6296) 已转为可审查状态，仅新增 data/plugins/MashedPotato817__dsh-git-plugin.yml；上游 [PR check](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/actions/runs/36828910934) 与 Submission gate 均已通过，尚未合并或收录。公开目录 updated=2026-09-30，共 4,400 条；本轮精确 URL 查询匹配 0 条。
+
+latest 推广期间的 404 已定位到本机 npm 12.0.2 的认证轮询：dist-tag 写请求的 PUT 选项被传入官方认证 done 端点。使用临时 preload 仅将该端点的轮询改为 GET，保留标签写请求的 PUT；官方浏览器认证随后成功。未修改全局 npm、插件运行时代码或账号设置，临时 helper 随验证目录清理。
 
 ## 已执行的验证
 
@@ -46,4 +48,4 @@
 
 真实模型会话、Linux 完整 DSH 宿主及其他 DSH 版本未验证；Web Git 面板尚未实现。目录 PR 提交、CI、审查合并与市场目录同步是不同状态，不把申请写成已上架。没有收集密码、OTP 或恢复码；没有修改日常 DSH profile。
 
-独立官方宿主、候选/渠道 profile、tarball、临时验证器与目录 fork 克隆待线上步骤结束后清理。最终 evidence 单独通过文档 PR 提交，不移动 v0.2.1 或覆盖 npm 包。
+独立官方宿主、候选/渠道 profile、tarball、临时验证器、认证 helper 与目录 fork 克隆已全部清理：本轮拥有的临时目录 dsh-release-021-g3i0qe2o 已删除。原仓库、远端 fork 与日常 DSH profile 保留。最终 evidence 单独通过文档 PR 提交，不移动 v0.2.1 或覆盖 npm 包。
