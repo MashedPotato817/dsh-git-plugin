@@ -1,5 +1,7 @@
 # dsh-market 收录准备
 
+> Status refresh / 状态更新（2026-10-01）：PR #6296 closed at 12:05:03 UTC, not merged, no explanatory comments. Earlier ready/check evidence below is historical. Catalog inclusion is not established. / 已关闭未合并，无说明评论；下文可审查/检查通过为历史记录，不宣称已收录。
+
 ## 当前状态（2026-10-01）
 
 - 目标市场：[dsh-market/dsh-market](https://github.com/dsh-market/dsh-market)。它使用 [awesome-dsh-plugin/awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 的目录，不是 DshMarketPlace 同名仓库。

@@ -5,16 +5,16 @@ English · [简体中文](AGENTS_ZH.md)
 ## Baseline (2026-10-01)
 
 - Working repository: `C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`. Check the actual checkout; do not edit another worktree inadvertently.
-- Published package: **0.2.1**. PR #4 preserved history; release point `084a767aa3055d5cb0e06ddf4fb42dda4156458c` matches npm gitHead, annotated v0.2.1, and public GitHub Release. At the last release audit, latest=next=0.2.1. Channel installs and 28 official-service checks per installed entry passed. See `docs/release-report-0.2.1.md`.
+- Previous published package: **0.2.1**. PR #4 preserved history; release point `084a767aa3055d5cb0e06ddf4fb42dda4156458c` matches npm gitHead, annotated v0.2.1, and public GitHub Release. At the last release audit, latest=next=0.2.1. Channel installs and 28 official-service checks per installed entry passed. See `docs/release-report-0.2.1.md`.
 - Historical 0.2.0 release point: `c83f3322950b0892022d6b3efd1e4f6edbed5be8`, PR #2. Its package contained five files; do not replace it or move its tag. See `docs/release-report-0.2.0.md`.
 - Adaptation commit `8181856` introduced strict TypeScript, DSH 0.2.0-rc.2 compatibility and argv/deadline/hook-directory fixes. Timer correction `922408d` removed unref from deadline/grace timers: Linux Node 20/22 could otherwise drain the event loop before timeout. Keep timers referenced and clear them when done.
 - Historical verification: 26 original tests; Windows Node 24.19.0 / Git 2.53.0.windows.2; isolated WSL2 Ubuntu 24.04 Node 20.20.2 / 22.23.3 and Git 2.43.0; clean artifact gate and release-point CI passed. See `docs/validation-report-0.2.0.md`.
 - Only **DSH 0.2.0-rc.2** has actual host evidence. Model sessions, other DSH versions remain unverified; Linux Node 22 real services/Web are now verified in the 0.3.0 record. Declared range is not the tested range.
-- Market PR #6296 is a separate catalog submission. Its checks passed and it was ready for review at the last audit; do not claim market inclusion without querying the actual catalog. See `docs/marketplace-submission.md`.
+- Market PR #6296 is a separate catalog submission. It closed unmerged on 2026-10-01, with no comments explaining the closure. Do not claim market inclusion without querying the actual catalog. See `docs/marketplace-submission.md`.
 
 ## Current development
 
-- `feat/web-git-panel` implements the first read-only right-sidebar panel for Issue #1, fixed Host routes and TSX build. It is being released as **0.3.0**; use docs/release-report-0.3.0.md for actual status. Do not overwrite npm 0.2.1 or add GUI writes.
+- PR #6 merged the first read-only right-sidebar panel for Issue #1 as **0.3.0**, release point 85fa7d1c4a7e6f7c274d83df242d10c65e319d24. GitHub v0.3.0 is public and its installed entry passed 28 service checks plus real Web acceptance. npm accepted the upload (202); registry availability and latest promotion remain pending. See docs/release-report-0.3.0.md. Do not overwrite npm 0.2.1 or add GUI writes.
 - Source: `src/index.ts`, `src/web-host.ts`, browser-safe `src/panel-types.ts`, `src/client/`. Build Host declarations/JS and generated `lib/client.js`; keep ESM and existing commands/tools.
 - English primary documents and `_ZH.md` counterparts: README, CONTRIBUTING, AGENTS; also paired Web usage documents. Synchronize facts, commands and validation boundaries. README stays a short product page; engineering details belong in CONTRIBUTING/docs and maintenance constraints here. Do not add a skill just for a documentation edit.
 - Web evidence: `docs/web-panel-validation.md`. Old release CI does not certify a new development SHA.
@@ -60,6 +60,6 @@ English · [简体中文](AGENTS_ZH.md)
 
 - CONTRIBUTING and bilingual issue/PR templates describe triage, scope, ownership, evidence, review and release. Labels and branch protection are separate settings; do not claim templates enabled them.
 - Use `Refs #1` for the read-only first phase; do not close the whole issue merely because a draft/partial UI exists.
-- The root screenshots.json currently describes the original capability banner. It is an illustration, not a GUI screenshot. New real screenshots must be labeled as development evidence until released and published; catalog readiness and catalog inclusion are different states.
+- Root screenshots.json references the capability illustration and actual released read-only panel screenshots in docs/images. The banner is an illustration; panel images use isolated fixture repositories. Catalog readiness and catalog inclusion are different states.
 - Old manual inserts must migrate to id/config overrides when enabling the bundle. DSH 0.2.0-rc.2 does not automatically add a bundle layer when upgrading an old ordinary dependency.
 - Preserve the isolated WSL runtimes `~/dsh-node-runtimes/node-v20.20.2-linux-x64` and `node-v22.23.3-linux-x64` unless removal is specifically requested. System Node 18 was not used for the prior matrix.

@@ -2,6 +2,8 @@
 
 Execute this package after reading AGENTS and [current evidence](../web-panel-validation.md). 先阅读维护指引与当前验收记录，然后执行。
 
+> Status / 状态（2026-10-01）：Linux real Web, edge repositories, dark/narrow layouts and installed GitHub channel have passed. Do not repeat completed checks; focus on mount-prefix hosting and actual slow Web navigation/process termination. / Linux 真 Web、边缘仓库、暗色窄屏与 GitHub 实装已通过，本包后续只聚焦前缀及真实慢 Web 请求切换/子进程终止。See [release record](../release-report-0.3.0.md).
+
 Owner / 执行：DSH. Goal / 目标：close remaining browser/platform checks without expanding GUI writes or repeating historical release work. 补真实浏览器与平台证据，不扩大到写操作、不重做旧发布。
 
 1. Audit branch/status/SHA and preserve existing changes. Read the local Harness checkout only; use exact DSH 0.2.0-rc.2. / 先审状态和基线，只读上游，固定宿主版本。
