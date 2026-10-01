@@ -2,6 +2,8 @@
 
 欢迎提交缺陷报告、兼容性验证、文档改进和功能实现。讨论可以使用中文或英文，请提供可复现的事实，尊重其他参与者。
 
+配置与安装参考：[插件配置](#插件配置) · [其他安装方式](#其他安装方式) · [兼容性与验证记录](#兼容性与验证记录)。
+
 ## 从哪里开始
 
 - 缺陷使用 [Bug 表单](https://github.com/MashedPotato817/dsh-git-plugin/issues/new?template=bug_report.yml)。
@@ -12,6 +14,115 @@
 - 安装与支持范围见 [README](README.md)，设计与发布流程见 [维护计划](docs/maintenance-plan.md)。允许版本范围不等于全部版本均已验证。
 
 本贡献指南和模板须进入默认分支后，GitHub 的相应入口才可使用；它们不会自动开启分支保护或创建标签。
+
+## 其他安装方式
+
+### 固定 GitHub tag
+
+```bash
+dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.2.0
+```
+
+npm 0.2.0 与此 tag 都携带编译产物，无需安装期构建；安装后仍按 README 的 insert 步骤启用。
+
+### 从源码安装
+
+```bash
+git clone https://github.com/MashedPotato817/dsh-git-plugin.git
+cd dsh-git-plugin
+npm ci
+npm run build
+dsh plugin --profile web add .
+```
+
+先核对 checkout：v0.2.0 需要手动 insert；当前开发分支新增 dsh.bundle.patch，供下一版本自动注册插件，尚未发布。从含 bundle 的新源码安装时，不要再追加同名 insert；配置使用按 id 覆盖。旧 profile 升级不会自动补 bundle 层，保留原 insert 后再添加 bundle 会重复注册，迁移步骤见[市场收录准备](docs/marketplace-submission.md)。
+
+修改源码后重新构建，并重启对应 profile。配置、运行行为及实际验证范围见下文。
+
+## 插件配置
+
+| 字段 | 默认值 | 说明 |
+|---|---|---|
+| `maxBytes` | `1048576` | 每次 Git 调用的 stdout 字节上限 |
+| `stderrMaxBytes` | `65536` | stderr 字节上限 |
+| `timeoutMs` | `30000` | 每次命令、工具或 preCommit 调用的截止时间，单位 ms |
+| `graceMs` | `3000` | 超时或取消后等待进程终止的宽限时间，单位 ms |
+| `preCommit` | `[]` | 提交前执行的一个 argv 命令；失败或超时则中止提交 |
+
+已发布的 `0.2.0` 可在启用行中配置较慢的检查：
+
+```yaml
+- insert:
+    - id: dsh-git-plugin
+      name: dsh-git-plugin
+      config:
+        preCommit: [npm, test]
+        timeoutMs: 300000
+```
+
+使用 bundle 的新源码时，插件行已由 bundle 提供，用户 patch 只覆盖配置：
+
+```yaml
+- id: dsh-git-plugin
+  config:
+    preCommit: [npm, test]
+    timeoutMs: 300000
+```
+
+`preCommit` 是参数数组，通过子进程直接执行，不是 shell 脚本。钩子与 `git add` / `git commit` 使用同一个目标仓库目录。
+
+## 工作原理
+
+| DSH 能力 | 插件用法 |
+|---|---|
+| `ctx.commands` | 注册 5 个斜杠命令 |
+| `ctx.tools` | 注册 4 个只读 Git 工具 |
+| `ctx.systemPrompt` | 注入 Git 工具使用与提交规范指引 |
+| `ctx.subprocess` | 用纯 argv 执行 Git，落实输出上限、取消与超时终止 |
+
+调用读取会话目录，解析目标仓库，再执行 Git 并返回文本结果。禁用插件时释放命令、工具和提示词注册；重新启用不重复注册。
+
+模型工具均为只读：
+
+| 工具 | 参数与行为 |
+|---|---|
+| `git-status` | 读取分支与工作区状态 |
+| `git-diff` | 默认读取未暂存 diff；`staged=true` 读取已暂存 diff |
+| `git-log` | 最近提交；`count` 控制条数，`path` 过滤文件 |
+| `git-show` | 查看指定提交的 message、author 和 diff，默认 `HEAD` |
+
+工具没有 push、reset 或文件恢复操作。插件通过 system-prompt 指引模型先查看状态，并参考仓库的提交与分支规范。
+
+## 兼容性与验证记录
+
+依赖声明是**允许加载的范围**，实测记录是**实际通过的版本**，两者分开看：
+
+| 项目 | 声明 / 要求 | 已验证 |
+|---|---|---|
+| DSH | `>=0.2.0-rc.2 <0.3.0-0` | **仅 `0.2.0-rc.2`** |
+| Node.js | `>=20` | Windows 24.19.0；Linux 20.20.2 / 22.23.3；GitHub Actions Node 20/22 |
+| Git | 支持 `--end-of-options`，Git 2.24+ | Windows 2.53.0.windows.2；Linux 2.43.0 |
+
+### 0.2.0 的实际验证
+
+| 层次 | 结果 |
+|---|---|
+| Windows / Linux 单元与真实 Git 集成 | 26 项通过，无失败、无取消 |
+| 发布点 CI | Ubuntu Node 20/22 构建、类型、语法、产物新鲜度与测试通过 |
+| 官方 DSH 服务栈 | 28 项通过：命令、工具、提示词、参数边界、启停清理与真实 preCommit 超时 |
+| npm / 固定 GitHub tag 安装 | 独立 profile 实装与启用通过，schema 无诊断；提供官方宿主 peer 后服务栈通过 |
+| 发布一致性 | npm gitHead、tag、Release 对应 `c83f332`；实际 tarball 的 `lib/` 哈希一致 |
+
+完整证据见[发布记录](docs/release-report-0.2.0.md)与[验证报告](docs/validation-report-0.2.0.md)。**真实模型会话、Linux 完整 DSH 宿主、其他 DSH 版本仍未验证。**
+
+### 运行限制
+
+- **版本限制：** DSH 0.1.x、低于下限的 `0.2.0-rc.1` 不支持；声明范围内其他版本先验证再使用。插件 `0.1.0` 不适用于 DSH `0.2.0-rc.2`。
+- **运行边界：** 这是 DSH 宿主插件；普通 Node 脱离宿主加载需要自行提供 SDK peer，不作为独立 CLI 分发。
+- **仓库发现：** 只检查会话目录与直接子目录；多个子仓库时列出候选，建议将会话切换到目标仓库。
+- **耗时检查：** preCommit 也受默认 30 秒截止时间约束；较慢的测试请显式调大 `timeoutMs`。
+- **平台边界：** Linux 本地测试和 CI 不等于完整 DSH 宿主验证；上游开发 peer 链的 Node 20 engine 告警见验证报告。
+- **界面范围：** 当前提供命令与工具，Web Git 面板留待后续任务实现。
 
 ## 准备开发环境
 
@@ -85,9 +196,20 @@ git status --porcelain
 
 构建产物门 `git diff --exit-code lib` 在**提交后的干净检出**重建后执行，不用它否定提交前正常的构建差异。未推送 SHA 从本地仓库克隆；远端克隆必须确实包含该 SHA。
 
-修改 DSH 接口、生命周期、命令/工具行为时，按 [README 的真实服务栈验证](README.md#验证) 与维护计划，安装精确 DSH 版本并运行 `scripts/verify-real-dsh.mjs`。
+修改 DSH 接口、生命周期、命令/工具行为时，按 [真实 DSH 服务栈验证](#真实-dsh-服务栈验证) 与维护计划，安装精确 DSH 版本并运行 `scripts/verify-real-dsh.mjs`。
 真实服务栈、profile 和模型会话是不同验证层次；分别写版本、平台、命令、退出码和失败/未执行项。
 GUI 需另验真实 Web 的注册、切换、禁用/启用及打包安装。不得把 mock 或旧提交的 CI 写成当前改动通过。
+
+### 真实 DSH 服务栈验证
+
+按需安装独立宿主包并运行验证，不属于日常 `npm test` 或 CI：
+
+```bash
+npm install --prefix .tmp-dsh-verify --no-save @deepseek-ai/dsh@0.2.0-rc.2
+node scripts/verify-real-dsh.mjs --dsh-root .tmp-dsh-verify
+```
+
+退出码：`0` 全通过，`1` 有失败，`2` 宿主包或参数无法解析。换 DSH 版本时在独立 `DSH_HOME` 和临时仓库验证，服务栈成功仍不能替代真实模型会话。
 
 ## Pull Request 与审查
 

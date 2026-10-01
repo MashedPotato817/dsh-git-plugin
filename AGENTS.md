@@ -42,6 +42,9 @@
 
 ## README 与市场安装准备（开发中）
 
+- README 保持简洁的产品首页：用途、能力、最短安装步骤、使用示例与文档入口。配置细节、源码安装、架构、测试和发布流程放 CONTRIBUTING.md / docs；代理维护约束放 AGENTS.md。无需为一次文档调整新增 skill。
+- 精简时保留已发布版本的真实启用方式、提交全部改动和 stash 的含义，以及实际验证宿主版本；不将开发中 bundle、未实现 GUI 或市场草稿描述为已经发布/收录。
+
 - `feat/readme-market-ready` 优化 README 并新增 bundle patch 自动注册；仅本地 tarball 与独立 profile 通过，不等于新版本已经发布或市场已经收录。下一次发布需提升版本，不能重发 0.2.0。
 - 市场来源是 `awesome-dsh-plugin/awesome-dsh-plugin`；条目、验证和旧 profile 迁移见 `docs/marketplace-submission.md`。老 insert 与新 bundle 同时启用会出现两个插件行，必须迁移为按 id 覆盖；DSH 0.2.0-rc.2 对旧依赖升级不自动补 bundle 层。
 
