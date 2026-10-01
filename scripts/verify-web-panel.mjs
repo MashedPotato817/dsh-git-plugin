@@ -134,6 +134,49 @@ try {
 	await panel.locator(".gp-patch").waitFor();
 	assert.match(await panel.locator(".gp-patch").innerText(), /staged line/);
 	await screenshot("git-staged");
+	// Actual rendered contrast regression: a nonexistent theme token previously
+	// left a pale selected/detail background behind the dark shell's white text.
+	await page.emulateMedia({ colorScheme: "dark" });
+	await page.waitForFunction(() =>
+		document.body.hasAttribute("data-ds-dark-theme"),
+	);
+	const contrast = await panel.evaluate((element) => {
+		const rgb = (value) =>
+			value
+				.match(/[\d.]+/g)
+				.slice(0, 3)
+				.map(Number)
+				.map((v) => v / 255);
+		const luminance = (value) =>
+			rgb(value)
+				.map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+				.reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i], 0);
+		const ratio = (foreground, background) => {
+			const a = luminance(foreground),
+				b = luminance(background);
+			return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+		};
+		const heading = element.querySelector(".gp-detail-head");
+		const title = element.querySelector(".gp-detail-title");
+		const selected = element.querySelector('.gp-file[aria-pressed="true"]');
+		return {
+			title: ratio(
+				getComputedStyle(title).color,
+				getComputedStyle(heading).backgroundColor,
+			),
+			selected: ratio(
+				getComputedStyle(selected).color,
+				getComputedStyle(selected).backgroundColor,
+			),
+		};
+	});
+	assert.ok(
+		contrast.title >= 4.5 && contrast.selected >= 4.5,
+		"Dark theme text contrast below 4.5:1",
+	);
+	await screenshot("git-dark");
+	await page.emulateMedia({ colorScheme: "light" });
+
 	await panel
 		.locator(".gp-group")
 		.filter({ has: page.getByRole("heading", { name: /^未暂存/ }) })

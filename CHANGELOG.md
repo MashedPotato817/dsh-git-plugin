@@ -17,6 +17,7 @@ Actual changes to `dsh-git-plugin`, following [Keep a Changelog](https://keepach
 
 ### Fixed
 
+- Fixed dark-theme selected rows/detail headings using the actual shell background token; brighter dark diff/status colors and real-browser contrast regression.
 - The panel reuses single-child repository discovery from its Session cwd, matching existing command resolution.
 
 ### Notes

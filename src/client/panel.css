@@ -2,7 +2,11 @@
 	--gp-line: var(--dsw-alias-border-l3, #dadde3);
 	--gp-muted: var(--dsw-alias-label-secondary, #747b88);
 	--gp-accent: #c06a37;
-	--gp-surface: var(--dsw-alias-background-l2, #f5f6f8);
+	--gp-add: #298253;
+	--gp-delete: #bc4a4a;
+	--gp-hunk: #5585b0;
+	--gp-warning: #aa7431;
+	--gp-surface: var(--dsw-alias-bg-layer-2, #f5f6f8);
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
@@ -193,15 +197,15 @@
 }
 .gp-line-add {
 	background: rgba(40, 160, 93, 0.1);
-	color: #298253;
+	color: var(--gp-add);
 }
 .gp-line-del {
 	background: rgba(201, 61, 61, 0.1);
-	color: #bc4a4a;
+	color: var(--gp-delete);
 }
 .gp-line-hunk {
 	background: rgba(71, 130, 195, 0.08);
-	color: #5585b0;
+	color: var(--gp-hunk);
 }
 .gp-history {
 	list-style: none;
@@ -245,6 +249,15 @@
 }
 .gp-warning {
 	padding: 8px 14px;
-	color: #aa7431;
+	color: var(--gp-warning);
 	background: var(--gp-surface);
+}
+
+/* The shell publishes this attribute when its active palette is dark. */
+body[data-ds-dark-theme] [data-git-panel] {
+	--gp-accent: #e09e72;
+	--gp-add: #75d29b;
+	--gp-delete: #f39090;
+	--gp-hunk: #96c4ed;
+	--gp-warning: #e4b875;
 }
