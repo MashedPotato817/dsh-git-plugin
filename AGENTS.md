@@ -2,10 +2,12 @@
 
 ## 当前基线（2026-10-01）
 
+- 当前包版本 0.2.1；PR #4 已保留历史合并，发布点为 084a767aa3055d5cb0e06ddf4fb42dda4156458c。npm latest=next=0.2.1、annotated tag 与公开 GitHub Release 均已核对该发布点，双渠道独立实装和各 28 项服务栈通过。市场 PR #6296 已转为可审查，上游两个检查通过，尚未收录，详见 docs/release-report-0.2.1.md。
+
 - 主工作目录：`C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`；先确认所在 checkout，避免把改动写到另一 worktree。
 - 适配已提交：`8181856`，包含严格 TypeScript 迁移、DSH 0.2.0-rc.2 适配、Git 参数安全/超时/钩子目录修复、测试与文档。
 - 源码为 `src/index.ts`；`npm run build` 生成 `lib/index.js`、`lib/index.d.ts`，构建产物随 Git 提交并用于 npm 安装。保持 ESM 与现有命令/工具行为。
-- 当前版本为 `0.2.0`，CHANGELOG 日期 2026-10-01；PR #2 已以 merge commit 保留历史合并，统一发布点为 `c83f3322950b0892022d6b3efd1e4f6edbed5be8`。远端 annotated tag `v0.2.0`、公开 GitHub Release 与 npm 0.2.0 的 gitHead 均指向它，tarball 与双渠道实装产物一致。npm latest=next=0.2.0，双渠道发布完成；不重复 publish 或移动 tag。证据见 `docs/release-report-0.2.0.md`。
+- `0.2.0` 历史发布，CHANGELOG 日期 2026-10-01；PR #2 已以 merge commit 保留历史合并，统一发布点为 `c83f3322950b0892022d6b3efd1e4f6edbed5be8`。远端 annotated tag `v0.2.0`、公开 GitHub Release 与 npm 0.2.0 的 gitHead 均指向它，tarball 与双渠道实装产物一致。当时 npm latest=next=0.2.0，双渠道发布完成（当前标签已推广至 0.2.1）；不重复 publish 或移动 tag。证据见 `docs/release-report-0.2.0.md`。
 - 已验证：严格类型检查、26 项测试、构建产物一致性，以及 **Linux Node 20.20.2 / 22.23.3 的隔离矩阵**（WSL2 Ubuntu 24.04；修复后 build/check/test 通过；修复候选 922408d 的提交后干净产物门与完整 Linux 矩阵已通过）。仅 DSH `0.2.0-rc.2` 有适配验证记录；服务栈/profile 验证不等于真实模型会话验证。完整证据见 `docs/validation-report-0.2.0.md`。
 - 发布点 GitHub Actions Ubuntu Node 20/22 已通过；npm 0.2.0 与固定 GitHub tag 的独立 profile 安装/启用/schema，以及官方 peer 下各 28 项服务栈验证已通过。Linux 完整 DSH 服务栈、真实模型会话及除 `0.2.0-rc.2` 外的 DSH 版本仍待验证；允许范围不等于实测范围。
 - 包 01 复查发现并修复了一个真实缺陷：截止时间/宽限定时器曾被 `unref`，在被等待的 promise 只由该定时器推进时超时会被跳过（Linux 上稳定复现）。修复和重建的 `lib/`、验证脚本加固已提交为 `922408d`；该 SHA 的 Linux Node 20/22 干净检出产物门与完整矩阵已通过。
@@ -32,7 +34,7 @@
 
 ## 后续顺序与发布
 
-- P1：`0.2.0` 双渠道发布已完成；当前优先准备下个补丁版本的 bundle 自动启用与市场收录，补验证并核对安装包与发布流程，GUI 不混入此阶段。
+- P1：`0.2.1` 双渠道发布、bundle 自动启用、README 展示与市场收录申请已完成；市场 PR #6296 等待上游审查合并及目录同步，之后核验市场搜索与实际安装。GUI 另开阶段。
 - P2：[Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的 Web 只读 Git 面板：状态、diff、历史；先评估 DSH 既有变更审阅与 client slots。
 - P3：再考虑 stage/commit/branch/stash 等写操作，核对 DSH 权限与审批及恢复方式。
 - 版本文件、CHANGELOG、源码、编译配置、测试和 `lib/` 一起纳入发布提交；确保 tag、Release、npm gitHead 与包内产物对应同一提交。
@@ -40,12 +42,12 @@
 - `AGENTS.md`、`docs/`、`.agent-teams/` 不进入 npm files；当前开发分支的 files 包含 lib、README、LICENSE、cordis.patch.yml 与 assets/readme/hero.svg（7 个实际文件）。原 0.2.0 发布包仍为 5 文件，不可覆盖；缓存与独立测试目录保持忽略。
 - 本地 commit 已获持续授权：每个任务或可审阅阶段完成验证后，立即执行 commit，不再请求用户认可。合并、推送、打 tag、发布及社区消息仍按各自授权执行；已有授权不重复询问。结束报告提交 SHA、文件与原因、验证结果、未验证项和工作区状态。
 
-## README 与市场安装准备（0.2.1 发布中）
+## README 与市场安装（0.2.1 已发布）
 
 - README 保持简洁的产品首页：用途、能力、最短安装步骤、使用示例与文档入口。配置细节、源码安装、架构、测试和发布流程放 CONTRIBUTING.md / docs；代理维护约束放 AGENTS.md。无需为一次文档调整新增 skill。
 - 精简时保留已发布版本的真实启用方式、提交全部改动和 stash 的含义，以及实际验证宿主版本；不将开发中 bundle、未实现 GUI 或市场草稿描述为已经发布/收录。
 
-- `feat/readme-market-ready` 优化 README 并新增 bundle patch 自动注册；用户已授权推送、保留历史合并、发布 0.2.1 与社区收录 PR。版本文件已提升至 0.2.1，正在发布验证；未成功 publish / 目录合并前不宣称已发布/收录。不能重发 0.2.0。
+- README 与 bundle 自动注册已进入 main，用户已授权全部上线步骤；npm latest=next=0.2.1，GitHub Release 已公开，双渠道验证通过。市场 PR #6296 尚待审查/合并，不宣称已收录；不能重发 0.2.0 / 0.2.1。
 - 市场图片声明在根 screenshots.json，指向原创能力横幅；实际界面尚未实现时不得将示意图当作功能截图。该声明由目录读取 GitHub，无需进入 npm files。
 - 市场来源是 `awesome-dsh-plugin/awesome-dsh-plugin`；条目、验证和旧 profile 迁移见 `docs/marketplace-submission.md`。老 insert 与新 bundle 同时启用会出现两个插件行，必须迁移为按 id 覆盖；DSH 0.2.0-rc.2 对旧依赖升级不自动补 bundle 层。
 

@@ -6,7 +6,8 @@
 - 实际公开目录：<https://awesome-dsh-plugin.com/plugins.json>；本轮查询 updated=2026-09-30，未发现 URL 精确匹配本仓库的条目。不要将相似的 `dsh-git-plugins` 当成本插件。
 - 已具备：公开仓库、MIT 许可证、实际实现、GitHub `dsh-plugin` topic、npm 对应关键词、0.2.0 双渠道发布与安装证据。
 - 发布的 `0.2.0` 不含 `dsh.bundle`，需要手动启用；目录的收录 CI 明确要求 bundle。
-- 本分支补齐 `dsh.bundle.patch`、根 `cordis.patch.yml`、patch 导出、打包内容与市场展示图片声明，供下一版本使用；**尚未发布新 npm 版本，尚未提交社区收录 PR，尚未宣称已上架**。
+- 0.2.1 的 bundle、patch、导出、打包内容和图片声明已进入公开 main；npm 0.2.1 已发布并通过双渠道实装，latest=next=0.2.1。GitHub tag v0.2.1 已推送，Release 已公开；npm gitHead 与 tag 均指向 084a767aa3055d5cb0e06ddf4fb42dda4156458c。
+- [收录 PR #6296](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/6296) 已提交；PR check 与 Submission gate 均通过，已转为可审查状态，仍待上游合并与目录同步，尚未上架。完整线上证据见 [0.2.1 发布记录](release-report-0.2.1.md)。
 
 ## 收录条目
 
@@ -67,7 +68,7 @@ bundle patch 只插入本插件自己的行：
 
 不改日常 profile，不通过重复 insert 掩盖迁移问题。
 
-## 本轮验证结果
+## 开发阶段验证记录（发布前）
 
 使用桌面版提供的 DSH CLI `0.2.0-rc.2`，在临时独立 `DSH_HOME` 中以 headless 模板验证；未运行模型会话，未修改日常 profile。
 
@@ -85,7 +86,7 @@ bundle patch 只插入本插件自己的行：
 | 迁移为 id 覆盖 | dump-config 只剩一行，timeoutMs=120000 保留，schema 可解析 |
 | 横幅与文档 | SVG 实际渲染检查、XML / YAML 解析、相对链接与标题锚点核对通过；screenshots.json 指向现有 SVG |
 
-临时 tarball 沿用工作树中的 0.2.0 版本号，只用于本地验证；与注册表已发布的 0.2.0 内容不同，不能拿它重发同一版本。真正发布时提升版本并同步 lock 与 CHANGELOG。收录必需的 bundle 声明仍需进入公开默认分支。npm 发布不是上游收录硬条件；本插件已有 npm 0.2.0，市场优先使用经过仓库关联核验的 npm 包时，应先发布带 bundle 的新版本，避免用户得到仍需手动启用的旧包。当前尚未执行市场 UI 搜索与一键安装。
+临时 tarball 沿用工作树中的 0.2.0 版本号，只用于本地验证；与注册表已发布的 0.2.0 内容不同，不能拿它重发同一版本。真正发布时提升版本并同步 lock 与 CHANGELOG。收录必需的 bundle 声明现已进入公开默认分支。npm 发布不是上游收录硬条件；本插件已发布带 bundle 的 npm 0.2.1，且 latest=next=0.2.1，市场优先使用的 npm 版本已具备自动注册配置。当前尚未执行市场 UI 搜索与一键安装。
 
 ## 执行安排
 
@@ -93,8 +94,8 @@ bundle patch 只插入本插件自己的行：
 |---|---|---|
 | README、bundle、展示图片与发布包准备 | 本仓库维护者 / coding agent | 独立 profile 自动注册、配置覆盖、卸载清理、打包文件完整 |
 | 进入本仓库默认分支 | 本仓库维护者 | PR 审查与当前 SHA CI 通过；原 v0.2.0 tag 不移动 |
-| 下个 npm 版本（保证现有 npm 优先渠道自动启用） | 本仓库维护者 | 提升补丁版本，版本/lock/CHANGELOG 一致，发布后实装验证；不是目录收录硬条件 |
+| npm 0.2.1（已发布并推广 latest，现有 npm 优先渠道自动启用） | 本仓库维护者 | 提升补丁版本，版本/lock/CHANGELOG 一致，发布后实装验证；不是目录收录硬条件 |
 | 社区目录 PR | 本仓库维护者发起，上游维护者审查 | 仅新增本插件的 YAML；默认分支 bundle 已可读取 |
 | 市场可发现性验收 | 本仓库维护者 | plugins.json 出现本仓库，市场搜索能找到，确认实际 install spec |
 
-新版本发布与向社区提交 PR 使用各自明确授权。本轮的本地开发与收录材料不能替代“已经在市场可搜到”的证据。GitHub README 可随源码 PR 更新，npm 已发布版本里的 README 不会因此被覆盖。
+用户已明确授权新版本发布与社区 PR；现已实际发布/提交。本地与 PR 验证不能替代“已经在市场可搜到”的证据，仍须等待目录维护者审查与合并。GitHub README 可随源码 PR 更新，npm 已发布版本里的 README 不会因此被覆盖。

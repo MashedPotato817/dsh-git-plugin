@@ -1,26 +1,51 @@
 # 0.2.1 发布记录
 
-日期：2026-10-01（Asia/Shanghai）。本报告仅记录实际完成的操作；待执行事项分别标注。
+日期：2026-10-01（Asia/Shanghai）。报告区分实际发布、标签推广、GitHub Release 与目录审查，不互相替代。
 
-## 范围与当前状态
+## 当前状态
 
-- README 精简为产品首页，原创横幅、徽章与快速上手；工程说明迁移至 CONTRIBUTING.md，代理约束保留 AGENTS.md。
-- 新增 bundle manifest、根 cordis.patch.yml 及导出，随包分发；新安装可自动注册。旧 profile 需迁移，不能同时保留旧 insert 与新 bundle。
-- 市场收录 YAML 与 screenshots.json 已准备，图片是能力示意图。尚未提交目录 PR，尚未收录。
-- 本次未修改 src/index.ts / lib 运行逻辑、依赖版本或兼容范围；实测宿主仍仅 DSH 0.2.0-rc.2。
-- 用户已明确授权上线：推送、PR 保留历史合并、0.2.1 双渠道发布、市场收录申请；本地 commit 持续授权。
-- 候选、当前 SHA CI、最终发布点、npm 与 tag/Release 一致性、双渠道实装：待本次执行后记录。
+- [PR #4](https://github.com/MashedPotato817/dsh-git-plugin/pull/4) 已以 merge commit 合并，保留历史。
+- 最终版本提交：aea3815e32cf9036df05a2c6c0c270960d716048；CHANGELOG 日期在 publish 前定稿。
+- 统一发布点：084a767aa3055d5cb0e06ddf4fb42dda4156458c；parents 为 eaadaf755a7513f2e56b129c3c45223734a609d6 与上述最终提交，两者发布树完全一致。
+- npm 0.2.1 已成功发布到 next，注册表 gitHead 对应发布点；只成功 publish 一次。首次无交互请求需要 EOTP，一次浏览器会话返回 404 未创建版本，后续官方挑战通过并成功发布。
+- latest 已通过官方浏览器认证推广，注册表 latest=next=0.2.1；没有再次 publish。
+- annotated tag v0.2.1 已推送且指向发布点；[GitHub Release](https://github.com/MashedPotato817/dsh-git-plugin/releases/tag/v0.2.1) 已公开（非预发布），publishedAt=2026-10-01T07:32:31Z。
+- GitHub 默认分支的 README、SVG、screenshots.json、manifest 和 patch 与本地发布点逐字节一致；搜索 topics 为 deepseek/deepseek-harness/dsh/dsh-plugin/git/git-plugin，简介与 npm 入口已核对。
+- [市场 PR #6296](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/6296) 已转为可审查状态，仅新增 data/plugins/MashedPotato817__dsh-git-plugin.yml；上游 [PR check](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/actions/runs/36828910934) 与 Submission gate 均已通过，尚未合并或收录。公开目录 updated=2026-09-30，共 4,400 条；本轮精确 URL 查询匹配 0 条。
 
-## 验证
+latest 推广期间的 404 已定位到本机 npm 12.0.2 的认证轮询：dist-tag 写请求的 PUT 选项被传入官方认证 done 端点。使用临时 preload 仅将该端点的轮询改为 GET，保留标签写请求的 PUT；官方浏览器认证随后成功。未修改全局 npm、插件运行时代码或账号设置，临时 helper 随验证目录清理。
 
-候选工作树（Windows Node 24.19.0）：npm ci/build/check、node --check、26 项回归全部通过（0 failed / cancelled）；实物 npm pack 含 7 文件，bundle patch 与横幅在包内，版本/lock 三处均为 0.2.1。src/lib 与 0.2.0 发布后基线无差异。
+## 已执行的验证
 
-桌面 DSH CLI 0.2.0-rc.2、独立 DSH_HOME/headless profile：本地候选 tarball 新装自动加入 bundle 一次，配置恰有一个启用行；schema 无 diagnostics，五字段默认值匹配。覆盖 timeoutMs=90000 后重复安装仍仅一行且配置保留。卸载移除依赖、bundle 和插件行；用户自定义 id 覆盖会保留并提示找不到条目，清理测试覆盖行后可恢复空 patch，不能误称宿主会删除用户配置。
+| 检查 | 结果 |
+|---|---|
+| Windows Node 24.19.0 候选 | npm ci/build/check、语法、26 项测试通过，0 failed / cancelled |
+| 候选 dd06ec0 的独立干净克隆 | ci/build 后 git diff --exit-code lib、类型、语法、26 项测试全部 exit 0 |
+| [PR SHA CI](https://github.com/MashedPotato817/dsh-git-plugin/actions/runs/36828223058) | Ubuntu Node 20/22 均通过，head aea3815 |
+| [main 发布点 CI](https://github.com/MashedPotato817/dsh-git-plugin/actions/runs/36828379872) | Ubuntu Node 20/22 均通过，head 084a767 |
+| 官方 DSH 0.2.0-rc.2 服务栈 | 候选 28 项 PASS，覆盖命令、工具、提示词、启停清理与真实 preCommit 超时 |
+| 候选 bundle 生命周期 | 独立 profile 新装自动注册一次；schema 五字段默认值匹配；timeoutMs=90000 重装保留；卸载移除依赖/bundle/插件行 |
+| npm dsh-git-plugin@0.2.1 实装 | 独立 profile 自动注册一次，启用行唯一，schema 无诊断；实际安装入口在官方 peer 下 28 项 PASS |
+| github:MashedPotato817/dsh-git-plugin#v0.2.1 实装 | 同上，实际安装入口在官方 peer 下 28 项 PASS |
+| 注册表 tarball | 7 文件，所有文件逐字节与发布点一致；npm/GitHub 实装 lib、patch、hero 哈希一致 |
 
-独立安装官方 DSH 0.2.0-rc.2：scripts/verify-real-dsh.mjs 实际 28 项 PASS、ALL CHECKS PASSED（exit 0），覆盖命令、工具、提示词、参数边界、启停清理与真实钩子超时。
+服务栈验证的临时副本只改变被测入口路径，指向实际安装的 lib/index.js；临时 Node resolve hook 将 SDK peer dsh-tools 绑定至独立官方宿主入口，没有修改实际安装包。此结果不能作为无宿主独立 Node 支持或真实模型会话证据。
 
-候选 dd06ec0ad670025e8c687c649627225f62e98c1f 的独立干净克隆：npm ci/build、重建后 git diff --exit-code lib、严格类型、语法及 26 项测试全部 exit 0（0 failed / cancelled）。当前 SHA 的 GitHub Actions 与双渠道发布实装尚待执行。
+卸载后 DSH 保留用户的 id/config 覆盖，并可能提示目标条目不存在；清理该自定义覆盖行后恢复空 patch。不能宣称宿主自动删除用户配置。
 
-## 未验证边界
+## 产物一致性
 
-真实模型会话、Linux 完整 DSH 宿主及其他 DSH 版本未验证；Web Git 面板尚未实现。市场 PR 的提交/CI/合并/目录同步是不同状态，不互相替代。
+注册表 tarball：f5a55b4bc806c411049fbf7fb743d4cde48df69a（SHA-1），38,665 bytes unpacked、7 文件：LICENSE、README.md、assets/readme/hero.svg、cordis.patch.yml、lib/index.js、lib/index.d.ts、package.json。
+
+| 文件 | SHA-256（发布点 / 注册表 / npm 与 GitHub 实装一致） |
+|---|---|
+| lib/index.js | `5a914e5e23f570881e647658da3dcc54005d5c828e72edf006153a164edf48ce` |
+| lib/index.d.ts | `9989f1e02fdce6274a0a0994094b2e7a56d8aa86636ac82a3b01833163445a86` |
+| cordis.patch.yml | `5e87b7a971fb0c5b5944dff6f1f96eb27340aeb61d0743a821707c70d5e9fc2c` |
+| assets/readme/hero.svg | `562b4ea41fbfc24192e4171d51e9de41c7c485283a4bfacfd7c6d013e20caeff` |
+
+## 边界与收尾
+
+真实模型会话、Linux 完整 DSH 宿主及其他 DSH 版本未验证；Web Git 面板尚未实现。目录 PR 提交、CI、审查合并与市场目录同步是不同状态，不把申请写成已上架。没有收集密码、OTP 或恢复码；没有修改日常 DSH profile。
+
+独立官方宿主、候选/渠道 profile、tarball、临时验证器、认证 helper 与目录 fork 克隆已全部清理：本轮拥有的临时目录 dsh-release-021-g3i0qe2o 已删除。原仓库、远端 fork 与日常 DSH profile 保留。最终 evidence 单独通过文档 PR 提交，不移动 v0.2.1 或覆盖 npm 包。
