@@ -643,7 +643,7 @@ async function apply(ctx: PluginContext, config: Partial<GitConfig>): Promise<vo
 	assertPositiveInteger("graceMs", caps.graceMs);
 	assertPositiveInteger("timeoutMs", caps.timeoutMs);
 
-	ctx.inject?.(["connection", "sessions", "sessionPersistence", "fs"], (scope) => registerWebPanel(scope, caps, runProcess));
+	ctx.inject?.(["connection", "sessions", "sessionPersistence", "fs"], (scope) => registerWebPanel(scope, caps, runProcess, resolveGitRoot));
 
 	applyCommands(ctx, caps);
 	applyTools(ctx, caps);

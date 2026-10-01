@@ -109,7 +109,20 @@ function validPath(value: string | null): string {
 	return value;
 }
 /** Routes live only while all optional Web capabilities are present. */
-export function registerWebPanel(ctx: Context, caps: Caps, run: Runner): void {
+export function registerWebPanel(
+	ctx: Context,
+	caps: Caps,
+	run: Runner,
+	resolveRoot: (
+		ctx: PluginContext,
+		cwd: string,
+		signal: AbortSignal,
+		caps: Caps,
+	) => Promise<
+		| { ok: true; root: string }
+		| { ok: false; text: string; aborted?: true; timedOut?: true }
+	>,
+): void {
 	const lifetime = new AbortController();
 	const pending = new Set<Promise<Response>>();
 	ctx.effect(() => async () => {
@@ -154,7 +167,19 @@ export function registerWebPanel(ctx: Context, caps: Caps, run: Runner): void {
 								"当前宿主不存在该会话。",
 								404,
 							);
-						const cwd = header.cwd;
+						let cwd = header.cwd;
+						const resolved = await resolveRoot(ctx, cwd, signal, caps);
+						if (!resolved.ok)
+							throw new PanelError(
+								resolved.aborted
+									? "cancelled"
+									: resolved.timedOut
+										? "timeout"
+										: "repository-unavailable",
+								resolved.text,
+								resolved.aborted ? 499 : resolved.timedOut ? 504 : 409,
+							);
+						cwd = resolved.root;
 						const git = async (args: string[], allowDiff = false) => {
 							const result = await run(ctx, ["git", ...common, ...args], {
 								cwd,

@@ -353,3 +353,18 @@ test("panel lifetime and timeout cancel an in-flight subprocess request", async 
 			assert.equal(childSignal.aborted, true);
 		});
 });
+
+test("panel discovers exactly one child repository from its session cwd", async (t) => {
+	const parent = fs.mkdtempSync(path.join(os.tmpdir(), "dsh-panel-parent-"));
+	t.after(() => fs.rmSync(parent, { recursive: true, force: true }));
+	const repo = repoFor(t);
+	const child = path.join(parent, "project");
+	fs.renameSync(repo, child);
+	const panel = await mount(t, parent);
+	const status = await panel.request("status");
+	assert.equal(status.status, 200);
+	assert.equal(
+		status.body.root,
+		fs.realpathSync.native(child).replaceAll("\\", "/"),
+	);
+});
