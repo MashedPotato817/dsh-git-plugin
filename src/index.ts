@@ -1,3 +1,5 @@
+import type { Context } from "@deepseek-ai/cordis";
+import { registerWebPanel } from "./web-host.js";
 import { existsSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
@@ -40,7 +42,7 @@ const Config = z.object({
 type GitConfig = Schemastery.TypeT<typeof Config>;
 
 /** Resolved per-run limits: the plugin's own copy of the validated config. */
-interface Caps {
+export interface Caps {
 	maxBytes: number;
 	stderrMaxBytes: number;
 	graceMs: number;
@@ -86,7 +88,8 @@ interface SubprocessCapability {
  * members here keeps `apply` assignable from a real Cordis context and from the
  * partial stand-ins the tests mount.
  */
-interface PluginContext {
+export interface PluginContext {
+	readonly inject?: Context["inject"];
 	readonly commands: { register(definition: CommandDefinition): unknown };
 	readonly tools: { register(definition: ToolDefinition): unknown };
 	readonly systemPrompt: { section(section: PromptSection): unknown };
@@ -94,7 +97,8 @@ interface PluginContext {
 }
 
 /** Options for one `runProcess` call. */
-interface RunOptions {
+export interface RunOptions {
+	acceptedExitCodes?: readonly number[];
 	cwd: string;
 	signal?: AbortSignal | undefined;
 	caps: Caps;
@@ -105,8 +109,8 @@ interface RunOptions {
  * that falls back on failure — repository discovery — can tell a cancellation
  * or an expired deadline apart from a genuinely absent repository.
  */
-type RunOutcome =
-	| { ok: true; text: string }
+export type RunOutcome =
+	| { ok: true; text: string; rawText?: string; truncated?: boolean }
 	| { ok: false; text: string; aborted?: true; timedOut?: true };
 
 /** The repository `resolveGitRoot` selected. */
@@ -186,7 +190,7 @@ async function terminateHandle(handle: SpawnedHandle, graceMs: number): Promise<
  * @param options - working directory, caller cancellation, and the resolved caps.
  * @returns the collected stdout, or a failure with the plugin's cause flags.
  */
-async function runProcess(ctx: PluginContext, argv: string[], { cwd, signal, caps }: RunOptions): Promise<RunOutcome> {
+async function runProcess(ctx: PluginContext, argv: string[], { cwd, signal, caps, acceptedExitCodes = [0] }: RunOptions): Promise<RunOutcome> {
 	const label = argv.join(" ");
 	if (signal?.aborted) {
 		return { ok: false, aborted: true, text: `${label} aborted` };
@@ -255,10 +259,10 @@ async function runProcess(ctx: PluginContext, argv: string[], { cwd, signal, cap
 	if (outcome.signal !== null || outcome.exitCode === null) {
 		return { ok: false, text: `${label} was killed by signal ${outcome.signal ?? "(unknown)"}` };
 	}
-	if (outcome.exitCode !== 0) {
+	if (!acceptedExitCodes.includes(outcome.exitCode)) {
 		return { ok: false, text: `${label} failed (exit ${outcome.exitCode})${errText.length > 0 ? `: ${errText}` : ""}` };
 	}
-	return { ok: true, text: lossy ? `${outText}\n(output truncated)` : outText };
+	return { ok: true, text: lossy ? `${outText}\n(output truncated)` : outText, rawText: outText, truncated: lossy };
 }
 
 /**
@@ -638,6 +642,8 @@ async function apply(ctx: PluginContext, config: Partial<GitConfig>): Promise<vo
 	assertPositiveInteger("stderrMaxBytes", caps.stderrMaxBytes);
 	assertPositiveInteger("graceMs", caps.graceMs);
 	assertPositiveInteger("timeoutMs", caps.timeoutMs);
+
+	ctx.inject?.(["connection", "sessions", "sessionPersistence", "fs"], (scope) => registerWebPanel(scope, caps, runProcess));
 
 	applyCommands(ctx, caps);
 	applyTools(ctx, caps);
