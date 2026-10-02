@@ -136,10 +136,11 @@ export async function mount(t, repo, config = {}) {
       const handler = routes.get("/api/git-panel/" + route);
       if (!handler) return { status: 404 };
       const response = await handler.fetch(
-        new Request("http://localhost/api/git-panel/" + route, {
+        new Request("http://dsh.internal/api/git-panel/" + route, {
           method: "POST",
           headers: {
             "content-type": "application/json",
+            host: "localhost",
             origin: "http://localhost",
             ...headers,
           },

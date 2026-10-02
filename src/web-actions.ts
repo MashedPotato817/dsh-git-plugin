@@ -157,8 +157,15 @@ function validate(value: Record<string, unknown>): ActionInput {
   return input;
 }
 async function bodyOf(request: Request): Promise<Record<string, unknown>> {
-  if (request.headers.get("origin") !== new URL(request.url).origin)
-    fail("foreign-origin", "写操作必须来自当前 DSH 页面。", 403);
+  // The official HTTP bridge uses dsh.internal in Request.url. Connection has
+  // already fenced the real Host; bind the mandatory browser Origin to it.
+  const origin=request.headers.get("origin"),host=request.headers.get("host");
+  let trusted=false;
+  try {
+    const source=new URL(origin??""),authority=new URL("http://"+(host??""));
+    trusted=!!host&&!!origin&&["http:","https:"].includes(source.protocol)&&source.origin===origin&&source.host===authority.host&&!authority.username&&!authority.password&&authority.pathname==="/";
+  }catch{}
+  if(!trusted)fail("foreign-origin", "写操作必须来自当前 DSH 页面。", 403);
   if (
     !request.headers
       .get("content-type")
