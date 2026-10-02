@@ -15,7 +15,7 @@ English · [简体中文](AGENTS_ZH.md)
 
 ## Current development
 
-- PR #6 merged the first read-only right-sidebar panel for Issue #1 as **0.3.0**, release point 85fa7d1c4a7e6f7c274d83df242d10c65e319d24. GitHub v0.3.0 is public and its installed entry passed 28 service checks plus real Web acceptance. npm registry availability, installed-package acceptance and latest=next=0.3.0 are confirmed. See docs/release-report-0.3.0.md. Do not overwrite npm 0.2.1 or add GUI writes.
+- PR #6 merged the first read-only right-sidebar panel for Issue #1 as **0.3.0**, release point 85fa7d1c4a7e6f7c274d83df242d10c65e319d24. GitHub v0.3.0 is public and its installed entry passed 28 service checks plus real Web acceptance. npm registry availability, installed-package acceptance and latest=next=0.3.0 are confirmed. See docs/release-report-0.3.0.md. Published versions remain immutable. The current explicit goal authorizes completing GUI operations in a new release, then closing Issue #1 after real acceptance.
 - Source: `src/index.ts`, `src/web-host.ts`, browser-safe `src/panel-types.ts`, `src/client/`. Build Host declarations/JS and generated `lib/client.js`; keep ESM and existing commands/tools.
 - English primary documents and `_ZH.md` counterparts: README, CONTRIBUTING, AGENTS; also paired Web usage documents. Synchronize facts, commands and validation boundaries. README stays a short product page; engineering details belong in CONTRIBUTING/docs and maintenance constraints here. Do not add a skill just for a documentation edit.
 - Web evidence: `docs/web-panel-validation.md`. Old release CI does not certify a new development SHA.
@@ -36,7 +36,7 @@ English · [简体中文](AGENTS_ZH.md)
 - Run build/check/test/pack for relevant source changes. Add regressions for actual fixes, not tests that merely mirror implementation.
 - Build artifacts with source in the same commit. After a commit, rebuild in a clean checkout and run `git diff --exit-code lib`; normal pre-commit artifact differences are expected.
 - Use independent DSH_HOME/profiles and temporary Git repositories. Do not touch daily profiles. Run the exact-host service script when appropriate; mocks do not replace host, Web or model validation.
-- Web: authenticate through the official Connection carrier; derive cwd from an existing Session, never request-supplied cwd/root/argv. DSH 0.2.0-rc.2 has one admitted operator, not tenant-specific session ACLs. Refuse unknown Sessions and constrain paths; disable external diff/textconv and keep routes read-only.
+- Web: authenticate through the official Connection carrier; derive cwd from an existing Session, never request-supplied cwd/root/argv. DSH 0.2.0-rc.2 has one admitted operator, not tenant-specific session ACLs. Refuse unknown Sessions and constrain paths; disable external diff/textconv. Writes use the separate same-origin JSON prepare/execute confirmation contract, Session/repository snapshot checks and single-use tokens; never expose arbitrary argv.
 - Client: generate the loader factory from TSX with a small build; externalize shell-owned React/JSX runtime. Never hand-edit client.js or bundle a second React. Dispose UI, styles, slots, tabs, routes and in-flight requests on disable; ignore stale responses on navigation.
 - Report actual type/unit/real-Git/host/Web/model/platform evidence separately, including failed or unexecuted checks.
 
@@ -52,7 +52,7 @@ English · [简体中文](AGENTS_ZH.md)
 
 - The 0.3.0 dual channels, bundle registration and read-only panel are released. Market PR #6296 closed unmerged and the 2026-10-02 public catalog has zero exact repository matches; investigate separately before claiming search/install availability.
 - P2 / Issue #1 is released: read-only status, diff and history; reuse the sidebar carrier, not turn-based workspace-change summaries. That summary excludes pre-existing edits and is not an index/worktree Git source.
-- P3: review stage/commit/branch/stash buttons separately. Turn-bound approval is unresolved for clicks outside an open turn; read authentication is not write authorization.
+- P3 / current authorized work: complete stage/unstage, staged-only commit, branches, stash and backup restore. Native approval.request requires an open model turn; explicit operator GUI confirmation is separate, never a fabricated turn or a model-tool grant. See docs/superpowers/specs/2026-10-02-git-actions-design.md.
 - Stage prompts: `docs/dsh-tasks/README.md`; 03–05 are complete, 06 has mount-prefix/slow Web cancellation remaining, 07 is write approval/recovery design. Adapt them to actual completed evidence rather than repeating historical instructions. Plan/history documents remain clearly dated.
 - A successful publish exit/HTTP 202 is acceptance, not installability. Allow official scanning and registry propagation; check actual availability/gitHead/tarball and installed behavior before latest promotion. A successful dist-tag write also requires a confirming tag read; do not repeat publish to address delays.
 - Finalize release date before publish. Version/lock/CHANGELOG/source/types/lib and tag/Release/npm gitHead/artifacts identify one release point. Publish each version once to next, verify, then promote with dist-tag. Changed published content needs a new version.

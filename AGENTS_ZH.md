@@ -17,7 +17,7 @@
 
 ## 当前开发任务
 
-- PR #6 已保留历史合并 Issue #1 首版只读面板为 0.3.0，发布点 85fa7d1c4a7e6f7c274d83df242d10c65e319d24；GitHub v0.3.0 已公开，固定 tag 实装的 28 项服务及真实 Web 通过。npm 注册表可见、正式实装及 latest=next=0.3.0 已确认；实际状态见 docs/release-report-0.3.0.md；不覆盖 npm 0.2.1，不混入 GUI 写操作。
+- PR #6 已保留历史合并 Issue #1 首版只读面板为 0.3.0，发布点 85fa7d1c4a7e6f7c274d83df242d10c65e319d24；GitHub v0.3.0 已公开，固定 tag 实装的 28 项服务及真实 Web 通过。npm 注册表可见、正式实装及 latest=next=0.3.0 已确认；实际状态见 docs/release-report-0.3.0.md；旧版本不可覆盖；当前明确目标已授权补完整 GUI 操作，正式实装验收后关闭 Issue #1。
 - README / CONTRIBUTING / AGENTS 采用英文主文档和 `_ZH.md` 中文对应页；面板使用文档同样配对，修改时同步事实、命令和验收边界。
 - 新 Web 证据见 `docs/web-panel-validation.md`；不能将旧发布点的 CI 当作本分支 CI。
 - 当前源码为 src/index.ts、src/web-host.ts、src/panel-types.ts 和 src/client/；客户端通过小型构建生成官方 loader 包装，复用宿主 React，不手改 lib/client.js、不捆绑第二份 React。
@@ -83,3 +83,7 @@
 
 - 贡献指南见 CONTRIBUTING.md；Issue 表单在 .github/ISSUE_TEMPLATE，PR 使用 .github/pull_request_template.md。报告必须区分本地、真实宿主、模型会话与当前 SHA 的 CI 证据。
 - 大任务先明确 Issue 范围与验收条件，拆阶段提交；维护者负责分流、审查与合并/发布。模板需进入默认分支后生效，不宣称标签、分支保护或远端设置已经启用。
+
+## 当前完整目标
+
+按 docs/superpowers/specs/2026-10-02-git-actions-design.md 实施暂存/取消暂存、仅暂存提交、分支、stash 和备份还原。人工 GUI 写确认独立于需要 open turn 的模型审批；同源 JSON、一次性确认、状态复核，不伪造模型回合。完整实装/CI/双渠道发布后回复并关闭 Issue #1，不把只读首期当作完整交付。
