@@ -1,6 +1,6 @@
 # 0.4.0 release record / 0.4.0 发布记录
 
-Status: GitHub v0.4.0 is public and its installed acceptance passed. npm accepted the sole 0.4.0 upload and is processing it; registry availability, npm installed acceptance, latest promotion and Issue closure remain pending. / GitHub 已公开且实装通过；npm 已接受唯一一次上传，仍在处理，正式包可用性、npm 实装、latest 及 Issue 关闭尚未完成。
+Status: npm0.4.0 and GitHub v0.4.0 are public; both installed acceptance runs passed. latest promotion and Issue closure remain pending. / npm 与 GitHub 均已公开，双渠道正式实装通过；latest 推广及 Issue 收尾尚未完成。
 
 ## Scope / 范围
 
@@ -27,7 +27,7 @@ Important documents are paired English/Chinese. GUI labels are Chinese. No remot
 - Actual narrow dark screenshot: [Git actions](images/git-actions-dark.png),343px panel; synthetic fixture only. / 已检查真实窄侧栏截图，不含日常仓库数据。
 - npm account check returned401; public metadata confirms0.4.0 unused and latest=next=0.3.0. Official web login will be required after release preparation. / 当前登录过期，发布前需要官方网页认证，不要求聊天发送秘密。
 
-Pending: public npm availability and installed acceptance, latest readback, Issue reply/closure. Final date/SHA CI, release-point artifact gate and public GitHub install passed below. / npm 正式实装、标签回读及 Issue 收尾仍待完成；其余门见下文。
+Pending: latest readback, Issue reply/closure. Final date/SHA CI, release-point artifact gate and both public installs passed below. / 标签回读及 Issue 收尾仍待完成；其余门见下文。
 
 DSH 0.2.0-rc.2, Windows Node 24.19.0/Git 2.53.0.windows.2 and WSL Ubuntu 24.04 Node 20.20.2/22.23.3 Git 2.43.0. Only exact tested host versions are verified. Git >=2.32 is required for untracked stash previews. Real model sessions, other host versions and reverse-proxy mount deployment remain unverified. / 实测范围与能力要求分开；不推断未测环境。
 
@@ -47,3 +47,10 @@ Use independent DSH_HOME/profile and throwaway repos; no daily profile or creden
 - Official DSH CLI installed github:MashedPotato817/dsh-git-plugin#v0.4.0 in an isolated profile. All15 packed-file SHA256 comparisons matched the clean release checkout. The installed entry passed28 official service checks; an in-memory module hook supplied the same official dsh-tools peer used by the host, without changing installed files. / 固定 tag 正式实装，十五文件一致，实际入口二十八项服务通过。
 - After restarting that profile, scripts/verify-web-actions.mjs passed the complete real browser workflow against a fresh disposable repository: stage/unstage, index-only commit, branches, stash, backup restore, read regression, cancellation, authentication/origin rejection and two enable/disable cycles; zero page errors, Edge154.0.4258.48. / 新临时仓库真实操作、独立 Git 断言、边界及两次启停全部通过。
 - At2026-10-02T13:59Z, the public npm packument still had latest=next=0.3.0 and no0.4.0 version. No second publish was attempted. / 此时 npm 尚未公开新版本，未重复上传。
+
+## Public npm channel / 公开 npm 渠道
+
+- Registry publication time2026-10-02T14:00:13.691Z. npm0.4.0 gitHead equals3d7ec4aafffbe5be0dfc92e26e49bae287636d28. Metadata integrity and the downloaded tgz SHA512 match the canonical pack and GitHub public asset. next=0.4.0 was confirmed. / 注册表新版本已公开，提交、元数据与真实下载包哈希一致，next 已回读。
+- The official DSH CLI replaced the isolated profile dependency with dsh-git-plugin@0.4.0. All15 file comparisons passed; the actual installed entry passed28 official service checks. The same independent profile was tested sequentially for both specs, never a daily profile. / npm 精确版本正式安装，十五文件及二十八项实际入口检查通过；两渠道在同一独立 profile 顺序替换验证。
+- After restart, a separate fresh npm-run/actions-repo fixture passed the entire real browser workflow and independent Git assertions, authentication/Origin boundaries, confirmation cancellation, two lifecycle cycles and zero page errors. Edge154.0.4258.48; DSH0.2.0-rc.2 on Linux Node22.23.3/Git2.43.0. / 正式 npm 安装的独立新仓库也通过完整 Web 验收。
+- Promotion invokes dist-tag add dsh-git-plugin@0.4.0 latest; its separate official browser authentication is pending. Do not republish. / 正在单独认证推广 latest，不重复 publish。
