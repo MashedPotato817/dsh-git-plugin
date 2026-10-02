@@ -1,6 +1,6 @@
 # DSH 后续任务包
 
-> Current handoff / 当前交接（2026-10-02）：0.3.0 只读面板已通过 PR #6 合并并完成 npm/GitHub 双渠道发布，latest=next=0.3.0，正式实装/服务/Web 验收通过；包 03–05 完成，Linux 真实 Web、暗色窄屏及边缘仓库验收已补齐。包 06 仅余挂载前缀及真实慢 Web 请求取消；包 07 先做 GUI 写操作审批/恢复设计。当前发布状态见 [0.3.0 记录](../release-report-0.3.0.md)，剩余逐项验证见 [验收记录](../web-panel-validation.md)，不要重复执行历史发布任务。English/中文使用见 [Web guide](../web-panel.md) / [中文指南](../web-panel_ZH.md)。
+> Current handoff / 当前交接（2026-10-02）：**0.4.0 released on npm/GitHub, latest=next=0.4.0; Issue #1 completed and closed.** / **0.4.0 双渠道发布完成，Issue #1 已完成关闭。** Both public installs passed fifteen file comparisons,28 host checks each and complete actual Web workflows; release-point four-job CI and57 tests passed. / 正式双渠道十五文件、各二十八项宿主与完整 Web 操作通过，发布点四组合 CI 和五十七项测试通过。Packages01–05 and07 are complete; only06 mount-prefix/slow-Web cancellation coverage remains optional. / 01–05 与 07 已完成，06 仅余前缀／真实慢请求取消的可选补验。See [0.4.0 release record](../release-report-0.4.0.md); do not repeat historical implementation/release/closure tasks. / 以新发布记录为准，不重做历史任务。English/中文使用见 [Web guide](../web-panel.md) / [中文指南](../web-panel_ZH.md)。
 
 核查日期：2026-10-01。主仓库：`C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`。
 基线：`feat/release-0.2.0` @ `feba7b80b0942a7a5733511ac0b9cf918ef8d2a8`。
@@ -32,11 +32,11 @@ DSH 主包 latest/next 都是 0.2.0-rc.2，commands/tools 子包 latest 仍旧�
 4. [04 Web UI](04-web-ui.md)：沿用 03 的分支与契约，完成 TSX 与客户端构建。
 5. [05 Web 联调验收](05-web-acceptance.md)：真实 DSH Web 验证、修复、交付。
 6. [06 剩余 Web 验收 / Remaining acceptance](06-web-edge-acceptance.md)：补 Linux、边缘状态、布局与真实慢请求证据。
-7. [07 GUI 写审批设计 / Write design](07-gui-write-design.md)：先确认无 open turn 的审批与恢复契约，再拆实现包。
+7. [07 GUI 写审批设计 / Write design](07-gui-write-design.md)：已完成设计及实现，0.4.0 双渠道正式验收发布；仅作历史参考。
 
 不要把这些包一次性合并为一个大任务。每包通过后再给 DSH 下一包。
 03–05 的功能不得混进 0.2.0 发布候选；默认在 02 完成后开始。
-GUI 写操作留给下一阶段，另做审批与恢复方案。
+以上实施顺序是历史分包约束；GUI 写操作已按独立人工确认与恢复契约交付于 0.4.0。
 
 ## 所有任务共用约束
 

@@ -1,5 +1,7 @@
 # Package 07: GUI write approval design / GUI 写审批设计
 
+> Completed2026-10-02: design and implementation released as0.4.0; both public installs passed complete Web acceptance and Issue #1 is closed. Native operator GUI confirmation is separate from turn-bound model approval. The instructions below are historical, not a request to repeat implementation or publication. / 已完成设计、实现及 0.4.0 双渠道验收发布，Issue #1 已关闭；GUI 人工确认独立于模型回合审批。下文保留历史提示词，不重复执行。See [release evidence](../release-report-0.4.0.md) and [accepted design](../superpowers/specs/2026-10-02-git-actions-design.md).
+
 Read AGENTS, Issue #1, the implemented read-only Host/client and the exact upstream approval contracts. 阅读维护指引、Issue #1、已实现只读面板与上游审批契约。
 
 Owner / 执行：DSH. Scope / 范围：reviewable design and optional isolated proof, not production write buttons. 可审设计与隔离验证，不直接加入生产写按钮。
