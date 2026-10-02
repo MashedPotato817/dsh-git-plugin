@@ -60,6 +60,7 @@ const actionNames = [
 ] as const;
 type Git = (args: string[], allowMissing?: boolean) => Promise<string>;
 interface Snapshot {
+  untrackedPreview: string;
   hash: string;
   status: string;
   files: FileState[];
@@ -338,6 +339,7 @@ export function registerWebActions(
         (input.action === "stash-save" || input.paths?.includes(f.path)),
     );
     let remaining = caps.maxBytes;
+    const untrackedPreview: string[] = [];
     for (const f of relevant) {
       await safeParents(root, f.path, signal);
       const path = resolve(root, f.path),
@@ -354,10 +356,12 @@ export function registerWebActions(
         fail("bad-path", "文件不在仓库内。", 400);
       const bytes = await ctx.fs.readBytes(target, signal, remaining);
       remaining -= bytes.byteLength;
-      hash.update(f.path).update(bytes);
+      hash.update(JSON.stringify([f.path, bytes.byteLength])).update(bytes);
+      untrackedPreview.push(`Untracked: ${f.path}\n${bytes.includes(0) ? "[binary file]" : new TextDecoder().decode(bytes)}`);
     }
     return {
       hash: hash.digest("hex"),
+      untrackedPreview: untrackedPreview.join("\n"),
       status,
       files,
       head,
@@ -407,13 +411,14 @@ export function registerWebActions(
     if (input.sha && !state.operations.stashes.some((s) => s.sha === input.sha))
       fail("stash-not-found", "stash 已变化，请刷新。");
   }
-  function presentation(
+  async function presentation(
     input: ActionInput,
     state: Snapshot,
     root: string,
     token: string,
     expires: number,
-  ): ActionPreview {
+    git: Git,
+  ): Promise<ActionPreview> {
     const descriptions: Record<ActionInput["action"], string> = {
       stage: "将选定文件的当前内容加入暂存区。",
       unstage: "取消选定文件的暂存，工作区内容保留。",
@@ -429,6 +434,13 @@ export function registerWebActions(
       restore:
         "先把所有已跟踪改动备份到保留的 stash，再将选定文件工作区还原为暂存区内容；未跟踪文件保留。",
     };
+    let preview = input.action === "commit" ? state.index : [state.index, state.worktree, state.untrackedPreview].filter(Boolean).join("\n");
+    if(input.paths) {
+      const paths=input.paths.flatMap(p=>{const f=state.files.find(f=>f.path===p);return f?.oldPath?[p,f.oldPath]:[p]});
+      preview = await git(["diff", ...(input.action === "unstage" ? ["--cached"] : []), "--binary", "--no-ext-diff", "--no-textconv", "--", ...paths]);
+      if(input.action === "stage")preview += state.untrackedPreview;
+    }
+    if(input.sha)preview=await git(["stash","show","--include-untracked","--patch","--binary","--no-ext-diff","--no-textconv",input.sha]);
     return {
       token,
       expiresAt: new Date(expires).toISOString(),
@@ -436,10 +448,7 @@ export function registerWebActions(
       branch: state.branch,
       input,
       description: descriptions[input.action],
-      preview:
-        input.action === "commit"
-          ? state.index
-          : [state.index, state.worktree].filter(Boolean).join("\n"),
+      preview,
       paths:
         input.paths ??
         state.files
@@ -583,7 +592,7 @@ export function registerWebActions(
                 expires = now + 120000;
               tokens.set(token, { input, root, hash: state.hash, expires });
               return Response.json(
-                presentation(input, state, root, token, expires),
+                await presentation(input, state, root, token, expires, git),
                 { headers: { "cache-control": "no-store" } },
               );
             }

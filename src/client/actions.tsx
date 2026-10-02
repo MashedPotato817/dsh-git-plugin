@@ -35,6 +35,7 @@ export function Actions({
   const controller = useRef<AbortController | null>(null),
     opener = useRef<HTMLElement | null>(null);
   const generation = useRef(0);
+  useEffect(()=>setNotice(""),[sessionId]);
   function cancel() {
     generation.current++;
     controller.current?.abort();

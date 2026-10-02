@@ -328,3 +328,9 @@ test("write mutation lock, disable and deadline abort in-flight execution", asyn
       assert.equal(git(repo, "diff", "--cached"), "");
     });
 });
+test("confirmation preview shows selected untracked content and chosen stash diff",async t=>{
+ const repo=repoFor(t);fs.writeFileSync(path.join(repo,"new.txt"),"review-untracked-contents");const panel=await mount(t,repo);
+ assert.match((await prepared(panel,"stage",{paths:["new.txt"]})).preview,/review-untracked-contents/);
+ git(repo,"stash","push","-u","-m","review selected stash");const sha=git(repo,"rev-parse","refs/stash").trim();
+ assert.match((await prepared(panel,"stash-apply",{sha})).preview,/review-untracked-contents/);
+});
