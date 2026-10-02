@@ -46,3 +46,41 @@ export interface PanelFailure {
         message: string;
     };
 }
+/** Fixed operator actions, never arbitrary argv or a model tool grant. */
+export type ActionName = "stage" | "unstage" | "commit" | "branch-create" | "branch-switch" | "stash-save" | "stash-apply" | "stash-drop" | "restore";
+export interface ActionInput {
+    sessionId: string;
+    action: ActionName;
+    paths?: string[];
+    message?: string;
+    branch?: string;
+    sha?: string;
+}
+export interface ActionPreview {
+    token: string;
+    expiresAt: string;
+    root: string;
+    branch: string;
+    input: ActionInput;
+    description: string;
+    preview: string;
+    paths: string[];
+    destructive: boolean;
+}
+export interface ActionResult {
+    ok: true;
+    message: string;
+    backup?: string;
+}
+export interface OperationsView {
+    branches: Array<{
+        name: string;
+        sha: string;
+        current: boolean;
+    }>;
+    stashes: Array<{
+        sha: string;
+        ref: string;
+        message: string;
+    }>;
+}
