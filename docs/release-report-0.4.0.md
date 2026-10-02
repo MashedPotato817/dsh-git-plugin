@@ -21,7 +21,13 @@ Important documents are paired English/Chinese. GUI labels are Chinese. No remot
 
 ## Final gates / 最终门
 
-Pending: final Windows/Linux checks, current-SHA CI, release-point artifact gate, public npm/GitHub installs and latest readback, Issue reply/closure. / 上述未执行项不标 PASS。
+- Candidate 33b7b0b: Windows build/check/57 tests; clean Linux Node20.20.2 and22.23.3 npm ci/build/artifact/check/57 tests; official services28 checks; actual installed 0.4.0 candidate tarball and complete browser operation acceptance all passed. / 最终候选的独立矩阵、宿主及完整 Web 通过。
+- Current-candidate push CI37014384527 and PR CI37014560238: all four Windows/Linux × Node20/22 jobs passed. / 两组四平台组合 CI 通过。
+- Independent reviewer verified a44650c and reproduced the fixes; no remaining release blockers. / 独立审查无剩余发布阻断问题。
+- Actual narrow dark screenshot: [Git actions](images/git-actions-dark.png),343px panel; synthetic fixture only. / 已检查真实窄侧栏截图，不含日常仓库数据。
+- npm account check returned401; public metadata confirms0.4.0 unused and latest=next=0.3.0. Official web login will be required after release preparation. / 当前登录过期，发布前需要官方网页认证，不要求聊天发送秘密。
+
+Pending: final date/SHA CI, release-point artifact gate, public npm/GitHub installs and latest readback, Issue reply/closure. / 未执行项不标 PASS。
 
 DSH 0.2.0-rc.2, Windows Node 24.19.0/Git 2.53.0.windows.2 and WSL Ubuntu 24.04 Node 20.20.2/22.23.3 Git 2.43.0. Only exact tested host versions are verified. Git >=2.32 is required for untracked stash previews. Real model sessions, other host versions and reverse-proxy mount deployment remain unverified. / 实测范围与能力要求分开；不推断未测环境。
 

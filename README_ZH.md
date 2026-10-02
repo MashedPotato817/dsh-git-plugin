@@ -43,6 +43,10 @@ dsh plugin --profile web add dsh-git-plugin@0.4.0
 
 进入仓库工作区／会话，展开右侧栏，点击 **Git**。查看分支／文件状态、已暂存与未暂存 diff，以及提交历史和详情。支持单文件／批量暂存、仅提交暂存区、分支与 stash 管理，以及保留备份后还原文件。每次写操作先预览，再由你明确确认。见[面板指南](docs/web-panel_ZH.md)。
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MashedPotato817/dsh-git-plugin/main/docs/images/git-actions-dark.png" width="343" alt="独立测试仓库中的真实 DSH Web Git 操作面板">
+</p>
+
 ## 使用
 
 ```text

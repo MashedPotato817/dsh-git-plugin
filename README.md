@@ -43,6 +43,10 @@ Upgrading a manually enabled 0.2.0 profile? Follow the [migration steps](docs/ma
 
 Open a repository workspace/session, expand the right sidebar and select **Git**. See branch/file states, switch between staged and unstaged diffs, and browse commit history/detail. Stage selected files or all changes, commit only the index, manage branches/stashes, and restore files with a retained backup. Every write opens a preview and requires your confirmation. [Panel guide](docs/web-panel.md).
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MashedPotato817/dsh-git-plugin/main/docs/images/git-actions-dark.png" width="343" alt="Actual DSH Web Git action panel in a disposable test repository">
+</p>
+
 ## Use
 
 ```text
