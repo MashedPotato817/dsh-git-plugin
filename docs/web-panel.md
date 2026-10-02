@@ -2,23 +2,48 @@
 
 English · [简体中文](web-panel_ZH.md)
 
-Version **0.3.0** implements the first read-only phase of [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1). Earlier 0.2.1 provides commands/tools without the panel. Do not overwrite any published package or move existing tags.
+**0.4.0** completes the Git operation panel requested in [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1). The UI uses Chinese labels; important documentation is bilingual.
 
-![Actual development panel in DSH Web](images/git-panel.png)
-
-This actual screenshot is from an independent DSH 0.2.0-rc.2 Web profile and a temporary Git repository. No private repository content is shown.
-
-## Install
+## Install and open
 
 ```bash
-dsh plugin --profile web add dsh-git-plugin@0.3.0
+dsh plugin --profile web add dsh-git-plugin@0.4.0
 ```
 
-Replace web with the active profile. Restart that DSH process and refresh the browser. Existing bundle configuration is retained; manually inserted 0.2.0 profiles follow the migration guide.
+Replace `web` with your profile. Restart DSH and refresh the browser. Select a repository workspace/session, open the right sidebar and choose **Git**. Older manual 0.2.0 inserts need the [migration](marketplace-submission.md#从手工启用的-020-迁移); do not register duplicate rows.
 
-## Try a source checkout
+## Daily workflow
 
-Use an independent `DSH_HOME` and profile. Do not replace your daily profile while testing. From this checkout:
+1. Inspect conflicted, staged, unstaged and untracked files. A file changed on both sides appears twice; each opens its own diff. History comes from Git objects, with pagination and commit details.
+2. Select a file for its actions, or stage/unstage all eligible files. Review the operation, paths and diff, then **确认执行**. Cancel performs no write.
+3. Enter a commit message and preview. **Web commits only the existing index.** Configured preCommit and native Git hooks still run. If the configured hook changes the reviewed snapshot, a new preview is required. The existing `/commit <message>` command still stages all changes before committing.
+4. Expand **分支与 stash** to create/switch local branches or save/apply/drop a stash. Switching requires a clean workspace. Save includes untracked files; apply restores the index and retains the stash, including on conflicts. Delete is explicitly confirmed.
+5. **备份并还原此文件** first stores all tracked edits in a retained stash, then restores the selected worktree file from the index. It preserves the index and untracked files. Apply the backup when recovery is needed; resolve conflicts manually.
+
+Confirmation expires after two minutes and is single-use. Session/root, branch/HEAD, refs, index, worktree or relevant untracked content changes invalidate it. Errors require checking current Git state before retrying; do not assume a failed or cancelled write rolled back. External editors/Git processes can race the checks. Native hooks are trusted repository code. Submodule internal edits require their own repository. There are no remote push/pull or forced history operations.
+
+## Host and client contract
+
+All routes use the official authenticated Connection carrier. The Host derives a canonical repository from an existing live/persisted Session, including single-child discovery. It rejects arbitrary cwd/root/argv, unknown Sessions, traversal/.git paths, Git option injection and unsafe untracked symlinks.
+
+| Route | Request | Result |
+|---|---|---|
+| status | GET sessionId | branch/root/HEAD/file states |
+| diff | GET sessionId/path/side | bounded staged/worktree or untracked preview |
+| log / show | GET sessionId/count/skip or full commit SHA | history / commit detail |
+| operations | GET sessionId | local branches and stashes |
+| prepare | POST fixed action input | review and expiring token; no mutation |
+| execute | POST sessionId/token/confirm:true | one reviewed mutation |
+
+POST requires JSON and a browser Origin matching the carrier's trusted Host authority. The native HTTP bridge uses dsh.internal internally, so that synthetic URL is not the browser origin. DSH 0.2.0-rc.2 has one admitted operator, not tenant-specific Session ACLs. GUI confirmation is separate from model tool approval and never fabricates an agent turn. Model tools remain read-only.
+
+Git runs through ctx.subprocess with pure argv, bounded output and per-call deadlines. Diffs disable external diff/textconv. Writes are locked against concurrent panel writes. Disable removes routes/tab/slot/style, expires tokens and aborts requests/processes. Navigation ignores stale results. Client requests respect the current base URL; reverse-proxy mount prefixes still need real deployment acceptance.
+
+Requires Git >=2.32 for stash previews including untracked content ([Git documentation](https://git-scm.com/docs/git-stash/2.32.0)). Actual tested versions and evidence are separate from this requirement.
+
+## Development and acceptance
+
+Use an independent DSH_HOME/profile and disposable repositories. Never use your daily profile for acceptance.
 
 ```bash
 npm ci
@@ -28,64 +53,8 @@ npm test
 npm pack
 ```
 
-Set `DSH_HOME` to a new test directory using your shell. Replace the paths below with absolute paths on your machine, and use the CLI belonging to your DSH installation:
+Create the Web profile with `dsh --profile git-panel-test --from-default-profile web --dump-config`, install the absolute tarball path using `dsh plugin --profile git-panel-test add <tarball>`, then start it from a fixture repository with `dsh --profile git-panel-test --no-open --port 17834`.
 
-```bash
-dsh --profile git-panel-test --from-default-profile web --dump-config
-dsh plugin --profile git-panel-test add /absolute/path/dsh-git-plugin-0.3.0.tgz
-```
+[Read acceptance](../scripts/verify-web-panel.mjs) and [operation acceptance](../scripts/verify-web-actions.mjs) run separately from CI/npm test. The latter documents its disposable actions-repo fixture and arguments at its top, uses the actual browser confirmation flow and independently checks Git results. It does not make model calls or export browser storage. Keep the startup authentication log private. Use a unique tarball filename for each development SHA: pnpm may cache a repeated pathname despite changed bytes; compare installed hashes and restart.
 
-Start DSH from a temporary Git repository:
-
-```bash
-dsh --profile git-panel-test --no-open --port 17832
-```
-
-Open the official local authentication URL printed by DSH. Select a repository workspace/session, open the right sidebar, and choose **Git**. Installing or replacing a tarball requires restarting that profile's DSH process and refreshing its browser page. No model request or API key is needed to read the panel.
-
-## What you can see
-
-- Branch and repository, with a manual refresh button.
-- Conflicted, staged, unstaged and untracked files. A file changed on both sides appears in both groups; each opens its own diff.
-- Text diffs rendered as text, with added/deleted lines highlighted. Untracked files show a bounded current-content preview, not a fabricated HEAD diff. Binary/unavailable previews and truncation are explicit.
-- Paginated commit history and commit detail from Git objects. Empty repositories and detached HEAD have explicit states.
-
-The UI currently uses Chinese labels. Bilingual documentation does not imply an English UI. There are no stage, commit, branch-switch, restore or stash buttons in this phase. Existing slash commands retain their behavior.
-
-## Host contract
-
-All routes are fixed, read-only `GET` requests behind DSH Connection authentication. Responses are JSON; failures are `{ "error": { "code": "...", "message": "..." } }`. Browser requests use the current DSH base URL, including a mount prefix.
-
-| Route | Query | Successful projection |
-|---|---|---|
-| `/api/git-panel/status` | `sessionId` | root, branch, HEAD and NUL-parsed XY file states |
-| `/api/git-panel/diff` | `sessionId`, repository-relative `path`, `side=staged\|unstaged` | text, binary/untracked/truncated flags |
-| `/api/git-panel/log` | `sessionId`, optional `count` (1–100, default 30), `skip` (0–10000, default 0) | entries, skip, hasMore, truncated |
-| `/api/git-panel/show` | `sessionId`, full lowercase 40–64 hex `sha` | commit text and truncated flag |
-
-The Host derives cwd from a live or persisted Session, and reuses the plugin's single-child repository discovery. Unknown Sessions are refused. Zero/multiple child repositories cannot silently select a target. Requests cannot supply arbitrary cwd, root, argv or repeated/unknown query keys.
-
-Path traversal, absolute paths and `.git` paths are refused; literal pathspecs prevent Git magic expansion. Commit detail accepts a verified commit SHA, not arbitrary option-shaped revisions. Git runs through `ctx.subprocess` with pure argv, disabled external diff/textconv, no optional Git locks, bounded output and the configured deadline. An incomplete capped status response is an error, never a false clean state.
-
-DSH 0.2.0-rc.2 authenticates one admitted operator. This is not a tenant-specific Session ACL; knowing another Session ID in the same admitted operator's host is not separate tenant authorization. The plugin adds unknown-Session and path boundaries within that host contract.
-
-Disabling the plugin disposes the tab, slot, style and Host routes, aborts pending requests and terminates their subprocesses. Closing/navigating the tab aborts browser reads; stale responses cannot replace the new Session/file view. CLI/headless hosts keep their original commands/tools without requiring Web services.
-
-## Repeat the browser check
-
-The optional [acceptance script](../scripts/verify-web-panel.mjs) needs Playwright installed in a separate tools directory and a supported browser (tested with Edge on Windows). It is outside npm test/CI and is not an npm runtime dependency. It enables the plugin, then runs two disable/enable cycles in the supplied test profile; never point it at a daily profile.
-
-Use the three-file fixture described by `--help`. Obtain its Session ID from the panel's `status?sessionId=...` request in browser DevTools; the ID is not a credential. Pass the isolated server log, not an account secret:
-
-```bash
-node scripts/verify-web-panel.mjs --help
-node scripts/verify-web-panel.mjs --dsh-log /test/server.log --session-id <fixture-session-id> --playwright-module /test/tools/node_modules/playwright --screenshots /test/screenshots
-```
-
-The script reads the official local authentication URL into memory, closes its browser, and never exports browser storage. Keep that startup log private; it contains the temporary authentication link. The operator must stop the test server and delete the independent profile after testing.
-
-## Validation and next phase
-
-See the [validation record](web-panel-validation.md) for test levels, exact environments and remaining checks. Windows and Linux real Web reads and live enable/disable passed; unit/real-Git evidence is separate from browser evidence. The current implementation is not marked stable before actual user acceptance.
-
-P3 must first resolve write approval for a sidebar click without an open model turn, define recoverability, and add focused regressions. Keep Issue #1 open with `Refs #1`; a read-only first phase does not close the entire request.
+Release evidence: [0.3.0](release-report-0.3.0.md) and [0.4.0](release-report-0.4.0.md). Real model sessions and other DSH versions remain unverified.

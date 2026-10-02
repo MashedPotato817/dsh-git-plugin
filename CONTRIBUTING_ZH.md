@@ -22,10 +22,10 @@
 ### 固定 GitHub tag
 
 ```bash
-dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.3.0
+dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.4.0
 ```
 
-npm 0.2.1 与此 tag 都携带编译产物与 bundle patch，无需安装期构建；新安装自动注册，重启对应 profile 即可。旧 0.2.0 profile 按迁移说明调整，不能保留重复 insert。
+npm 0.4.0 与此 tag 都携带编译产物与 bundle patch，无需安装期构建；新安装自动注册，重启对应 profile 即可。旧 0.2.0 profile 按迁移说明调整，不能保留重复 insert。
 
 ### 从源码安装
 
@@ -47,7 +47,7 @@ dsh plugin --profile web add .
 |---|---|---|
 | `maxBytes` | `1048576` | 每次 Git 调用的 stdout 字节上限 |
 | `stderrMaxBytes` | `65536` | stderr 字节上限 |
-| `timeoutMs` | `30000` | 每次命令、工具或 preCommit 调用的截止时间，单位 ms |
+| `timeoutMs` | `30000` | 每次 Git、工具或 preCommit 调用的截止时间，单位 ms |
 | `graceMs` | `3000` | 超时或取消后等待进程终止的宽限时间，单位 ms |
 | `preCommit` | `[]` | 提交前执行的一个 argv 命令；失败或超时则中止提交 |
 
@@ -82,7 +82,7 @@ dsh plugin --profile web add .
 | `ctx.systemPrompt` | 注入 Git 工具使用与提交规范指引 |
 | `ctx.subprocess` | 用纯 argv 执行 Git，落实输出上限、取消与超时终止 |
 
-调用读取会话目录，解析目标仓库，再执行 Git 并返回文本结果。禁用插件时释放命令、工具和提示词注册；开发版还清理 Web 路由、tab、slot、样式和请求，重新启用不重复注册。
+调用读取会话目录，解析目标仓库，再执行 Git 并返回文本结果。禁用插件时释放命令、工具和提示词注册；面板还清理 Web 路由、tab、slot、样式和请求，重新启用不重复注册。
 
 模型工具均为只读：
 
@@ -103,7 +103,7 @@ dsh plugin --profile web add .
 |---|---|---|
 | DSH | `>=0.2.0-rc.2 <0.3.0-0` | **仅 `0.2.0-rc.2`** |
 | Node.js | `>=20` | Windows 24.19.0；Linux 20.20.2 / 22.23.3；GitHub Actions Node 20/22 |
-| Git | 支持 `--end-of-options`，Git 2.24+ | Windows 2.53.0.windows.2；Linux 2.43.0 |
+| Git | Git 2.32+，支持未跟踪 stash 预览 | Windows 2.53.0.windows.2；Linux 2.43.0 |
 
 ### 0.2.0 的实际验证
 
@@ -115,7 +115,7 @@ dsh plugin --profile web add .
 | npm / 固定 GitHub tag 安装 | 独立 profile 实装与启用通过，schema 无诊断；提供官方宿主 peer 后服务栈通过 |
 | 发布一致性 | npm gitHead、tag、Release 对应 `c83f332`；实际 tarball 的 `lib/` 哈希一致 |
 
-完整证据见[发布记录](docs/release-report-0.2.0.md)与[验证报告](docs/validation-report-0.2.0.md)。**真实模型会话、Linux 完整 DSH 宿主、其他 DSH 版本仍未验证。**
+完整证据见[发布记录](docs/release-report-0.2.0.md)与[验证报告](docs/validation-report-0.2.0.md)。上述为 0.2.0 历史验证；Linux 真实服务栈／Web 已在 [0.3.0 发布记录](docs/release-report-0.3.0.md)验证。真实模型会话和其他 DSH 版本仍未验证。
 
 ### 运行限制
 
@@ -124,7 +124,7 @@ dsh plugin --profile web add .
 - **仓库发现：** 只检查会话目录与直接子目录；多个子仓库时列出候选，建议将会话切换到目标仓库。
 - **耗时检查：** preCommit 也受默认 30 秒截止时间约束；较慢的测试请显式调大 `timeoutMs`。
 - **平台边界：** Linux 本地测试和 CI 不等于完整 DSH 宿主验证；上游开发 peer 链的 Node 20 engine 告警见验证报告。
-- **界面范围：** 发布的 0.2.1 提供命令与工具；开发分支已实现只读 Web 面板，尚未发布。见[面板说明](docs/web-panel_ZH.md)。
+- **界面范围：** 0.2.x 提供命令与工具，0.3.0 已发布只读 Web 面板，0.4.0 增加人工确认的 Git 操作。见[面板说明](docs/web-panel_ZH.md)。
 
 ## 准备开发环境
 

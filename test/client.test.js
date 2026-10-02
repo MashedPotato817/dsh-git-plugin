@@ -157,11 +157,15 @@ test("client registers cleanly, renders safe text, aborts old session requests a
   );
   assert.equal(document.querySelector('[role="dialog"]'), null);
   await act(async () => stage.click());
-  const actionRoot=document.querySelector(".gp-actions");
+  const actionRoot = document.querySelector(".gp-actions");
   await act(async () =>
     document.querySelector('[aria-label="确认执行操作"]').click(),
   );
-  assert.equal(document.querySelector(".gp-actions") === actionRoot, true,"refresh preserves operation controls");
+  assert.equal(
+    document.querySelector(".gp-actions") === actionRoot,
+    true,
+    "refresh preserves operation controls",
+  );
   const executed = requests.filter((r) =>
     r.address.pathname.endsWith("/execute"),
   );

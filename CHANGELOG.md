@@ -6,6 +6,25 @@ Actual changes to `dsh-git-plugin`, following [Keep a Changelog](https://keepach
 
 ## [Unreleased]
 
+## [0.4.0] - 待发布
+
+### Added
+
+- Complete Web Git workflow for Issue #1: selected/bulk stage and unstage, staged-only commit with hooks, local branches, stash save/apply/drop, and tracked-file restore with a retained stash backup.
+- Mandatory operator preview/confirmation with two-minute single-use tokens; Session/root/snapshot rechecks, per-repository mutation locks, same-authority JSON POST and lifecycle cancellation. Model tools remain read-only.
+- Real-Git/DOM regressions and an optional installed-Web operation acceptance script.
+
+### Fixed
+
+- Bind Origin to the native carrier Host rather than the bridge's synthetic dsh.internal URL.
+- Stash operations omit inherited literal-pathspec mode so native Git cleans saved untracked files.
+- Confirmation previews include selected untracked content and chosen stash diffs.
+
+### Notes
+
+- Requires Git >=2.32 for untracked stash previews; tested versions are documented separately. UI labels remain Chinese. External Git processes can race panel snapshots; native hooks are trusted repository code.
+
+
 ## [0.3.0] - 2026-10-01
 
 ### Added

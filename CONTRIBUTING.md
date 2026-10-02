@@ -19,10 +19,10 @@ Bug reports, compatibility evidence, documentation, and focused implementations 
 ### Fixed GitHub tag
 
 ```bash
-dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.3.0
+dsh plugin --profile web add github:MashedPotato817/dsh-git-plugin#v0.4.0
 ```
 
-npm 0.2.1 and this tag contain compiled outputs and the bundle patch. They need no installation-time build. New installations register automatically; restart the profile. Migrate older manual 0.2.0 inserts instead of keeping duplicate rows.
+npm 0.4.0 and this tag contain compiled outputs and the bundle patch. They need no installation-time build. New installations register automatically; restart the profile. Migrate older manual 0.2.0 inserts instead of keeping duplicate rows.
 
 ### Source installation
 
@@ -36,7 +36,7 @@ dsh plugin --profile web add .
 
 Check your checkout first: v0.2.0 requires a manual insert; v0.2.1 declares a bundle patch. A bundle supplies the row; user configuration overrides it by id. Upgrading an existing ordinary dependency does not automatically add the bundle layer in DSH 0.2.0-rc.2. See [migration evidence](docs/marketplace-submission.md).
 
-Rebuild after editing source, then restart that profile. The Web panel exists only on the development branch until a new release; neither published 0.2.1 channel contains it.
+Rebuild after editing source, then restart that profile. The Web panel shipped in 0.3.0; 0.4.0 adds confirmed operator actions. Published 0.2.x packages contain commands/tools only.
 
 ## Configuration
 
@@ -44,7 +44,7 @@ Rebuild after editing source, then restart that profile. The Web panel exists on
 |---|---|---|
 | `maxBytes` | `1048576` | stdout byte cap per Git call |
 | `stderrMaxBytes` | `65536` | stderr byte cap |
-| `timeoutMs` | `30000` | Per-command, tool, or preCommit deadline in ms |
+| `timeoutMs` | `30000` | Per-Git-call, tool, or preCommit deadline in ms |
 | `graceMs` | `3000` | Process termination grace period in ms |
 | `preCommit` | `[]` | One argv command; failure or timeout aborts the commit |
 
@@ -78,9 +78,9 @@ For a 0.2.1 bundle, override the existing row instead:
 | `ctx.tools` | Four read-only Git tools |
 | `ctx.systemPrompt` | Git tool and commit guidance |
 | `ctx.subprocess` | Plain argv, output caps, cancellation and deadlines |
-| Optional Web services | Authenticated routes and Session-derived repository reads |
+| Optional Web services | Authenticated reads and confirmed operator writes in a Session-derived repository |
 
-Commands resolve the repository from the session cwd, including exactly one immediate child repository. Tools return text. Disabling removes commands, tools and prompt registrations; the development panel also removes routes, tabs, slots, styles and pending requests.
+Commands resolve the repository from the session cwd, including exactly one immediate child repository. Tools return text. Disabling removes commands, tools and prompt registrations; the panel also removes routes, tabs, slots, styles and pending requests.
 
 | Tool | Arguments and behavior |
 |---|---|
@@ -95,16 +95,16 @@ Commands resolve the repository from the session cwd, including exactly one imme
 |---|---|---|
 | DSH | `>=0.2.0-rc.2 <0.3.0-0` | Only `0.2.0-rc.2` |
 | Node.js | `>=20` | Windows 24.19.0; historical Linux 20.20.2 / 22.23.3 matrix |
-| Git | `>=2.24`, including `--end-of-options` | Windows 2.53.0.windows.2; historical Linux 2.43.0 |
+| Git | `>=2.32`, including stash show --include-untracked | Windows 2.53.0.windows.2; historical Linux 2.43.0 |
 
-Release evidence: [0.2.0](docs/release-report-0.2.0.md), [0.2.1](docs/release-report-0.2.1.md), and [original validation](docs/validation-report-0.2.0.md). Development panel evidence: [Web validation](docs/web-panel-validation.md).
+Release evidence: [0.2.0](docs/release-report-0.2.0.md), [0.2.1](docs/release-report-0.2.1.md), [0.3.0](docs/release-report-0.3.0.md), and [original validation](docs/validation-report-0.2.0.md). Panel evidence: [Web validation](docs/web-panel-validation.md).
 
 - DSH 0.1.x and `0.2.0-rc.1` are unsupported. Other versions within the declaration must still be verified. Plugin 0.1.0 is not compatible with DSH 0.2.0-rc.2.
 - This is a DSH-hosted plugin, not a standalone Node CLI. Ordinary Node loading needs the SDK peers supplied separately.
 - Repository discovery checks the session cwd and immediate children. Multiple candidates require choosing a session cwd inside the desired repository.
 - Slow preCommit checks need an explicit higher `timeoutMs`.
 - Node-only Linux tests or CI do not prove the complete Linux DSH runtime works. Upstream development peer engine warnings are recorded in the original validation report.
-- Real model sessions, other DSH versions and the complete Linux Web host remain unverified. Published 0.2.1 contains commands and tools; the read-only panel is unreleased.
+- Real model sessions and other DSH versions remain unverified. Linux real DSH Web is verified separately from Node-only tests; see the release reports.
 
 ## Development setup
 

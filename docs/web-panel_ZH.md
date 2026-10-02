@@ -2,23 +2,48 @@
 
 [English](web-panel.md) · 简体中文
 
-**0.3.0** 实现了 [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的首期只读面板。旧版 0.2.1 仅有命令／工具，不含面板；不要覆盖任何已发布包或移动旧标签。
+**0.4.0** 完成 [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的 Git 操作面板。界面使用中文，重要文档英中双语。
 
-![真实 DSH Web 开发版面板](images/git-panel.png)
-
-截图来自独立 DSH 0.2.0-rc.2 Web profile 与临时 Git 仓库，不含私人仓库内容。
-
-## 安装
+## 安装并打开
 
 ```bash
-dsh plugin --profile web add dsh-git-plugin@0.3.0
+dsh plugin --profile web add dsh-git-plugin@0.4.0
 ```
 
-将 web 替换为实际 profile，重启对应 DSH 并刷新页面。原 bundle 配置保留；手工 insert 的 0.2.0 profile 先按迁移说明调整。
+将 `web` 替换为你的 profile。重启 DSH 并刷新浏览器。选择仓库工作区／会话，展开右侧栏，点击 **Git**。旧版手工插入的 0.2.0 配置先按[迁移说明](marketplace-submission.md#从手工启用的-020-迁移)处理，避免重复注册。
 
-## 试用源码 checkout
+## 日常流程
 
-使用独立 `DSH_HOME` 与 profile；不要替换日常配置。在当前开发 checkout 中执行：
+1. 查看冲突、已暂存、未暂存和未跟踪文件。同一文件两侧都有改动时出现两行，各自打开对应 diff。历史和提交详情来自真实 Git 对象。
+2. 点击文件后使用单文件操作，或批量暂存／取消暂存。核对操作、路径及差异后点 **确认执行**；取消不写入。
+3. 输入提交说明并预览。**Web 只提交现有暂存区。** 配置的 preCommit 与 Git 原生钩子仍执行；配置钩子改变预览快照后须重新预览。原有 `/commit <message>` 仍会暂存全部改动后提交。
+4. 展开 **分支与 stash**，创建／切换本地分支，保存／应用／删除 stash。切换要求干净工作区；保存包含未跟踪文件，应用恢复暂存状态并保留原 stash，冲突时也保留。删除需要明确确认。
+5. **备份并还原此文件** 先将所有已跟踪改动存入保留的 stash，再把选定工作区文件还原为暂存区内容。暂存区及未跟踪文件保留；需要恢复时应用备份，冲突自行处理。
+
+确认两分钟失效、只能使用一次。会话／仓库、HEAD／分支、引用、暂存区、工作区或相关未跟踪内容变化后须重新预览。错误后先检查当前 Git 状态，不假设失败或取消意味着回滚。外部编辑器／Git 进程可能并发修改；原生钩子是受信仓库代码。子模块内部改动须进入其仓库处理。不提供远端推拉或强制改写历史。
+
+## 宿主与客户端契约
+
+全部接口通过官方 Connection 认证载体。宿主从已有活动／持久化 Session 推导规范化仓库，复用唯一子仓库发现。拒绝任意 cwd/root/argv、未知会话、越界／.git 路径、选项注入及不安全的未跟踪符号链接。
+
+| 接口 | 请求 | 结果 |
+|---|---|---|
+| status | GET sessionId | 分支／目录／HEAD／文件状态 |
+| diff | GET sessionId/path/side | 受限的暂存／工作区或未跟踪预览 |
+| log / show | GET sessionId/count/skip 或完整 SHA | 历史／提交详情 |
+| operations | GET sessionId | 本地分支与 stash |
+| prepare | POST 固定操作字段 | 预览及短期凭证，不写入 |
+| execute | POST sessionId/token/confirm:true | 执行一次已确认操作 |
+
+POST 需要 JSON 和与受信 Host authority 匹配的浏览器 Origin；HTTP bridge 的 dsh.internal 内部 URL 不代表浏览器地址。DSH 0.2.0-rc.2 认证单一操作用户，并非租户级 Session ACL。GUI 人工确认与模型审批分开，不伪造 agent turn；模型工具仍只读。
+
+Git 通过 ctx.subprocess、纯 argv、输出上限及每次调用截止执行；禁用外部 diff/textconv。每仓库写锁防止面板操作相互并发。停用时移除接口／tab／slot／样式，清除凭证并中止请求与进程；导航不显示过期响应。请求尊重 base URL，但反向代理挂载前缀仍须真实部署验收。
+
+未跟踪 stash 预览要求 Git >=2.32（[官方文档](https://git-scm.com/docs/git-stash/2.32.0)）；实际验证版本与最低要求分开记录。
+
+## 开发与验收
+
+使用独立 DSH_HOME／profile 和临时仓库，不在日常配置上验收。
 
 ```bash
 npm ci
@@ -28,64 +53,8 @@ npm test
 npm pack
 ```
 
-用当前 shell 设置 `DSH_HOME` 为新的测试目录。下列路径替换为本机绝对路径，使用当前 DSH 安装对应的 CLI：
+用 `dsh --profile git-panel-test --from-default-profile web --dump-config` 建立 Web profile；`dsh plugin --profile git-panel-test add <绝对 tarball 路径>` 安装；从临时仓库运行 `dsh --profile git-panel-test --no-open --port 17834`。
 
-```bash
-dsh --profile git-panel-test --from-default-profile web --dump-config
-dsh plugin --profile git-panel-test add /absolute/path/dsh-git-plugin-0.3.0.tgz
-```
+[读取验收](../scripts/verify-web-panel.mjs)和[操作验收](../scripts/verify-web-actions.mjs)不进入 CI/npm test。后者文件顶部列出 actions-repo 临时夹具和参数，通过真实浏览器确认流程操作，并独立核对 Git 结果。不调用模型、不导出浏览器存储；启动认证日志须保密。每个开发 SHA 使用不同 tarball 文件名：pnpm 可能缓存同一路径，必须比较实际安装哈希并重启。
 
-在临时 Git 仓库内启动：
-
-```bash
-dsh --profile git-panel-test --no-open --port 17832
-```
-
-打开 DSH 输出的官方本地认证链接，选择仓库工作区／会话，打开右侧栏，点击 **Git**。安装或更换 tgz 后，重启该 profile 的 DSH 并刷新页面。查看面板不需要发起模型请求或配置 API Key。
-
-## 可以查看的内容
-
-- 分支、仓库与手动刷新。
-- 冲突、已暂存、未暂存、未跟踪文件。同一文件两侧均有改动时，会分别出现，打开各自 diff。
-- 以文本渲染的 diff，新增／删除行着色。未跟踪文件显示受限的当前内容预览，不伪造 HEAD diff；二进制、无法预览和截断均明确提示。
-- 从 Git 对象读取的分页历史与提交详情，明确显示空仓库及 detached HEAD。
-
-当前 UI 使用中文标签；文档双语不代表 UI 已有英文。首期不提供暂存、提交、切分支、恢复或 stash 按钮，现有斜杠命令行为保持。
-
-## Host 契约
-
-所有接口都是 DSH Connection 认证后的固定只读 `GET`，返回 JSON。失败结构为 `{ "error": { "code": "...", "message": "..." } }`。浏览器沿用当前 DSH base URL，包括挂载前缀。
-
-| 路由 | 参数 | 成功结果 |
-|---|---|---|
-| `/api/git-panel/status` | `sessionId` | 根目录、分支、HEAD 与按 NUL 解析的 XY 文件状态 |
-| `/api/git-panel/diff` | `sessionId`、仓库相对 `path`、`side=staged\|unstaged` | 文本及 binary/untracked/truncated 标记 |
-| `/api/git-panel/log` | `sessionId`、可选 `count`（1–100，默认 30）、`skip`（0–10000，默认 0） | entries、skip、hasMore、truncated |
-| `/api/git-panel/show` | `sessionId`、完整小写 40–64 位十六进制 `sha` | 提交文本、truncated |
-
-Host 从运行中或持久化 Session 取得 cwd，并复用插件的唯一子仓库发现。未知 Session 拒绝读取；零个／多个子仓库不会擅自选定目标。请求不能传任意 cwd、root、argv，重复或未知参数拒绝。
-
-路径穿越、绝对路径及 `.git` 路径拒绝；literal pathspec 防止 Git magic 展开。提交详情只接受验证后的 commit SHA，不接受任意选项形式 revision。Git 继续通过 `ctx.subprocess` 与纯 argv 执行，关闭 external diff/textconv 和可选 Git 锁，受输出字节及配置超时限制。状态超限返回错误，不把缺项列表显示成干净仓库。
-
-DSH 0.2.0-rc.2 对准入的单一 operator 认证，并没有按租户划分 Session ACL。同一宿主内已准入 operator 知道其他 Session ID，不是另一套租户授权。插件在该宿主契约内增加未知 Session 与路径边界。
-
-禁用插件会清理 tab、slot、样式和 Host 路由，取消请求并终止相应子进程。关闭／切换面板取消浏览器读取，旧响应不能覆盖新 Session／文件视图。CLI/headless 继续使用原命令和工具，无需 Web 服务。
-
-## 复跑浏览器验收
-
-可选[验收脚本](../scripts/verify-web-panel.mjs)需要独立工具目录内的 Playwright 与可用浏览器（本轮使用 Windows Edge），不进入 npm test/CI，不是插件运行时依赖。它会在指定测试 profile 内启用插件并执行两轮禁用／启用；不要指向日常 profile。
-
-按 `--help` 创建三文件样本。从浏览器 DevTools 的面板 `status?sessionId=...` 请求读取该测试会话 ID（它不是凭据），传入独立服务日志，不传账号秘密：
-
-```bash
-node scripts/verify-web-panel.mjs --help
-node scripts/verify-web-panel.mjs --dsh-log /test/server.log --session-id <fixture-session-id> --playwright-module /test/tools/node_modules/playwright --screenshots /test/screenshots
-```
-
-脚本只在内存中读取官方本地认证 URL，结束时关闭浏览器，不导出 browser storage。启动日志含临时认证链接，应留在本地；验收后由执行者停止测试服务并清理独立 profile。
-
-## 验证与下一阶段
-
-[验收记录](web-panel-validation.md) 区分测试层级、实际环境与未验证项。Windows 和 Linux 真实 Web 读取与在线启停已通过；单元／真实 Git 结果与浏览器证据分别记录。用户实际验收前，不标为“暂定稳定”。
-
-P3 首先要解决无模型 open turn 时点击按钮的写审批契约，确定可恢复性并补针对性回归。Issue #1 保持开放，使用 `Refs #1`；只读首期不等于整个 GUI 需求完成。
+发布证据：[0.3.0](release-report-0.3.0.md)、[0.4.0](release-report-0.4.0.md)。真实模型会话及其他 DSH 版本仍未验证。

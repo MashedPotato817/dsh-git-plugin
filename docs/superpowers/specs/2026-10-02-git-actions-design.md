@@ -14,7 +14,7 @@ Keep status, independent index/worktree diffs, previews and history. Add selecte
 - Read authentication alone does not mutate. Reject foreign/missing Origin, unknown/repeated query fields, extra JSON keys, unknown Sessions, absolute/traversal/.git paths, arbitrary cwd/argv, option-shaped refs and untracked symlink reads.
 
 ## Behavior / 操作语义
-- stage uses git add -A -- exact listed files; rename includes its source. unstage retains worktree; unborn HEAD uses git rm --cached.
+- stage uses git add -A -- exact listed files; an already indexed rename stages only its selected destination; an unstaged rename includes its still-indexed source. unstage retains worktree; unborn HEAD uses git rm --cached.
 - commit uses only the existing index, honors configured preCommit, refuses conflicts/empty index, rechecks the reviewed snapshot after the hook and reports Git hook failures. Never git add -A during commit.
 - Branch switch uses ordinary Git protections, no force. A clean workspace is required; create-and-switch preserves changes.
 - Stash save includes untracked files; apply --index retains its stash even on conflicts; drop requires explicit destructive confirmation. Submodule internal edits need their own repository.

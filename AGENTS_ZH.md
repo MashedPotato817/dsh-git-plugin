@@ -47,7 +47,7 @@
 
 ## 后续顺序与发布
 
-- P1：`0.2.1` 双渠道发布、bundle 自动启用、README 展示与市场收录申请已完成；市场 PR #6296 等待上游审查合并及目录同步，之后核验市场搜索与实际安装。GUI 另开阶段。
+- P1：`0.2.1` 双渠道发布、bundle 自动启用、README 展示与市场收录申请已完成；市场 PR #6296 已关闭未合并、无说明评论；目录没有本仓库精确匹配，不宣称已收录。GUI 另开阶段。
 - P2：[Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的 Web 只读 Git 面板：状态、diff、历史首期已实现；继续补验及用户验收。
 - P3：再考虑 stage/commit/branch/stash 等写操作，核对 DSH 权限与审批及恢复方式。
 - 版本文件、CHANGELOG、源码、编译配置、测试和 `lib/` 一起纳入发布提交；确保 tag、Release、npm gitHead 与包内产物对应同一提交。
@@ -66,7 +66,7 @@
 
 ## 后续任务入口（2026-10-01 核查）
 
-- 任务分包见 [docs/dsh-tasks/README.md](docs/dsh-tasks/README.md)：03–05 已完成并发布；06 仅余挂载前缀/真实慢 Web 请求取消，07 先设计 GUI 写操作审批和恢复；逐包推进。
+- 任务分包见 [docs/dsh-tasks/README.md](docs/dsh-tasks/README.md)：03–05 已完成并发布；06 仅余挂载前缀/真实慢 Web 请求取消，07 的审批与恢复设计已由当前 Git 操作契约实现；逐包推进。
 - 原候选 feba7b8，定时器修复 922408d，发布点 c83f332；PR/main 当前 SHA CI 均通过，协作文档与模板已进入默认分支。包 02 的 npm、GitHub、latest 推广与双渠道安装均完成；随后 03–05 的只读 Web 已实现为 0.3.0，继续 06/07 的剩余项目。
 - Linux Node 20/22 已用**隔离运行时**（WSL2 Ubuntu 24.04，`~/dsh-node-runtimes/node-v20.20.2-linux-x64`、`node-v22.23.3-linux-x64`）完成修复后 build/check/test 复验；修复候选 922408d 的 npm ci/build/产物门/check/语法/test/pack 全部通过。系统 Node 18.19.1 未用于验证。证据见 `docs/validation-report-0.2.0.md`。未推送 SHA 的干净检出从本地主仓库克隆。
 
@@ -87,3 +87,9 @@
 ## 当前完整目标
 
 按 docs/superpowers/specs/2026-10-02-git-actions-design.md 实施暂存/取消暂存、仅暂存提交、分支、stash 和备份还原。人工 GUI 写确认独立于需要 open turn 的模型审批；同源 JSON、一次性确认、状态复核，不伪造模型回合。完整实装/CI/双渠道发布后回复并关闭 Issue #1，不把只读首期当作完整交付。
+
+## 0.4.0 候选
+
+- 源码提交：8b9efc1 操作，293ff98 内容预览，9871360 原生 Host/Origin，da406ac 刷新保留操作区。最后界面小修前 Windows build/check 和 55 项测试通过；小修后的客户端与类型检查通过。a44650c 修复审查指出的 rename/stash 范围，完整 Windows build/check/57 项通过；发布前须复跑最终候选／CI／正式安装 Web。
+- 新 Web 能力要求 Git 2.32（stash show --include-untracked），仅实际测试版本声明已验证。原生 bridge 的 URL 为 dsh.internal，强制 Origin 绑定已受信 Host authority。
+- 每个开发 SHA 使用不同 tarball 文件路径，避免 pnpm 同名缓存；比较实际安装 lib 哈希并重启独立 profile，不手改安装产物。
