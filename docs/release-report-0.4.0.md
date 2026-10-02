@@ -1,6 +1,6 @@
 # 0.4.0 release record / 0.4.0 发布记录
 
-Status: release prepared at the merged point; npm official login pending, not published. / 已合并并完成发布准备，等待 npm 官方登录，尚未发布。
+Status: GitHub v0.4.0 is public and its installed acceptance passed. npm accepted the sole 0.4.0 upload and is processing it; registry availability, npm installed acceptance, latest promotion and Issue closure remain pending. / GitHub 已公开且实装通过；npm 已接受唯一一次上传，仍在处理，正式包可用性、npm 实装、latest 及 Issue 关闭尚未完成。
 
 ## Scope / 范围
 
@@ -27,7 +27,7 @@ Important documents are paired English/Chinese. GUI labels are Chinese. No remot
 - Actual narrow dark screenshot: [Git actions](images/git-actions-dark.png),343px panel; synthetic fixture only. / 已检查真实窄侧栏截图，不含日常仓库数据。
 - npm account check returned401; public metadata confirms0.4.0 unused and latest=next=0.3.0. Official web login will be required after release preparation. / 当前登录过期，发布前需要官方网页认证，不要求聊天发送秘密。
 
-Pending: final date/SHA CI, release-point artifact gate, public npm/GitHub installs and latest readback, Issue reply/closure. / 未执行项不标 PASS。
+Pending: public npm availability and installed acceptance, latest readback, Issue reply/closure. Final date/SHA CI, release-point artifact gate and public GitHub install passed below. / npm 正式实装、标签回读及 Issue 收尾仍待完成；其余门见下文。
 
 DSH 0.2.0-rc.2, Windows Node 24.19.0/Git 2.53.0.windows.2 and WSL Ubuntu 24.04 Node 20.20.2/22.23.3 Git 2.43.0. Only exact tested host versions are verified. Git >=2.32 is required for untracked stash previews. Real model sessions, other host versions and reverse-proxy mount deployment remain unverified. / 实测范围与能力要求分开；不推断未测环境。
 
@@ -39,4 +39,11 @@ Use independent DSH_HOME/profile and throwaway repos; no daily profile or creden
 - Main CI37015175374 at that point: all Windows/Linux × Node20/22 build/artifact/type/syntax/tests passed. / 发布点四组合门通过。
 - Windows clean local clone: npm ci/build/artifact/check/57 tests passed. Rechecked build/artifact from merged HEAD with clean status. / 干净检出与合并发布点的产物一致。
 - Official npm10.9.9 release pack:15 files; integrity sha512-/YOUUZ8fueQk2ZpbXKAovlJIqM5wTOogf2FH1YjoQwko8gOjJjPmrnp87xNElPxf+ds211zJekzGfNkSVZ1iMQ==. It contains closed generated runtime/types, bilingual READMEs,license,patch and hero asset; no engineering/profile/cache files. / 打包闭包及哈希已记录。
-- CHANGELOG English/Chinese date2026-10-02 was committed before upload. Published0.4.0 remains pending account authentication; do not treat prepared pack as a registry release. / 发布日期已提前入提交，准备包不等于正式发布。
+- CHANGELOG English/Chinese date2026-10-02 was committed before upload. Official browser login and the separate publish authentication completed; npm publish --tag next exited0 with a processing notice. This is upload acceptance, not public installability. / 发布日期提前入提交；登录及发布认证完成，唯一一次 publish 返回0并提示处理中，尚不等于公开可安装。
+
+## Public GitHub channel / 公开 GitHub 渠道
+
+- Annotated v0.4.0 points to3d7ec4aafffbe5be0dfc92e26e49bae287636d28. The public [Release](https://github.com/MashedPotato817/dsh-git-plugin/releases/tag/v0.4.0) has bilingual notes and its33644-byte tgz matches the canonical local tarball by SHA512. / tag、Release 与发布点一致，公开附件哈希一致。
+- Official DSH CLI installed github:MashedPotato817/dsh-git-plugin#v0.4.0 in an isolated profile. All15 packed-file SHA256 comparisons matched the clean release checkout. The installed entry passed28 official service checks; an in-memory module hook supplied the same official dsh-tools peer used by the host, without changing installed files. / 固定 tag 正式实装，十五文件一致，实际入口二十八项服务通过。
+- After restarting that profile, scripts/verify-web-actions.mjs passed the complete real browser workflow against a fresh disposable repository: stage/unstage, index-only commit, branches, stash, backup restore, read regression, cancellation, authentication/origin rejection and two enable/disable cycles; zero page errors, Edge154.0.4258.48. / 新临时仓库真实操作、独立 Git 断言、边界及两次启停全部通过。
+- At2026-10-02T13:59Z, the public npm packument still had latest=next=0.3.0 and no0.4.0 version. No second publish was attempted. / 此时 npm 尚未公开新版本，未重复上传。
