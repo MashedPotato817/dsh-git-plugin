@@ -1,6 +1,6 @@
 # 0.4.0 release record / 0.4.0 发布记录
 
-Status: candidate, not published. / 当前为候选，未发布。
+Status: release prepared at the merged point; npm official login pending, not published. / 已合并并完成发布准备，等待 npm 官方登录，尚未发布。
 
 ## Scope / 范围
 
@@ -32,3 +32,11 @@ Pending: final date/SHA CI, release-point artifact gate, public npm/GitHub insta
 DSH 0.2.0-rc.2, Windows Node 24.19.0/Git 2.53.0.windows.2 and WSL Ubuntu 24.04 Node 20.20.2/22.23.3 Git 2.43.0. Only exact tested host versions are verified. Git >=2.32 is required for untracked stash previews. Real model sessions, other host versions and reverse-proxy mount deployment remain unverified. / 实测范围与能力要求分开；不推断未测环境。
 
 Use independent DSH_HOME/profile and throwaway repos; no daily profile or credentials are modified. Final publication must use one new version upload and a single consistent npm gitHead/tag/Release/tree point. / 独立环境与发布一致性约束保持。
+
+## Release point / 发布点
+
+- Final feature b3e442b642590233217fba356c17e3d95273b67f; CI37014950028 and37014955276 all four jobs passed. PR#8 merge point3d7ec4aafffbe5be0dfc92e26e49bae287636d28 has exactly the same tree. / 最终分支与保留历史合并树一致。
+- Main CI37015175374 at that point: all Windows/Linux × Node20/22 build/artifact/type/syntax/tests passed. / 发布点四组合门通过。
+- Windows clean local clone: npm ci/build/artifact/check/57 tests passed. Rechecked build/artifact from merged HEAD with clean status. / 干净检出与合并发布点的产物一致。
+- Official npm10.9.9 release pack:15 files; integrity sha512-/YOUUZ8fueQk2ZpbXKAovlJIqM5wTOogf2FH1YjoQwko8gOjJjPmrnp87xNElPxf+ds211zJekzGfNkSVZ1iMQ==. It contains closed generated runtime/types, bilingual READMEs,license,patch and hero asset; no engineering/profile/cache files. / 打包闭包及哈希已记录。
+- CHANGELOG English/Chinese date2026-10-02 was committed before upload. Published0.4.0 remains pending account authentication; do not treat prepared pack as a registry release. / 发布日期已提前入提交，准备包不等于正式发布。
