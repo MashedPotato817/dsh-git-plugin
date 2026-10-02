@@ -4,8 +4,9 @@
 
 ## 当前基线（2026-10-02）
 
-- 当前 **0.3.0 已完成双渠道发布**，latest=next=0.3.0（2026-10-02 核对）。PR #6 发布点 85fa7d1c4a7e6f7c274d83df242d10c65e319d24 与 npm gitHead、annotated v0.3.0、公开 Release/tgz 一致；两个实际安装 spec 均通过十三文件对比、各 28 项官方服务和真实 Web 验收，详见 docs/release-report-0.3.0.md。
-- 上一已发布包版本 0.2.1；PR #4 已保留历史合并，发布点为 084a767aa3055d5cb0e06ddf4fb42dda4156458c。npm latest=next=0.2.1、annotated tag 与公开 GitHub Release 均已核对该发布点，双渠道独立实装和各 28 项服务栈通过。市场 PR #6296 已于 2026-10-01 关闭且未合并、无说明评论，不宣称已收录，详见 docs/release-report-0.2.1.md。
+- 当前 **0.4.0 已完成双渠道发布**，latest=next=0.4.0（2026-10-02 核对）。PR #8 发布点 `3d7ec4aafffbe5be0dfc92e26e49bae287636d28` 与 npm gitHead、annotated v0.4.0、公开 Release/tgz 一致；两渠道正式安装均通过十五文件对比、各 28 项官方服务及完整 Web 操作。Issue #1 已回复并按完成关闭，详见 `docs/release-report-0.4.0.md`。
+- 上一版本 **0.3.0**：PR #6 发布点 `85fa7d1c4a7e6f7c274d83df242d10c65e319d24`；其 tag、npm 包及只读发布不可覆盖。当时双渠道十三文件、各 28 项服务与真实 Web 验收通过，见 `docs/release-report-0.3.0.md`。
+- 历史 0.2.1；PR #4 已保留历史合并，发布点为 084a767aa3055d5cb0e06ddf4fb42dda4156458c。当时 npm latest=next=0.2.1、annotated tag 与公开 GitHub Release 均已核对该发布点，双渠道独立实装和各 28 项服务栈通过。市场 PR #6296 已于 2026-10-01 关闭且未合并、无说明评论，不宣称已收录，详见 docs/release-report-0.2.1.md。
 
 - 主工作目录：`C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`；先确认所在 checkout，避免把改动写到另一 worktree。
 - 适配已提交：`8181856`，包含严格 TypeScript 迁移、DSH 0.2.0-rc.2 适配、Git 参数安全/超时/钩子目录修复、测试与文档。
@@ -17,10 +18,10 @@
 
 ## 当前开发任务
 
-- PR #6 已保留历史合并 Issue #1 首版只读面板为 0.3.0，发布点 85fa7d1c4a7e6f7c274d83df242d10c65e319d24；GitHub v0.3.0 已公开，固定 tag 实装的 28 项服务及真实 Web 通过。npm 注册表可见、正式实装及 latest=next=0.3.0 已确认；实际状态见 docs/release-report-0.3.0.md；旧版本不可覆盖；当前明确目标已授权补完整 GUI 操作，正式实装验收后关闭 Issue #1。
+- PR #8 在 0.3.0 只读首期基础上，以 **0.4.0** 发布 Issue #1 的完整 GUI 操作。两种公开安装 spec 的真实入口及浏览器验收、latest=next=0.4.0 与 Issue 关闭均已确认。已发布包和 tag 不可覆盖；后续证据提交不移动发布点。
 - README / CONTRIBUTING / AGENTS 采用英文主文档和 `_ZH.md` 中文对应页；面板使用文档同样配对，修改时同步事实、命令和验收边界。
 - 新 Web 证据见 `docs/web-panel-validation.md`；不能将旧发布点的 CI 当作本分支 CI。
-- 当前源码为 src/index.ts、src/web-host.ts、src/panel-types.ts 和 src/client/；客户端通过小型构建生成官方 loader 包装，复用宿主 React，不手改 lib/client.js、不捆绑第二份 React。
+- 当前源码为 src/index.ts、src/web-host.ts、src/web-actions.ts、src/panel-types.ts 和 src/client/；客户端通过小型构建生成官方 loader 包装，复用宿主 React，不手改 lib/client.js、不捆绑第二份 React。
 - Web 从运行中／持久化 Session 获取 cwd；拒绝请求提供任意 cwd/root/argv，限制相对路径、literal pathspec、external diff/textconv。DSH 0.2.0-rc.2 是单一已准入 operator，并无按租户分隔的 Session ACL，不能宣称租户隔离。
 - 禁用时清理 UI、样式、tab、slot、路由和进行中的请求；切换会话后旧响应不能覆盖新视图。真实 Web 验收脚本 scripts/verify-web-panel.mjs 按需运行，不进入 npm test/CI。
 
@@ -48,8 +49,8 @@
 ## 后续顺序与发布
 
 - P1：`0.2.1` 双渠道发布、bundle 自动启用、README 展示与市场收录申请已完成；市场 PR #6296 已关闭未合并、无说明评论；目录没有本仓库精确匹配，不宣称已收录。GUI 另开阶段。
-- P2：[Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1) 的 Web 只读 Git 面板：状态、diff、历史首期已实现；继续补验及用户验收。
-- P3：再考虑 stage/commit/branch/stash 等写操作，核对 DSH 权限与审批及恢复方式。
+- P2：状态、diff、历史只读面板已在 0.3.0 发布。
+- P3 / [Issue #1](https://github.com/MashedPotato817/dsh-git-plugin/issues/1)：暂存／取消暂存、仅暂存提交、本地分支、stash 与备份还原已在 0.4.0 双渠道验收发布，Issue 已完成关闭。GUI 人工确认与需要 open turn 的模型审批分开；未来远端操作先另定范围与设计。
 - 版本文件、CHANGELOG、源码、编译配置、测试和 `lib/` 一起纳入发布提交；确保 tag、Release、npm gitHead 与包内产物对应同一提交。
 - 同一版本只 `npm publish --tag next` 一次；验证通过后用 `npm dist-tag add dsh-git-plugin@<版本> latest` 推广。需要修改已发布内容时提升版本。
 - `AGENTS.md`、`docs/`、`.agent-teams/` 不进入 npm files；已发布 0.2.1 实际为 7 文件；当前开发包增加 Web 产物及 README_ZH，按实际 pack 文件表核验。原 0.2.0 发布包仍为 5 文件，不可覆盖；缓存与独立测试目录保持忽略。
@@ -66,7 +67,7 @@
 
 ## 后续任务入口（2026-10-01 核查）
 
-- 任务分包见 [docs/dsh-tasks/README.md](docs/dsh-tasks/README.md)：03–05 已完成并发布；06 仅余挂载前缀/真实慢 Web 请求取消，07 的审批与恢复设计已由当前 Git 操作契约实现；逐包推进。
+- 任务分包见 [docs/dsh-tasks/README.md](docs/dsh-tasks/README.md)：01–05 与 07 已完成；06 仅余挂载前缀／真实慢 Web 请求取消的可选补验。不要重复历史实现、发布或 Issue 关闭任务。
 - 原候选 feba7b8，定时器修复 922408d，发布点 c83f332；PR/main 当前 SHA CI 均通过，协作文档与模板已进入默认分支。包 02 的 npm、GitHub、latest 推广与双渠道安装均完成；随后 03–05 的只读 Web 已实现为 0.3.0，继续 06/07 的剩余项目。
 - Linux Node 20/22 已用**隔离运行时**（WSL2 Ubuntu 24.04，`~/dsh-node-runtimes/node-v20.20.2-linux-x64`、`node-v22.23.3-linux-x64`）完成修复后 build/check/test 复验；修复候选 922408d 的 npm ci/build/产物门/check/语法/test/pack 全部通过。系统 Node 18.19.1 未用于验证。证据见 `docs/validation-report-0.2.0.md`。未推送 SHA 的干净检出从本地主仓库克隆。
 
@@ -86,10 +87,10 @@
 
 ## 当前完整目标
 
-按 docs/superpowers/specs/2026-10-02-git-actions-design.md 实施暂存/取消暂存、仅暂存提交、分支、stash 和备份还原。人工 GUI 写确认独立于需要 open turn 的模型审批；同源 JSON、一次性确认、状态复核，不伪造模型回合。完整实装/CI/双渠道发布后回复并关闭 Issue #1，不把只读首期当作完整交付。
+docs/superpowers/specs/2026-10-02-git-actions-design.md 的完整操作已通过正式实装／CI／双渠道发布，Issue #1 已关闭。维护同源 JSON、一次性确认与状态复核；人工 GUI 写确认独立于需要 open turn 的模型审批，不伪造模型回合。
 
-## 0.4.0 候选
+## 0.4.0 验证与维护
 
-- 源码提交：8b9efc1 操作，293ff98 内容预览，9871360 原生 Host/Origin，da406ac 刷新保留操作区。最后界面小修前 Windows build/check 和 55 项测试通过；小修后的客户端与类型检查通过。a44650c 修复审查指出的 rename/stash 范围，完整 Windows build/check/57 项通过；发布前须复跑最终候选／CI／正式安装 Web。
+- 发布点 Windows/Linux × Node20/22 四组合 CI 通过，干净构建／产物／类型／语法及完整 57 项测试通过；两种正式安装均通过完整真实 Web 操作与各 28 项宿主检查。维护审查修复的 rename 路径、stash 仅暂存预览及原生 Host/Origin 转发回归覆盖。
 - 新 Web 能力要求 Git 2.32（stash show --include-untracked），仅实际测试版本声明已验证。原生 bridge 的 URL 为 dsh.internal，强制 Origin 绑定已受信 Host authority。
 - 每个开发 SHA 使用不同 tarball 文件路径，避免 pnpm 同名缓存；比较实际安装 lib 哈希并重启独立 profile，不手改安装产物。

@@ -1,5 +1,7 @@
 # Web panel validation / Web 面板验收
 
+> Historical first-phase evidence. The read-only panel shipped in0.3.0; full confirmed GUI operations shipped in0.4.0 and Issue #1 is closed. Current installed/publication evidence: [0.4.0 report](release-report-0.4.0.md). Mount-prefix and actual slow-Web cancellation coverage remain optional follow-up. / 下文是首期历史证据；只读面板已于 0.3.0 发布，完整 GUI 操作已于 0.4.0 双渠道验收发布且 Issue 已关闭。前缀／真实慢 Web 请求取消仍待可选补验。
+
 Date / 日期：2026-10-01. Scope / 范围：Issue #1 read-only first phase on `feat/web-git-panel`, **unreleased / 未发布**. This record pairs English and Chinese within each section.
 
 ## Baseline and implementation / 基线与实现

@@ -4,9 +4,10 @@ English · [简体中文](AGENTS_ZH.md)
 
 ## Baseline (2026-10-02)
 
-- Published **0.3.0**, latest=next=0.3.0 (2026-10-02 audit). PR #6 release point 85fa7d1c4a7e6f7c274d83df242d10c65e319d24 matches npm gitHead, annotated v0.3.0 and public GitHub Release/tgz. Both channel installs passed all thirteen file comparisons, 28 official-service checks each and real Web acceptance. See docs/release-report-0.3.0.md.
+- Published **0.4.0**, latest=next=0.4.0 (2026-10-02 audit). PR #8 release point `3d7ec4aafffbe5be0dfc92e26e49bae287636d28` matches npm gitHead, annotated v0.4.0 and public GitHub Release/tgz. Both channel installs passed all fifteen file comparisons, 28 official-service checks each and the complete real Web workflow. Issue #1 was replied to and closed as completed. See `docs/release-report-0.4.0.md`.
+- Previous **0.3.0** release point: PR #6, `85fa7d1c4a7e6f7c274d83df242d10c65e319d24`. Its tag, npm package and read-only release are immutable. At that release audit both channel installs passed thirteen file comparisons, 28 service checks each and real Web acceptance. See `docs/release-report-0.3.0.md`.
 - Working repository: `C:/Users/Mashed Potato/Desktop/npm/dsh-git-plugin`. Check the actual checkout; do not edit another worktree inadvertently.
-- Previous published package: **0.2.1**. PR #4 preserved history; release point `084a767aa3055d5cb0e06ddf4fb42dda4156458c` matches npm gitHead, annotated v0.2.1, and public GitHub Release. At the last release audit, latest=next=0.2.1. Channel installs and 28 official-service checks per installed entry passed. See `docs/release-report-0.2.1.md`.
+- Historical **0.2.1** package: PR #4 preserved history; release point `084a767aa3055d5cb0e06ddf4fb42dda4156458c` matches npm gitHead, annotated v0.2.1, and public GitHub Release. At that release audit, latest=next=0.2.1. Channel installs and 28 official-service checks per installed entry passed. See `docs/release-report-0.2.1.md`.
 - Historical 0.2.0 release point: `c83f3322950b0892022d6b3efd1e4f6edbed5be8`, PR #2. Its package contained five files; do not replace it or move its tag. See `docs/release-report-0.2.0.md`.
 - Adaptation commit `8181856` introduced strict TypeScript, DSH 0.2.0-rc.2 compatibility and argv/deadline/hook-directory fixes. Timer correction `922408d` removed unref from deadline/grace timers: Linux Node 20/22 could otherwise drain the event loop before timeout. Keep timers referenced and clear them when done.
 - Historical verification: 26 original tests; Windows Node 24.19.0 / Git 2.53.0.windows.2; isolated WSL2 Ubuntu 24.04 Node 20.20.2 / 22.23.3 and Git 2.43.0; clean artifact gate and release-point CI passed. See `docs/validation-report-0.2.0.md`.
@@ -15,8 +16,8 @@ English · [简体中文](AGENTS_ZH.md)
 
 ## Current development
 
-- PR #6 merged the first read-only right-sidebar panel for Issue #1 as **0.3.0**, release point 85fa7d1c4a7e6f7c274d83df242d10c65e319d24. GitHub v0.3.0 is public and its installed entry passed 28 service checks plus real Web acceptance. npm registry availability, installed-package acceptance and latest=next=0.3.0 are confirmed. See docs/release-report-0.3.0.md. Published versions remain immutable. The current explicit goal authorizes completing GUI operations in a new release, then closing Issue #1 after real acceptance.
-- Source: `src/index.ts`, `src/web-host.ts`, browser-safe `src/panel-types.ts`, `src/client/`. Build Host declarations/JS and generated `lib/client.js`; keep ESM and existing commands/tools.
+- PR #8 released the complete Issue #1 GUI workflow as **0.4.0**, following the read-only 0.3.0 release. Both public installation specs passed installed-entry and browser acceptance; latest=next=0.4.0 and Issue closure are confirmed. Published versions and release tags remain immutable; evidence-only follow-up commits do not move the release point.
+- Source: `src/index.ts`, `src/web-host.ts`, `src/web-actions.ts`, browser-safe `src/panel-types.ts`, `src/client/`. Build Host declarations/JS and generated `lib/client.js`; keep ESM and existing commands/tools.
 - English primary documents and `_ZH.md` counterparts: README, CONTRIBUTING, AGENTS; also paired Web usage documents. Synchronize facts, commands and validation boundaries. README stays a short product page; engineering details belong in CONTRIBUTING/docs and maintenance constraints here. Do not add a skill just for a documentation edit.
 - Web evidence: `docs/web-panel-validation.md`. Old release CI does not certify a new development SHA.
 
@@ -52,8 +53,8 @@ English · [简体中文](AGENTS_ZH.md)
 
 - The 0.3.0 dual channels, bundle registration and read-only panel are released. Market PR #6296 closed unmerged and the 2026-10-02 public catalog has zero exact repository matches; investigate separately before claiming search/install availability.
 - P2 / Issue #1 is released: read-only status, diff and history; reuse the sidebar carrier, not turn-based workspace-change summaries. That summary excludes pre-existing edits and is not an index/worktree Git source.
-- P3 / current authorized work: stage/unstage, staged-only commit, branches, stash and backup restore are implemented; finish installed acceptance and publish 0.4.0 before closing the issue. Native approval.request requires an open model turn; explicit operator GUI confirmation is separate, never a fabricated turn or a model-tool grant. See docs/superpowers/specs/2026-10-02-git-actions-design.md.
-- Stage prompts: `docs/dsh-tasks/README.md`; 03–05 are complete, 06 has mount-prefix/slow Web cancellation remaining, 07 design is implemented by the current Git actions contract. Adapt them to actual completed evidence rather than repeating historical instructions. Plan/history documents remain clearly dated.
+- P3 / Issue #1 is complete in 0.4.0: stage/unstage, staged-only commit, local branches, stash and backup restore passed both public installed workflows. Native approval.request requires an open model turn; explicit operator GUI confirmation is separate, never a fabricated turn or a model-tool grant. See docs/superpowers/specs/2026-10-02-git-actions-design.md. Future remote operations require a new scoped design.
+- Stage prompts: `docs/dsh-tasks/README.md`; 01–05 and 07 are complete. Only 06 mount-prefix/slow Web cancellation evidence remains optional follow-up. Do not repeat historical implementation, release or Issue-closure instructions. Plan/history documents remain clearly dated.
 - A successful publish exit/HTTP 202 is acceptance, not installability. Allow official scanning and registry propagation; check actual availability/gitHead/tarball and installed behavior before latest promotion. A successful dist-tag write also requires a confirming tag read; do not repeat publish to address delays.
 - Finalize release date before publish. Version/lock/CHANGELOG/source/types/lib and tag/Release/npm gitHead/artifacts identify one release point. Publish each version once to next, verify, then promote with dist-tag. Changed published content needs a new version.
 - AGENTS/docs/team state are engineering resources, not npm runtime files. Pack only closed runtime outputs, bilingual READMEs, license, patch and referenced assets; verify actual file list. Published 0.2.0/0.2.1 contents are immutable.
@@ -61,13 +62,13 @@ English · [简体中文](AGENTS_ZH.md)
 ## Community collaboration
 
 - CONTRIBUTING and bilingual issue/PR templates describe triage, scope, ownership, evidence, review and release. Labels and branch protection are separate settings; do not claim templates enabled them.
-- Use `Refs #1` for the read-only first phase; do not close the whole issue merely because a draft/partial UI exists.
+- Issue #1 was closed after complete public-install acceptance of 0.4.0. Link new defects or feature requests to it for context; do not repeat the release response or reopen it merely to track unrelated follow-up.
 - Root screenshots.json references the capability illustration and actual released read-only panel screenshots in docs/images. The banner is an illustration; panel images use isolated fixture repositories. Catalog readiness and catalog inclusion are different states.
 - Old manual inserts must migrate to id/config overrides when enabling the bundle. DSH 0.2.0-rc.2 does not automatically add a bundle layer when upgrading an old ordinary dependency.
 - Preserve the isolated WSL runtimes `~/dsh-node-runtimes/node-v20.20.2-linux-x64` and `node-v22.23.3-linux-x64` unless removal is specifically requested. System Node 18 was not used for the prior matrix.
 
-## 0.4.0 candidate
+## 0.4.0 verification and maintenance
 
-- Source commits: 8b9efc1 actions, 293ff98 content previews, 9871360 native Host/Origin seam, da406ac retained controls on refresh. Windows build/check and 55 tests passed before the last UI-only fix; its client test and type check passed. a44650c fixes reviewed rename/stash scope and passed full Windows build/check/57 tests. Run final candidate checks/CI and installed Web before release.
+- Release-point Windows/Linux × Node20/22 CI passed all four jobs, as did clean builds/artifact/type/syntax gates and all57 tests. Both public specs passed the full actual browser workflow and28 real-service checks each. Preserve regression coverage for reviewed rename paths, stash index-only previews and native Host/Origin forwarding.
 - New Web minimum Git 2.32 is required for stash show --include-untracked; only actual tested versions may be claimed verified. Connection HTTP bridge uses dsh.internal URL; validate mandatory Origin against its trusted Host authority.
 - Use a unique development tarball path per SHA; pnpm can cache a repeated filename. Compare installed lib hashes, restart the isolated profile, and never hand-edit installed outputs.

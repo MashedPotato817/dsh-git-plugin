@@ -1,6 +1,6 @@
 # 0.4.0 release record / 0.4.0 发布记录
 
-Status: npm0.4.0 and GitHub v0.4.0 are public; both installed acceptance runs passed. latest promotion and Issue closure remain pending. / npm 与 GitHub 均已公开，双渠道正式实装通过；latest 推广及 Issue 收尾尚未完成。
+Status: **complete**. npm latest=next=0.4.0, public GitHub v0.4.0, both installed acceptance runs passed; Issue #1 is closed as completed. / **发布完成**：双渠道正式实装通过，latest=next=0.4.0，Issue #1 已回复并关闭。
 
 ## Scope / 范围
 
@@ -25,9 +25,9 @@ Important documents are paired English/Chinese. GUI labels are Chinese. No remot
 - Current-candidate push CI37014384527 and PR CI37014560238: all four Windows/Linux × Node20/22 jobs passed. / 两组四平台组合 CI 通过。
 - Independent reviewer verified a44650c and reproduced the fixes; no remaining release blockers. / 独立审查无剩余发布阻断问题。
 - Actual narrow dark screenshot: [Git actions](images/git-actions-dark.png),343px panel; synthetic fixture only. / 已检查真实窄侧栏截图，不含日常仓库数据。
-- npm account check returned401; public metadata confirms0.4.0 unused and latest=next=0.3.0. Official web login will be required after release preparation. / 当前登录过期，发布前需要官方网页认证，不要求聊天发送秘密。
+- Before publication, the account check returned401 and public metadata confirmed0.4.0 unused with latest=next=0.3.0. Subsequent official web login and publish authentication completed as recorded below. / 发布前曾登录过期且新版本未占用；后续官方登录及认证已完成，见下文。
 
-Pending: latest readback, Issue reply/closure. Final date/SHA CI, release-point artifact gate and both public installs passed below. / 标签回读及 Issue 收尾仍待完成；其余门见下文。
+Final date/SHA CI, release-point artifact gate, both public installs, latest readback and Issue closure passed below. / 发布门、双渠道实装、标签回读及 Issue 收尾全部完成，见下文；未测环境不据此宣称通过。
 
 DSH 0.2.0-rc.2, Windows Node 24.19.0/Git 2.53.0.windows.2 and WSL Ubuntu 24.04 Node 20.20.2/22.23.3 Git 2.43.0. Only exact tested host versions are verified. Git >=2.32 is required for untracked stash previews. Real model sessions, other host versions and reverse-proxy mount deployment remain unverified. / 实测范围与能力要求分开；不推断未测环境。
 
@@ -53,4 +53,10 @@ Use independent DSH_HOME/profile and throwaway repos; no daily profile or creden
 - Registry publication time2026-10-02T14:00:13.691Z. npm0.4.0 gitHead equals3d7ec4aafffbe5be0dfc92e26e49bae287636d28. Metadata integrity and the downloaded tgz SHA512 match the canonical pack and GitHub public asset. next=0.4.0 was confirmed. / 注册表新版本已公开，提交、元数据与真实下载包哈希一致，next 已回读。
 - The official DSH CLI replaced the isolated profile dependency with dsh-git-plugin@0.4.0. All15 file comparisons passed; the actual installed entry passed28 official service checks. The same independent profile was tested sequentially for both specs, never a daily profile. / npm 精确版本正式安装，十五文件及二十八项实际入口检查通过；两渠道在同一独立 profile 顺序替换验证。
 - After restart, a separate fresh npm-run/actions-repo fixture passed the entire real browser workflow and independent Git assertions, authentication/Origin boundaries, confirmation cancellation, two lifecycle cycles and zero page errors. Edge154.0.4258.48; DSH0.2.0-rc.2 on Linux Node22.23.3/Git2.43.0. / 正式 npm 安装的独立新仓库也通过完整 Web 验收。
-- Promotion invokes dist-tag add dsh-git-plugin@0.4.0 latest; its separate official browser authentication is pending. Do not republish. / 正在单独认证推广 latest，不重复 publish。
+- After installed acceptance, dist-tag add dsh-git-plugin@0.4.0 latest completed its separate official browser authentication and exited0. Both the dist-tags endpoint and package packument confirmed latest=next=0.4.0. Exactly one publish and one promotion invocation were used. / 实装通过后推广成功，两个注册表入口回读一致；仅上传一次、推广一次。
+
+## Issue completion and maintenance / Issue 收尾与维护
+
+- [Bilingual completion reply](https://github.com/MashedPotato817/dsh-git-plugin/issues/1#issuecomment-5954190626) posted2026-10-02T14:04:32Z. Issue #1 closed as completed at14:04:34Z; GitHub API state=CLOSED was confirmed. / 双语回复含安装、范围、验收及指南，完成关闭已回读。
+- Maintenance baseline and task-package handoff are synchronized in English/Chinese. Packages01–05 and07 are complete; package06's reverse-proxy mount prefix and actual slow-Web cancellation remain optional environment coverage, along with model sessions/other DSH versions. They do not block the accepted Issue #1 workflow. / 双语基线与分包同步；剩余环境补验与本次完成范围明确分开。
+- Evidence-only commits follow the immutable release point; do not move v0.4.0 or republish its content when merging this report. Cleanup is limited to owned test profiles, browser fixtures and authentication files; preserve shared Node runtimes, daily profiles and the unrelated managed worktree. / 证据提交不移动发布点，清理仅限本次独立环境，保留共享运行时及日常数据。

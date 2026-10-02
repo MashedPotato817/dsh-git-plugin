@@ -1,6 +1,6 @@
 <!-- Historical maintenance analysis below; current development supersedes its dated snapshots. -->
 
-> 2026-10-02 当前：0.3.0 已双渠道发布，完整 Git 操作进入 0.4.0 候选。发布顺序仍为最终提交 → PR 保留历史合并 → 干净产物/CI → 单次 next publish → 双渠道实装 → latest → Issue 完成。当前基线与证据见 AGENTS.md / docs/release-report-0.4.0.md；下文旧版本表、社区数量及“尚未实现”属于日期所示历史。
+> Current2026-10-02:0.4.0 released on both channels, latest=next=0.4.0, installed service/Web acceptance passed and Issue #1 closed. / 当前 0.4.0 双渠道发布完成，正式实装服务／Web 通过，Issue #1 已关闭。发布顺序仍为最终提交 → PR 保留历史合并 → 干净产物/CI → 单次 next publish → 双渠道实装 → latest → Issue 完成。当前基线与证据见 AGENTS.md / docs/release-report-0.4.0.md；下文旧版本表、社区数量及“尚未实现”属于日期所示历史。
 
 # dsh-git-plugin 维护计划
 
