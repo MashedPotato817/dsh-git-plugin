@@ -19,20 +19,20 @@ English · [简体中文](README_ZH.md)
 
 ## Keep Git in your DSH session
 
-Inspect changes, create branches, run pre-commit checks, and keep recoverable snapshots. **Read-only Web panel + 5 slash commands + 4 read-only model tools** give you and your agent the same view of the repository.
+Inspect changes, create branches, run pre-commit checks, and keep recoverable snapshots. **Web Git panel + 5 slash commands + 4 read-only model tools** give you and your agent the same view of the repository.
 
 - **See the changes** — branch, working tree, staged / unstaged diff, and history.
 - **Commit with checks** — branch and commit directly in your session.
 - **Keep a snapshot** — stash current changes, then list or restore them.
 
-Version: **0.3.0**. Verified host: **DSH 0.2.0-rc.2**. Requires Node.js ≥20 and Git ≥2.24. [Compatibility and validation](CONTRIBUTING.md#compatibility-and-validation).
+Version: **0.4.0**. Verified host: **DSH 0.2.0-rc.2**. Requires Node.js ≥20 and Git ≥2.32. [Compatibility and validation](CONTRIBUTING.md#compatibility-and-validation).
 
 ## Install
 
 Use your active profile; replace `web` as needed:
 
 ```bash
-dsh plugin --profile web add dsh-git-plugin@0.3.0
+dsh plugin --profile web add dsh-git-plugin@0.4.0
 ```
 
 New installations register the plugin automatically. Restart that profile's DSH process and refresh the browser when using Web.
@@ -41,7 +41,11 @@ Upgrading a manually enabled 0.2.0 profile? Follow the [migration steps](docs/ma
 
 ## Git in the Web sidebar
 
-Open a repository workspace/session, expand the right sidebar and select **Git**. See branch/file states, switch between staged and unstaged diffs, and browse commit history/detail. The panel is read-only; Git writes use the existing slash commands. [Panel guide](docs/web-panel.md).
+Open a repository workspace/session, expand the right sidebar and select **Git**. See branch/file states, switch between staged and unstaged diffs, and browse commit history/detail. Stage selected files or all changes, commit only the index, manage branches/stashes, and restore files with a retained backup. Every write opens a preview and requires your confirmation. [Panel guide](docs/web-panel.md).
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MashedPotato817/dsh-git-plugin/main/docs/images/git-actions-dark.png" width="343" alt="Actual DSH Web Git action panel in a disposable test repository">
+</p>
 
 ## Use
 
@@ -64,7 +68,7 @@ The model can use `git-status`, `git-diff`, `git-log`, and `git-show`. For examp
 
 > Check Git status, diff, and the last five commits. Explain what is staged and what to verify before committing.
 
-**Commit scope:** `/commit <message>` stages all changes in the target repository before committing. Check the scope first. Without a message it only shows guidance and changes.
+**Commit scope:** the Web commit uses only staged changes. `/commit <message>` stages all changes in the target repository before committing. Check the scope first. Without a message it only shows guidance and changes.
 
 **Snapshots:** `/undo` stashes working-tree changes, including untracked files. It does not revert commits. Restoring with `pop` may produce conflicts.
 
@@ -79,7 +83,7 @@ Need longer timeouts or a test hook? See [configuration](CONTRIBUTING.md#configu
 - [Web panel](docs/web-panel.md) · development preview and validation
 - [Maintenance instructions](AGENTS.md) · engineering constraints
 
-Version 0.3.0 adds the first read-only Web panel for Issue #1. Market inclusion is tracked separately. Presentation inspired by [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams); the SVG banner is original.
+Version 0.4.0 completes the Git operation panel requested in Issue #1. Market inclusion is tracked separately. Presentation inspired by [dsh-agent-teams](https://github.com/NanmiCoder/dsh-agent-teams); the SVG banner is original.
 
 ## License
 

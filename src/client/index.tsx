@@ -12,6 +12,7 @@ import type {
 	FileState,
 } from "../panel-types.js";
 import styles from "./panel.css";
+import {Actions} from "./actions.js";
 
 export const inject = ["slots", "sidebarRightTabs"];
 const ID = "dsh-git-plugin";
@@ -351,6 +352,7 @@ export function GitPanel({ sessionId, useTabInfo }: PanelProps): ReactNode {
 						)}
 					</>
 				)}
+				{mode === "files" && <Actions sessionId={sessionId} signal={tab.signal} revision={revision} files={files} selected={selection && "path" in selection ? selection.path : undefined} onChange={()=>{setSelection(null);setRevision(n=>n+1)}}/>}
 				{selection && (
 					<section className="gp-detail" aria-label="Git 详情">
 						<div className="gp-detail-head">
@@ -397,7 +399,7 @@ export function GitPanel({ sessionId, useTabInfo }: PanelProps): ReactNode {
 					</section>
 				)}
 			</div>
-			<footer className="gp-footer">只读 · 数据来自当前会话的 Git 仓库</footer>
+			<footer className="gp-footer">当前会话仓库 · 写操作须先预览并确认</footer>
 		</section>
 	);
 }
@@ -420,7 +422,7 @@ export function apply(ctx: Context): void {
 					id: "git",
 					order: 30,
 					title: () => "Git",
-					description: () => "文件状态、diff 与提交历史",
+					description: () => "状态、diff、历史与 Git 操作",
 				},
 			],
 		}),
