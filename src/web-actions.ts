@@ -159,13 +159,23 @@ function validate(value: Record<string, unknown>): ActionInput {
 async function bodyOf(request: Request): Promise<Record<string, unknown>> {
   // The official HTTP bridge uses dsh.internal in Request.url. Connection has
   // already fenced the real Host; bind the mandatory browser Origin to it.
-  const origin=request.headers.get("origin"),host=request.headers.get("host");
-  let trusted=false;
+  const origin = request.headers.get("origin"),
+    host = request.headers.get("host");
+  let trusted = false;
   try {
-    const source=new URL(origin??""),authority=new URL("http://"+(host??""));
-    trusted=!!host&&!!origin&&["http:","https:"].includes(source.protocol)&&source.origin===origin&&source.host===authority.host&&!authority.username&&!authority.password&&authority.pathname==="/";
-  }catch{}
-  if(!trusted)fail("foreign-origin", "写操作必须来自当前 DSH 页面。", 403);
+    const source = new URL(origin ?? ""),
+      authority = new URL("http://" + (host ?? ""));
+    trusted =
+      !!host &&
+      !!origin &&
+      ["http:", "https:"].includes(source.protocol) &&
+      source.origin === origin &&
+      source.host === authority.host &&
+      !authority.username &&
+      !authority.password &&
+      authority.pathname === "/";
+  } catch {}
+  if (!trusted) fail("foreign-origin", "写操作必须来自当前 DSH 页面。", 403);
   if (
     !request.headers
       .get("content-type")
@@ -209,6 +219,24 @@ async function lists(git: Git): Promise<OperationsView> {
       return { sha: sha!, ref: ref!, message: message.join("\0") };
     });
   return { branches, stashes };
+}
+/** Use the same exact path scope for review and mutation. A staged rename's
+ * old name is no longer in the index; staging it could add an unrelated new file. */
+function effectivePaths(input: ActionInput, files: FileState[]): string[] {
+  return [
+    ...new Set(
+      (input.paths ?? []).flatMap((p) => {
+        const f = files.find((f) => f.path === p);
+        const source =
+          f?.oldPath &&
+          ((input.action === "unstage" && f.index === "R") ||
+            (input.action === "stage" &&
+              f.worktree === "R" &&
+              f.index !== "R"));
+        return source ? [p, filePath(f.oldPath)] : [p];
+      }),
+    ),
+  ];
 }
 /** Authenticated operator writes; separate from model tool approval and never opens an artificial turn. */
 export function registerWebActions(
@@ -307,7 +335,8 @@ export function registerWebActions(
       "-uall",
     ]);
     const files = parseStatus(status).files;
-    for (const name of input.paths ?? []) await safeParents(root, name, signal);
+    const selected = effectivePaths(input, files);
+    for (const name of selected) await safeParents(root, name, signal);
     const head =
       (await git(["rev-parse", "--verify", "--quiet", "HEAD"], true)).trim() ||
       null;
@@ -343,7 +372,7 @@ export function registerWebActions(
     const relevant = files.filter(
       (f) =>
         f.untracked &&
-        (input.action === "stash-save" || input.paths?.includes(f.path)),
+        (input.action === "stash-save" || selected.includes(f.path)),
     );
     let remaining = caps.maxBytes;
     const untrackedPreview: string[] = [];
@@ -364,7 +393,9 @@ export function registerWebActions(
       const bytes = await ctx.fs.readBytes(target, signal, remaining);
       remaining -= bytes.byteLength;
       hash.update(JSON.stringify([f.path, bytes.byteLength])).update(bytes);
-      untrackedPreview.push(`Untracked: ${f.path}\n${bytes.includes(0) ? "[binary file]" : new TextDecoder().decode(bytes)}`);
+      untrackedPreview.push(
+        `Untracked: ${f.path}\n${bytes.includes(0) ? "[binary file]" : new TextDecoder().decode(bytes)}`,
+      );
     }
     return {
       hash: hash.digest("hex"),
@@ -441,13 +472,66 @@ export function registerWebActions(
       restore:
         "先把所有已跟踪改动备份到保留的 stash，再将选定文件工作区还原为暂存区内容；未跟踪文件保留。",
     };
-    let preview = input.action === "commit" ? state.index : [state.index, state.worktree, state.untrackedPreview].filter(Boolean).join("\n");
-    if(input.paths) {
-      const paths=input.paths.flatMap(p=>{const f=state.files.find(f=>f.path===p);return f?.oldPath?[p,f.oldPath]:[p]});
-      preview = await git(["diff", ...(input.action === "unstage" ? ["--cached"] : []), "--binary", "--no-ext-diff", "--no-textconv", "--", ...paths]);
-      if(input.action === "stage")preview += state.untrackedPreview;
+    let preview =
+      input.action === "commit"
+        ? state.index
+        : [state.index, state.worktree, state.untrackedPreview]
+            .filter(Boolean)
+            .join("\n");
+    if (input.paths) {
+      const paths = effectivePaths(input, state.files);
+      preview = await git([
+        "diff",
+        ...(input.action === "unstage" ? ["--cached"] : []),
+        "--binary",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--",
+        ...paths,
+      ]);
+      if (input.action === "stage") preview += state.untrackedPreview;
     }
-    if(input.sha)preview=await git(["stash","show","--include-untracked","--patch","--binary","--no-ext-diff","--no-textconv",input.sha]);
+    let stashPaths: string[] | undefined;
+    if (input.sha) {
+      const indexArgs = [input.sha + "^1", input.sha + "^2"];
+      const indexPreview = await git([
+        "diff",
+        "--binary",
+        "--no-ext-diff",
+        "--no-textconv",
+        ...indexArgs,
+      ]);
+      const treePreview = await git([
+        "stash",
+        "show",
+        "--include-untracked",
+        "--patch",
+        "--binary",
+        "--no-ext-diff",
+        "--no-textconv",
+        input.sha,
+      ]);
+      preview = [
+        indexPreview ? "Stash index changes:\n" + indexPreview : "",
+        treePreview
+          ? "Stash worktree / untracked changes:\n" + treePreview
+          : "",
+      ]
+        .filter(Boolean)
+        .join("\n");
+      const names = await git(["diff", "--name-only", "-z", ...indexArgs]);
+      const treeNames = await git([
+        "stash",
+        "show",
+        "--include-untracked",
+        "--name-only",
+        "-z",
+        input.sha,
+      ]);
+      stashPaths = [
+        ...new Set((names + treeNames).split("\0").filter(Boolean)),
+      ];
+    }
     return {
       token,
       expiresAt: new Date(expires).toISOString(),
@@ -457,7 +541,7 @@ export function registerWebActions(
       description: descriptions[input.action],
       preview,
       paths:
-        input.paths ??
+        (input.paths ? effectivePaths(input, state.files) : stashPaths) ??
         state.files
           .filter(
             (f) =>
@@ -474,11 +558,7 @@ export function registerWebActions(
     root: string,
     signal: AbortSignal,
   ): Promise<ActionResult> {
-    const paths =
-      input.paths?.flatMap((p) => {
-        const f = state.files.find((f) => f.path === p);
-        return f?.oldPath ? [p, f.oldPath] : [p];
-      }) ?? [];
+    const paths = effectivePaths(input, state.files);
     let text = "";
     switch (input.action) {
       case "stage":

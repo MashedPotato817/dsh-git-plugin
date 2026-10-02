@@ -328,9 +328,53 @@ test("write mutation lock, disable and deadline abort in-flight execution", asyn
       assert.equal(git(repo, "diff", "--cached"), "");
     });
 });
-test("confirmation preview shows selected untracked content and chosen stash diff",async t=>{
- const repo=repoFor(t);fs.writeFileSync(path.join(repo,"new.txt"),"review-untracked-contents");const panel=await mount(t,repo);
- assert.match((await prepared(panel,"stage",{paths:["new.txt"]})).preview,/review-untracked-contents/);
- git(repo,"stash","push","-u","-m","review selected stash");const sha=git(repo,"rev-parse","refs/stash").trim();
- assert.match((await prepared(panel,"stash-apply",{sha})).preview,/review-untracked-contents/);
+test("confirmation preview shows selected untracked content and chosen stash diff", async (t) => {
+  const repo = repoFor(t);
+  fs.writeFileSync(path.join(repo, "new.txt"), "review-untracked-contents");
+  const panel = await mount(t, repo);
+  assert.match(
+    (await prepared(panel, "stage", { paths: ["new.txt"] })).preview,
+    /review-untracked-contents/,
+  );
+  git(repo, "stash", "push", "-u", "-m", "review selected stash");
+  const sha = git(repo, "rev-parse", "refs/stash").trim();
+  assert.match(
+    (await prepared(panel, "stash-apply", { sha })).preview,
+    /review-untracked-contents/,
+  );
+});
+test("staging an edited indexed rename never adds its missing or recreated source", async (t) => {
+  const repo = repoFor(t);
+  git(repo, "mv", "a.txt", "renamed.txt");
+  fs.writeFileSync(path.join(repo, "renamed.txt"), "reviewed target\n");
+  const panel = await mount(t, repo);
+  const p = await prepared(panel, "stage", { paths: ["renamed.txt"] });
+  assert.equal((await execute(panel, p)).status, 200);
+  assert.equal(git(repo, "show", ":renamed.txt"), "reviewed target\n");
+  fs.writeFileSync(path.join(repo, "renamed.txt"), "review target again\n");
+  fs.writeFileSync(path.join(repo, "a.txt"), "PREPARE UNTRACKED\n");
+  const q = await prepared(panel, "stage", { paths: ["renamed.txt"] });
+  fs.writeFileSync(path.join(repo, "a.txt"), "EXECUTE UNTRACKED\n");
+  assert.equal((await execute(panel, q)).status, 200);
+  assert.equal(git(repo, "ls-files", "--", "a.txt"), "");
+  assert.equal(
+    fs.readFileSync(path.join(repo, "a.txt"), "utf8"),
+    "EXECUTE UNTRACKED\n",
+  );
+});
+test("stash confirmation includes index-only changes and original changed paths", async (t) => {
+  const repo = repoFor(t),
+    original = git(repo, "show", "HEAD:a.txt");
+  fs.writeFileSync(path.join(repo, "a.txt"), "index-only-stash-content\n");
+  git(repo, "add", "a.txt");
+  fs.writeFileSync(path.join(repo, "a.txt"), original);
+  git(repo, "stash", "push", "-m", "index-only");
+  const panel = await mount(t, repo),
+    sha = git(repo, "rev-parse", "refs/stash").trim(),
+    p = await prepared(panel, "stash-apply", { sha });
+  assert.match(p.preview, /index-only-stash-content/);
+  assert.ok(p.paths.includes("a.txt"));
+  assert.equal((await execute(panel, p)).status, 200);
+  assert.equal(git(repo, "show", ":a.txt"), "index-only-stash-content\n");
+  assert.equal(fs.readFileSync(path.join(repo, "a.txt"), "utf8"), original);
 });
