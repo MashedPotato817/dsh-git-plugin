@@ -352,7 +352,7 @@ export function GitPanel({ sessionId, useTabInfo }: PanelProps): ReactNode {
 						)}
 					</>
 				)}
-				{mode === "files" && status.value && <Actions sessionId={sessionId} signal={tab.signal} revision={revision} files={files} selected={selection && "path" in selection ? selection.path : undefined} onChange={()=>{setSelection(null);setRevision(n=>n+1)}}/>}
+				{mode === "files" && <Actions sessionId={sessionId} signal={tab.signal} revision={revision} files={files} selected={selection && "path" in selection ? selection.path : undefined} onChange={()=>{setSelection(null);setRevision(n=>n+1)}}/>}
 				{selection && (
 					<section className="gp-detail" aria-label="Git 详情">
 						<div className="gp-detail-head">
